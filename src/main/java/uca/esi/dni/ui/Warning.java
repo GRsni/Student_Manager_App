@@ -57,7 +57,6 @@ public class Warning {
         parent.push();
         parent.fill(255);
         parent.textAlign(PApplet.CENTER, PApplet.BOTTOM);
-        parent.textFont(DniParser.font_small);
         parent.textSize(14);
         parent.text(content, parent.width / 2f, parent.height / 2f + 10);
         parent.pop();

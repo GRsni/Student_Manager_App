@@ -4,8 +4,6 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
 import processing.core.PVector;
-import uca.esi.dni.DniParser;
-import uca.esi.dni.views.View;
 
 public class Button {
     private final PApplet parent;
@@ -13,13 +11,16 @@ public class Button {
     private int w, h;
     private final int cornerR;
     private boolean clicked = false;
-    private boolean active = true;
+    private boolean active;
+    private boolean hasShadow = false;
+    private boolean hover = false;
 
     private PImage icon;
     private boolean isIconLoaded = false;
 
     private int color;
     private int clickColor;
+    private int hoverColor;
 
     private final TextField content;
     private int iconSize = 0;
@@ -96,6 +97,14 @@ public class Button {
         this.color = color;
     }
 
+    public int getHoverColor() {
+        return hoverColor;
+    }
+
+    public void setHoverColor(int hoverColor) {
+        this.hoverColor = hoverColor;
+    }
+
     public int getTextColor() {
         return content.getTextColor();
     }
@@ -146,9 +155,13 @@ public class Button {
         parent.push();
         parent.noStroke();
         if (clicked) {
-            parent.fill(View.COLORS.ACCENT);
+            parent.fill(clickColor);
         } else {
-            parent.fill(color);
+            if (hover) {
+                parent.fill(hoverColor);
+            } else {
+                parent.fill(color);
+            }
         }
         parent.rect(pos.x, pos.y, w, h, cornerR);
         parent.pop();

@@ -4,21 +4,27 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PFont;
 import processing.core.PVector;
+import uca.esi.dni.views.View;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ItemList {
-    private final ArrayList<String> items = new ArrayList<>();
-    private PApplet parent;
+    private final Set<String> items = new HashSet<>();
+    private final PApplet parent;
 
-    private PVector pos;
-    private int w, h;
+    private final PVector pos;
+    private final int w;
+    private final int h;
     private int visibleItems = 0;
 
     private int backgroundColor;
     private int textColor;
     private PFont font;
     private int fontSize;
+
+    private boolean hasShadow = false;
 
     private TextField title;
 
@@ -78,8 +84,16 @@ public class ItemList {
         items.add(item);
     }
 
+    public void addList(Set<String> list) {
+        items.addAll(list);
+    }
+
     public void remove(String item) {
         items.remove(item);
+    }
+
+    public void removeList(Set<String> list) {
+        items.removeAll(list);
     }
 
     public void display() {
@@ -97,19 +111,33 @@ public class ItemList {
     }
 
     public void renderItems() {
+        int itemsDisplayed = 0;
+
         parent.push();
         parent.textAlign(PConstants.LEFT, PConstants.CENTER);
-        if (items.size() > 0) {
-            for (int i = 0; i < items.size() && i < visibleItems; i++) {
-                float yOffset = parent.height / 16 * i;
-                TextField item = new TextField(parent, pos.x, pos.y + yOffset, w, h / visibleItems, items.get(i));
-                item.setTextColor(textColor);
-                item.setFontSize(fontSize);
-                item.setFont(font);
-                item.display();
-            }
+
+        for (Iterator<String> it = items.iterator(); it.hasNext() && itemsDisplayed <= visibleItems; itemsDisplayed++) {
+            float yOffset = parent.height / 16 * itemsDisplayed;
+            String item = getItem(itemsDisplayed, it);
+            TextField textField = new TextField(parent, pos.x, pos.y + yOffset, w, h / visibleItems, item);
+            textField.setTextColor(textColor);
+            textField.setFontSize(fontSize);
+            textField.setBackgroundColor(View.COLORS.ACCENT);
+            textField.setFont(font);
+            textField.display();
         }
+
         parent.pop();
+    }
+
+    private String getItem(int itemsDisplayed, Iterator<String> it) {
+        String item;
+        if (itemsDisplayed < visibleItems) {
+            item = it.next();
+        } else {
+            item = "...";
+        }
+        return item;
     }
 
     public void createTitle(PApplet parent, float x, float y, float w, float h, String title) {
@@ -118,7 +146,7 @@ public class ItemList {
     }
 
     private int calculateNumberOfVisibleItems() {
-        return h / (parent.height / 16);
+        return h / (parent.height / 16) - 1;
     }
 
 }

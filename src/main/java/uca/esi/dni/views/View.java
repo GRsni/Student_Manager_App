@@ -1,25 +1,28 @@
 package uca.esi.dni.views;
 
 import processing.core.PApplet;
-import uca.esi.dni.controllers.Controller;
+
 
 public abstract class View {
 
-    private Controller controller;
     protected PApplet parent;
+    protected int widthUnitSize;
+    protected int heightUnitSize;
 
     protected View(PApplet parent) {
         this.parent = parent;
+        this.widthUnitSize = parent.width / 16;
+        this.heightUnitSize = parent.height / 16;
     }
 
     protected View() {
     }
 
-    protected void contextInterface() {
-        controller.algorithm();
-    }
-
     public abstract void update();
+
+    public abstract void show();
+
+    public abstract void handleInput(processing.event.MouseEvent e);
 
     public static class COLORS {
         public final static int PRIMARY = 0xff008577;

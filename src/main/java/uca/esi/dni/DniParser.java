@@ -1,32 +1,25 @@
 package uca.esi.dni;
 
-import org.checkerframework.checker.units.qual.A;
-import processing.core.*;
+import processing.core.PApplet;
+import uca.esi.dni.controllers.Controller;
+import uca.esi.dni.controllers.MainController;
 import uca.esi.dni.file.FileManager;
 import uca.esi.dni.models.AppModel;
+import uca.esi.dni.models.Model;
 import uca.esi.dni.ui.Warning;
-import uca.esi.dni.ui.Button;
-import uca.esi.dni.ui.InputButton;
 import uca.esi.dni.views.MainView;
+import uca.esi.dni.views.View;
 
+import processing.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 
 public class DniParser extends PApplet {
 
-    public static PFont font_small, font_big;
-    private InputButton textHandler, JSONHandler, folderHandler;
+    private Model appModel;
+    private View currentView;
+    private Controller currentController;
 
-    private static PImage DBIcon;
-    private static PImage txtIcon;
-    private static PImage ExcelIcon;
-    private static PImage graphIcon;
-    private static PImage background;
-
-    private AppModel appModel;
-    private MainView mainView;
-
-    private static Button createNewFile, addStudents, extractDataFile, exitButton;
     public static FileManager manager;
     private static final ArrayList<Warning> warnings = new ArrayList<>();
 
@@ -37,41 +30,16 @@ public class DniParser extends PApplet {
     public void settings() {
         size(displayWidth / 2, displayHeight / 2);
         // size(300, 200);
-        preloadImages();
     }
 
     public void setup() {
+        this.registerMethod("mouseEvent", this);
         surface.setTitle("Manual de laboratorio: Gestor de datos");
         manager = new FileManager(this);
-        initFonts();
-        initButtons();
         surface.setResizable(true);
         appModel = new AppModel();
-        mainView = new MainView(appModel, this);
-    }
-
-    private void initButtons() {
-        textHandler = new InputButton(this, new PVector(30, 350), "", "Archivo .txt");
-        JSONHandler = new InputButton(this, new PVector(30, 400), "", "Archivo .json");
-        folderHandler = new InputButton(this, new PVector(30, 450), "", "Carpeta");
-
-    }
-
-    private void initFonts() {
-        if (fontExists("data/Calibri-14.vlw")) {
-            font_small = loadFont("data/Calibri-14.vlw");
-        }
-        if (fontExists("data/Calibri-30.vlw")) {
-            font_big = loadFont("data/Calibri-30.vlw");
-        }
-    }
-
-    private void preloadImages() {
-        DBIcon = loadImage("data/icons/server-storage.png");
-        txtIcon = loadImage("data/icons/txt-file-symbol.png");
-        ExcelIcon = loadImage("data/icons/excel.png");
-        graphIcon = loadImage("data/icons/statistics.png");
-        background = loadImage("data/background/main_back.png");
+        currentView = new MainView(this);
+        currentController = new MainController(appModel, currentView);
     }
 
     public void draw() {
@@ -85,7 +53,7 @@ public class DniParser extends PApplet {
         text(mouseX + " : " + mouseY, mouseX, mouseY);
         text(width + " : " + height, 100, 50);*/
 
-        mainView.show();
+        currentView.show();
 
     }
 
@@ -94,21 +62,9 @@ public class DniParser extends PApplet {
         fill(0);
         textAlign(CENTER, TOP);
         textSize(30);
-        textFont(font_big);
         text("Aplicacion auxiliar", width / 2f, 30);
         pop();
 
-        drawButtons();
-    }
-
-    private void drawButtons() {
-        textHandler.show();
-        JSONHandler.show();
-        folderHandler.show();
-
-        createNewFile.show();
-        addStudents.show();
-        extractDataFile.show();
     }
 
     public void addNewWarning(String content, int fadeout) {
@@ -131,16 +87,8 @@ public class DniParser extends PApplet {
         }
     }
 
-    public void mouseClicked() {
-
-    }
-
-    public void mousePressed() {
-
-    }
-
-    public void mouseReleased() {
-
+    public void mouseEvent(processing.event.MouseEvent e) {
+        currentView.handleInput(e);
     }
 
     public void selectTextFile(File selection) {
@@ -151,7 +99,7 @@ public class DniParser extends PApplet {
             String filePath = selection.getAbsolutePath();
             println("user selected: " + filePath);
             if (checkFileExtension(filePath, ".txt")) {
-                textHandler.setFileName(selection.getName());
+                // textHandler.setFileName(selection.getName());
                 manager.setParserTextFile(selection);
             } else {
                 addNewWarning("Error al leer el archivo de texto.", 150);
@@ -167,7 +115,7 @@ public class DniParser extends PApplet {
             String filePath = selection.getAbsolutePath();
             println("user selected: " + filePath);
             if (checkFileExtension(filePath, ".json")) {
-                JSONHandler.setFileName(selection.getName());
+                // JSONHandler.setFileName(selection.getName());
                 manager.setParserJSONFile(selection);
             } else {
                 addNewWarning("Error al leer el archivo .json de la base de datos.", 150);
@@ -184,7 +132,7 @@ public class DniParser extends PApplet {
             println("user selected folder:" + folderPath);
             if (folder.isDirectory()) {
                 manager.setOutputFolder(folder);
-                folderHandler.setFileName(folder.getName());
+                //folderHandler.setFileName(folder.getName());
             }
         }
     }

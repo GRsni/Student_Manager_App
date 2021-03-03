@@ -20,6 +20,8 @@ public class TextField {
     private String content;
     private int padding = 4;
 
+    private boolean hasShadow = false;
+
     public TextField(PApplet parent, float x, float y, float w, float h, String content) {
         this.parent = parent;
         this.pos = new PVector(x, y);
