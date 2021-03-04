@@ -2,22 +2,12 @@ package uca.esi.dni.views;
 
 import processing.core.PApplet;
 import processing.core.PFont;
-import processing.core.PImage;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
 
-import static processing.event.MouseEvent.CLICK;
-
 
 public class MainView extends View {
-
-    private Button editButton;
-    private Button generateFilesButton;
-    private Button generateStatsButton;
-    private ItemList DBStudentList;
-    private PImage background;
-    private TextField DBItems;
 
     public MainView(PApplet parent) {
         super(parent);
@@ -25,83 +15,55 @@ public class MainView extends View {
 
     }
 
-    private void onCreate() {
-        PFont smallFont = parent.loadFont("data/fonts/Calibri-14.vlw");
-        PFont bigFont = parent.loadFont("data/fonts/Calibri-30.vlw");
-
+    protected void onCreate() {
         background = parent.loadImage("data/background/main_back.png");
 
         background.resize(parent.width, parent.height); //resize background image to app size to improve performance
 
-        editButton = new Button(parent, widthUnitSize, heightUnitSize * 2f, widthUnitSize * 6,
-                heightUnitSize * 3, 6, "Editar Lista", true);
+        createElements();
+    }
+
+    @Override
+    protected void createElements() {
+        PFont smallFont = parent.loadFont("data/fonts/Calibri-14.vlw");
+        PFont bigFont = parent.loadFont("data/fonts/Calibri-30.vlw");
+
+        Button editButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 6,
+                HEIGHT_UNIT_SIZE * 3, 6, "Editar Lista", true);
         editButton.setIcon(parent.loadImage("data/icons/edit-list.png"));
-        editButton.setColor(COLORS.PRIMARY);
-        editButton.setClickColor(COLORS.ACCENT_DARK);
-        editButton.setTextColor(COLORS.WHITE);
         editButton.setFont(bigFont);
         editButton.setFontSize(10);
+        elements.add(editButton);
 
-        generateFilesButton = new Button(parent, widthUnitSize, heightUnitSize * 6.5f, widthUnitSize * 6,
-                heightUnitSize * 3, 6, "Generar archivos Excel", true);
+        Button generateFilesButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 6.5f, WIDTH_UNIT_SIZE * 6,
+                HEIGHT_UNIT_SIZE * 3, 6, "Generar archivos Excel", true);
         generateFilesButton.setIcon(parent.loadImage("data/icons/excel.png"));
-        generateFilesButton.setColor(COLORS.PRIMARY);
-        generateFilesButton.setClickColor(COLORS.ACCENT_DARK);
-        generateFilesButton.setTextColor(COLORS.WHITE);
         generateFilesButton.setFont(bigFont);
         generateFilesButton.setFontSize(30);
-        //generateFilesButton.setContentBackgroundColor(COLORS.ACCENT);
+        elements.add(generateFilesButton);
 
-        generateStatsButton = new Button(parent, widthUnitSize, heightUnitSize * 11f, widthUnitSize * 6,
-                heightUnitSize * 3, 6, "Generar estadísticas", true);
+        Button generateStatsButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 11f, WIDTH_UNIT_SIZE * 6,
+                HEIGHT_UNIT_SIZE * 3, 6, "Generar estadísticas", true);
         generateStatsButton.setIcon(parent.loadImage("data/icons/statistics.png"));
-        generateStatsButton.setColor(COLORS.PRIMARY);
-        generateStatsButton.setClickColor(COLORS.ACCENT_DARK);
-        generateStatsButton.setTextColor(COLORS.WHITE);
         generateStatsButton.setFont(bigFont);
         generateStatsButton.setFontSize(30);
+        elements.add(generateStatsButton);
 
-        DBItems = new TextField(parent, widthUnitSize * 13, heightUnitSize * 14, widthUnitSize * 2,
-                heightUnitSize, "Alumnos en BD: ");
+        TextField DBItems = new TextField(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
+                HEIGHT_UNIT_SIZE, "Alumnos en BD: ");
         DBItems.setFont(smallFont);
         DBItems.setTextColor(COLORS.BLACK);
         DBItems.setFontSize(10);
+        elements.add(DBItems);
 
 
-        DBStudentList = new ItemList(parent, widthUnitSize * 12, heightUnitSize * 2, widthUnitSize * 3,
-                heightUnitSize * 12, "Alumnos en base de datos:");
-        DBStudentList.setTextColor(COLORS.BLACK);
-        DBStudentList.setBackgroundColor(COLORS.WHITE);
-        DBStudentList.setTitleBackgroundColor(COLORS.ACCENT_DARK);
-        DBStudentList.setFont(smallFont);
-        DBStudentList.setFontSize(10);
-        DBStudentList.setTitleFontSize(20);
-
-        //testing item list display
-        for (int i = 0; i < 13; i++) {
-            DBStudentList.addItem(String.valueOf(parent.random(1000)));
-        }
-    }
-
-
-    @Override
-    public void show() {
-        parent.image(background, 0, 0);
-        editButton.show();
-        generateFilesButton.show();
-        generateStatsButton.show();
-        DBItems.display();
-        DBStudentList.display();
-    }
-
-    public void handleInput(processing.event.MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-
-        switch (e.getAction()){
-
-        }
-
+        ItemList DBStudentsItemList = new ItemList(parent, WIDTH_UNIT_SIZE * 12, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 3,
+                HEIGHT_UNIT_SIZE * 12, "Alumnos en BD");
+        DBStudentsItemList.setFont(smallFont);
+        DBStudentsItemList.setFontSize(10);
+        DBStudentsItemList.setTitleFontSize(20);
+        DBStudentsItemList.setTitleFont(bigFont);
+        elements.add(DBStudentsItemList);
     }
 
     @Override

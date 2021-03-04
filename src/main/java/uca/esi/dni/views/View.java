@@ -1,32 +1,52 @@
 package uca.esi.dni.views;
 
 import processing.core.PApplet;
+import processing.core.PFont;
+import processing.core.PImage;
+import uca.esi.dni.ui.BaseElement;
+
+import java.util.ArrayList;
 
 
 public abstract class View {
 
     protected PApplet parent;
-    protected int widthUnitSize;
-    protected int heightUnitSize;
+    public static int WIDTH_UNIT_SIZE;
+    public static int HEIGHT_UNIT_SIZE;
+
+    protected final ArrayList<BaseElement> elements = new ArrayList<>();
+
+    protected PImage background;
 
     protected View(PApplet parent) {
         this.parent = parent;
-        this.widthUnitSize = parent.width / 16;
-        this.heightUnitSize = parent.height / 16;
+        WIDTH_UNIT_SIZE = parent.width / 16;
+        HEIGHT_UNIT_SIZE = parent.height / 16;
     }
 
     protected View() {
     }
 
+    protected abstract void onCreate();
+
+    protected abstract void createElements();
+
     public abstract void update();
 
-    public abstract void show();
+    public void show() {
+        parent.image(background, 0, 0);
+        for (BaseElement element : elements) {
+            element.display();
+        }
+    }
 
-    public abstract void handleInput(processing.event.MouseEvent e);
+    public BaseElement getUIElement(int index) {
+        return elements.get(index);
+    }
 
     public static class COLORS {
         public final static int PRIMARY = 0xff008577;
-        public final static int PRIMARY_DARK = 0xff003d37;
+        public final static int PRIMARY_DARK = 0xff00665c;
         public final static int SECONDARY = 0xfff5b000;
         public final static int SECONDARY_DARK = 0xffdcaa2c;
         public final static int ACCENT_DARK = 0xffaaaaaa;

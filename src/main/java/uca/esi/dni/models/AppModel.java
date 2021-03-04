@@ -13,7 +13,12 @@ public class AppModel extends Model {
     private String DBReference;
     private final ArrayList<Warning> warnings = new ArrayList<>();
 
-    public AppModel(){}
+    public AppModel() {
+        //testing item list display
+        for (int i = 0; i < 13; i++) {
+            DBStudents.add(new Student(String.valueOf(i * 100), "hash", i));
+        }
+    }
 
     public File getInputFile() {
         return inputFile;
@@ -55,15 +60,15 @@ public class AppModel extends Model {
         return modifiedStudents.get(index);
     }
 
-    public void addWarning(Warning w){
+    public void addWarning(Warning w) {
         warnings.add(w);
     }
 
-    public void removeWarning(Warning w){
+    public void removeWarning(Warning w) {
         warnings.remove(w);
     }
 
-    public Warning getWarning(int index){
+    public Warning getWarning(int index) {
         return warnings.get(index);
     }
 }

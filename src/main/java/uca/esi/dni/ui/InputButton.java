@@ -24,8 +24,8 @@ public class InputButton {
         this.parent = parent;
     }
 
-    public void show() {
-        inputB.show();
+    public void display() {
+        inputB.display();
         renderFileName();
     }
 
@@ -44,10 +44,6 @@ public class InputButton {
         parent.noStroke();
         parent.rect(pos.x + inputB.getW(), pos.y, 200, 30);
         parent.pop();
-    }
-
-    public boolean inside(float x, float y) {
-        return inputB.inside(x, y);
     }
 
     public void isClicked(boolean state) {

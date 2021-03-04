@@ -4,16 +4,13 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
 import processing.core.PVector;
+import uca.esi.dni.views.View;
 
-public class Button {
-    private final PApplet parent;
-    private PVector pos;
-    private int w, h;
+public class Button extends BaseElement {
+
     private final int cornerR;
-    private boolean clicked = false;
     private boolean active;
     private boolean hasShadow = false;
-    private boolean hover = false;
 
     private PImage icon;
     private boolean isIconLoaded = false;
@@ -26,13 +23,20 @@ public class Button {
     private int iconSize = 0;
 
     public Button(PApplet parent, float x, float y, int w, int h, int corner, String content, boolean active) {
-        this.parent = parent;
-        this.pos = new PVector(x, y);
-        this.content = new TextField(parent, x + w * .1f, y + h * .1f, w * .8f, h * .8f, content);
-        this.w = w;
-        this.h = h;
+        this(parent, x, y, w, h, corner, content, active, View.COLORS.PRIMARY, View.COLORS.PRIMARY_DARK,
+                View.COLORS.ACCENT_DARK, View.COLORS.WHITE);
+    }
+
+    public Button(PApplet parent, float x, float y, int w, int h, int corner, String content, boolean active,
+                  int color, int hoverColor, int clickColor, int textColor) {
+        super(parent, new PVector(x, y), w, h);
+        this.content = new TextField(parent, x + w * .1f, y + h * .1f, w / 10 * 8, h / 10 * 8, content);
         this.cornerR = corner;
         this.active = active;
+        this.color = color;
+        this.hoverColor = hoverColor;
+        this.clickColor = clickColor;
+        this.content.setTextColor(textColor);
     }
 
     public TextField getContent() {
@@ -86,7 +90,7 @@ public class Button {
     private void adjustTextFieldWithIcon(int iconSize) {
         PVector textOffset = new PVector(iconSize, 0);
         content.setPos(content.getPos().x + textOffset.x, content.getPos().y + textOffset.y);
-        content.setW(w * .7f);
+        content.setW(w / 10 * 7);
     }
 
     public int getColor() {
@@ -121,18 +125,22 @@ public class Button {
         this.clickColor = clickColor;
     }
 
+    @Override
     public PFont getFont() {
         return content.getFont();
     }
 
+    @Override
     public void setFont(PFont font) {
         this.content.setFont(font);
     }
 
+    @Override
     public int getFontSize() {
         return content.getFontSize();
     }
 
+    @Override
     public void setFontSize(int fontSize) {
         this.content.setFontSize(fontSize);
     }
@@ -145,7 +153,7 @@ public class Button {
         content.setBackgroundColor(color);
     }
 
-    public void show() {
+    public void display() {
         renderButton();
         renderIcon();
         content.display();
@@ -173,15 +181,4 @@ public class Button {
         }
     }
 
-    public boolean inside(float x, float y) {
-        return x > pos.x - w / 2 && x < pos.x + w / 2 && y > pos.y - h / 2 && y < pos.y + h / 2;
-    }
-
-    public void isClicked(boolean state) {
-        clicked = state;
-    }
-
-    public boolean isClicked() {
-        return clicked;
-    }
 }

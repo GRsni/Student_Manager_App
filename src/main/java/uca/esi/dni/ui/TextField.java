@@ -2,31 +2,21 @@ package uca.esi.dni.ui;
 
 import processing.core.PApplet;
 import processing.core.PConstants;
-import processing.core.PFont;
 import processing.core.PVector;
+import uca.esi.dni.views.View;
 
-public class TextField {
-    private final PApplet parent;
-
-    private PVector pos;
-    private float w;
-    private float h;
+public class TextField extends BaseElement {
 
     private int backgroundColor;
     private boolean hasBackground = false;
-    private int textColor;
-    private PFont font;
-    private int fontSize = 10;
+    private int textColor = View.COLORS.BLACK;
     private String content;
     private int padding = 4;
 
     private boolean hasShadow = false;
 
-    public TextField(PApplet parent, float x, float y, float w, float h, String content) {
-        this.parent = parent;
-        this.pos = new PVector(x, y);
-        this.w = w;
-        this.h = h;
+    public TextField(PApplet parent, float x, float y, int w, int h, String content) {
+        super(parent, new PVector(x, y), w, h);
         this.content = content;
     }
 
@@ -42,7 +32,7 @@ public class TextField {
         return w;
     }
 
-    public void setW(float w) {
+    public void setW(int w) {
         this.w = w;
     }
 
@@ -50,7 +40,7 @@ public class TextField {
         return h;
     }
 
-    public void setH(float h) {
+    public void setH(int h) {
         this.h = h;
     }
 
@@ -60,22 +50,6 @@ public class TextField {
 
     public void setTextColor(int textColor) {
         this.textColor = textColor;
-    }
-
-    public PFont getFont() {
-        return font;
-    }
-
-    public void setFont(PFont font) {
-        this.font = font;
-    }
-
-    public int getFontSize() {
-        return fontSize;
-    }
-
-    public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
     }
 
     public String getContent() {

@@ -1,4 +1,26 @@
 package uca.esi.dni.views;
 
-public class StatsView {
+import processing.core.PApplet;
+
+public class StatsView extends View {
+
+    public StatsView(PApplet parent) {
+        super(parent);
+        onCreate();
+    }
+
+    @Override
+    protected void onCreate() {
+
+    }
+
+    @Override
+    protected void createElements() {
+
+    }
+
+    @Override
+    public void update() {
+
+    }
 }

@@ -48,7 +48,7 @@ public class FileManager {
         ArrayList<String> validLines = loadLinesFromTextFile();
 
         if (validLines == null) {
-            parent.addNewWarning("Error cargando los datos de texto.", 100);
+
             return;
         }
 
@@ -63,13 +63,13 @@ public class FileManager {
         fileObject.setJSONObject("Ids", ids);
 
         saveJSONFile(fileObject, "data/databaseFile" + System.currentTimeMillis() + ".json");
-        parent.addNewWarning("Generado nuevo archivo de datos.", 100);
+        //parent.addNewWarning("Generado nuevo archivo de datos.", 100);
     }
 
     public void appendNewStudentsToJSONFile() {
         JSONObject fileObject = loadJSONObjectsFromFile();
         if (fileObject == null) {
-            parent.addNewWarning("Error cargando datos de archivo JSON", 100);
+            //parent.addNewWarning("Error cargando datos de archivo JSON", 100);
             return;
         }
 
@@ -78,7 +78,7 @@ public class FileManager {
 
         ArrayList<String> validLines = loadLinesFromTextFile();
         if (validLines == null) {
-            parent.addNewWarning("Error cargando los datos de texto", 100);
+            //parent.addNewWarning("Error cargando los datos de texto", 100);
             return;
         }
 
@@ -88,7 +88,7 @@ public class FileManager {
             }
         }
         saveJSONFile(fileObject, "data/databaseFile" + System.currentTimeMillis() + ".json");
-        parent.addNewWarning("Añadidos nuevos alumnos al archivo.", 100);
+       // parent.addNewWarning("Añadidos nuevos alumnos al archivo.", 100);
 
     }
 
@@ -124,11 +124,11 @@ public class FileManager {
     public void createStudentsDataTables() {
         JSONObject fileObject = loadJSONObjectsFromFile();
         if (fileObject == null) {
-            parent.addNewWarning("Error cargando datos de archivo JSON", 100);
+          //  parent.addNewWarning("Error cargando datos de archivo JSON", 100);
             return;
         }
         if (outputFolder == null) {
-            parent.addNewWarning("Debe seleccionar una carpeta de destino.", 100);
+            //parent.addNewWarning("Debe seleccionar una carpeta de destino.", 100);
             return;
         }
 
@@ -153,7 +153,7 @@ public class FileManager {
                             parent.saveTable(dataTable, pathToFolder + tipo + ".csv", "csv");
                         } catch (Exception e) {
                             System.err.println("Error guardando excel de datos: " + e.getMessage());
-                            parent.addNewWarning("Error guardando excel de datos.", 100);
+                            //parent.addNewWarning("Error guardando excel de datos.", 100);
                         }
                     }
                 }
