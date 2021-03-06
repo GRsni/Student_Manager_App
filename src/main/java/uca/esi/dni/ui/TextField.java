@@ -12,6 +12,7 @@ public class TextField extends BaseElement {
     private int textColor = View.COLORS.BLACK;
     private String content;
     private int padding = 4;
+    private boolean isClickable = false;
 
     private boolean hasShadow = false;
 
@@ -67,6 +68,14 @@ public class TextField extends BaseElement {
     public void setBackgroundColor(int backgroundColor) {
         this.backgroundColor = backgroundColor;
         hasBackground = true;
+    }
+
+    public boolean isClickable() {
+        return isClickable;
+    }
+
+    public void setClickable(boolean clickable) {
+        isClickable = clickable;
     }
 
     public void display() {

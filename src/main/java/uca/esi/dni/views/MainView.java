@@ -2,9 +2,14 @@ package uca.esi.dni.views;
 
 import processing.core.PApplet;
 import processing.core.PFont;
+import uca.esi.dni.data.Student;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
+import uca.esi.dni.ui.Warning;
+
+import java.io.File;
+import java.util.ArrayList;
 
 
 public class MainView extends View {
@@ -52,7 +57,6 @@ public class MainView extends View {
         TextField DBItems = new TextField(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, "Alumnos en BD: ");
         DBItems.setFont(smallFont);
-        DBItems.setTextColor(COLORS.BLACK);
         DBItems.setFontSize(10);
         elements.add(DBItems);
 
@@ -67,7 +71,10 @@ public class MainView extends View {
     }
 
     @Override
-    public void update() {
-
+    public void update(ArrayList<Student> dbList, ArrayList<Student> modList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
+        ItemList list = (ItemList) elements.get(4);
+        for (Student s : dbList) {
+            list.addItem(s.getID());
+        }
     }
 }

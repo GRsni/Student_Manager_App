@@ -10,13 +10,14 @@ public class AppModel extends Model {
     private final ArrayList<Student> DBStudents = new ArrayList<>();
     private final ArrayList<Student> modifiedStudents = new ArrayList<>();
     private File inputFile;
+    private File outputFolder;
     private String DBReference;
     private final ArrayList<Warning> warnings = new ArrayList<>();
 
     public AppModel() {
         //testing item list display
         for (int i = 0; i < 13; i++) {
-            DBStudents.add(new Student(String.valueOf(i * 100), "hash", i));
+            DBStudents.add(new Student(String.valueOf(i * 100), "test@", i));
         }
     }
 
@@ -36,6 +37,18 @@ public class AppModel extends Model {
         this.DBReference = DBReference;
     }
 
+    public File getOutputFolder() {
+        return outputFolder;
+    }
+
+    public void setOutputFolder(File outputFolder) {
+        this.outputFolder = outputFolder;
+    }
+
+    public ArrayList<Student> getDBStudents() {
+        return DBStudents;
+    }
+
     public void addDBStudent(Student s) {
         DBStudents.add(s);
     }
@@ -46,6 +59,10 @@ public class AppModel extends Model {
 
     public Student getDBStudent(int index) {
         return DBStudents.get(index);
+    }
+
+    public ArrayList<Student> getModifiedStudents() {
+        return modifiedStudents;
     }
 
     public void addModifiedStudent(Student s) {
@@ -60,6 +77,10 @@ public class AppModel extends Model {
         return modifiedStudents.get(index);
     }
 
+    public ArrayList<Warning> getWarnings() {
+        return warnings;
+    }
+
     public void addWarning(Warning w) {
         warnings.add(w);
     }
@@ -71,4 +92,5 @@ public class AppModel extends Model {
     public Warning getWarning(int index) {
         return warnings.get(index);
     }
+
 }

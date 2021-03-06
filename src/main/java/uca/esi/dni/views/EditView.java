@@ -2,9 +2,14 @@ package uca.esi.dni.views;
 
 import processing.core.PApplet;
 import processing.core.PFont;
+import uca.esi.dni.data.Student;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
+import uca.esi.dni.ui.Warning;
+
+import java.io.File;
+import java.util.ArrayList;
 
 public class EditView extends View {
 
@@ -34,7 +39,7 @@ public class EditView extends View {
         elements.add(enterStudent);
 
         Button selectFile = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 9.5f, WIDTH_UNIT_SIZE * 4,
-                HEIGHT_UNIT_SIZE*2, 3, "Seleccionar archivo", true);
+                HEIGHT_UNIT_SIZE * 2, 3, "Seleccionar archivo", true);
         selectFile.setIcon(parent.loadImage("data/icons/txt-file-symbol.png"));
         selectFile.setFont(bigFont);
         elements.add(selectFile);
@@ -57,7 +62,7 @@ public class EditView extends View {
         deleteFromList.setFont(smallFont);
         elements.add(deleteFromList);
 
-        Button emptyList = new Button(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE*2,
+        Button emptyList = new Button(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, 3, "Vaciar lista", true);
         emptyList.setIcon(parent.loadImage("data/icons/empty-list.png"));
         emptyList.setFont(smallFont);
@@ -70,11 +75,21 @@ public class EditView extends View {
         manuallyTF.setFontSize(30);
         elements.add(manuallyTF);
 
-        TextField IDTF = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 2,
+        TextField IDTF = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 3 / 2,
                 HEIGHT_UNIT_SIZE, "ID");
         IDTF.setBackgroundColor(COLORS.WHITE);
+        IDTF.setTextColor(COLORS.ACCENT);
         IDTF.setFont(smallFont);
+        IDTF.setClickable(true);
         elements.add(IDTF);
+
+        TextField emailTF = new TextField(parent, WIDTH_UNIT_SIZE * 3.5f, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 3 / 2,
+                HEIGHT_UNIT_SIZE, "email");
+        emailTF.setBackgroundColor(COLORS.WHITE);
+        emailTF.setTextColor(COLORS.ACCENT);
+        emailTF.setFont(smallFont);
+        emailTF.setClickable(true);
+        elements.add(emailTF);
 
         TextField currentStudents = new TextField(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, "Alumnos en lista actual:");
@@ -102,7 +117,7 @@ public class EditView extends View {
     }
 
     @Override
-    public void update() {
+    public void update(ArrayList<Student> dbList, ArrayList<Student> modList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
 
     }
 }

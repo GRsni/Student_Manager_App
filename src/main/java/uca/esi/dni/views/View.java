@@ -1,10 +1,12 @@
 package uca.esi.dni.views;
 
 import processing.core.PApplet;
-import processing.core.PFont;
 import processing.core.PImage;
+import uca.esi.dni.data.Student;
 import uca.esi.dni.ui.BaseElement;
+import uca.esi.dni.ui.Warning;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -31,7 +33,8 @@ public abstract class View {
 
     protected abstract void createElements();
 
-    public abstract void update();
+    public abstract void update(ArrayList<Student> dbList, ArrayList<Student> modList,
+                                File inputFile, String dbReference, ArrayList<Warning> warnings);
 
     public void show() {
         parent.image(background, 0, 0);

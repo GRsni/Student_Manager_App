@@ -6,6 +6,7 @@ import processing.core.PFont;
 import processing.core.PVector;
 import uca.esi.dni.views.View;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -16,6 +17,7 @@ public class ItemList extends BaseElement {
     private final Set<String> items = new HashSet<>();
 
     private int visibleItems = 0;
+    private int itemHeight = HEIGHT_UNIT_SIZE / 2;
 
     private int backgroundColor;
     private int textColor;
@@ -88,7 +90,7 @@ public class ItemList extends BaseElement {
         items.add(item);
     }
 
-    public void addList(Set<String> list) {
+    public void addList(ArrayList<String> list) {
         items.addAll(list);
     }
 
@@ -96,7 +98,7 @@ public class ItemList extends BaseElement {
         items.remove(item);
     }
 
-    public void removeList(Set<String> list) {
+    public void removeList(ArrayList<String> list) {
         items.removeAll(list);
     }
 
@@ -122,10 +124,10 @@ public class ItemList extends BaseElement {
         parent.textAlign(PConstants.LEFT, PConstants.CENTER);
 
         for (Iterator<String> it = items.iterator(); it.hasNext() && itemsDisplayed <= visibleItems; itemsDisplayed++) {
-            float yOffset = HEIGHT_UNIT_SIZE / 2 * itemsDisplayed;
+            float yOffset = itemHeight * itemsDisplayed;
             String item = getItem(itemsDisplayed, it);
             TextField textField = new TextField(parent, pos.x, pos.y + yOffset, w, h / visibleItems, item);
-            textField.setTextColor(textColor);
+            textField.setTextColor(View.COLORS.BLACK);
             textField.setFontSize(fontSize);
             textField.setBackgroundColor(View.COLORS.ACCENT);
             textField.setFont(font);
@@ -145,12 +147,8 @@ public class ItemList extends BaseElement {
         return item;
     }
 
-    public void createTitle(PApplet parent, float x, float y, int w, int h, String title) {
-
-    }
-
     private int calculateNumberOfVisibleItems() {
-        return h / (HEIGHT_UNIT_SIZE / 2) - 1;
+        return h / itemHeight - 1;
     }
 
 }

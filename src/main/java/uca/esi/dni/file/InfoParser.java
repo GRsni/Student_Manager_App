@@ -1,12 +1,14 @@
 package uca.esi.dni.file;
 
+import processing.core.PApplet;
+import uca.esi.dni.DniParser;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import processing.core.PApplet;
 
-class InfoParser {
+public class InfoParser {
     private static final Pattern idPattern = Pattern.compile("u[a-zA-Z0-9]{8}");
 
     public static ArrayList<String> getCorrectLines(File text) {
@@ -43,6 +45,11 @@ class InfoParser {
             match = m.group(0);
         }
         return match;
+    }
+
+    public static boolean checkFileExtension(String file, String ext) {
+        String fileExtension = DniParser.checkExtension(file);
+        return fileExtension.equals(ext);
     }
 
 }
