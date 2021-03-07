@@ -7,9 +7,9 @@ import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 import uca.esi.dni.file.EmailHandler;
-import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
+import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
 import uca.esi.dni.views.View;
 
@@ -39,11 +39,13 @@ public class EditController extends Controller {
         int x = e.getX();
         int y = e.getY();
 
+        TextField idTF = (TextField) view.getUIElement("idTF");
+        TextField emailTF = (TextField) view.getUIElement("emailTF");
+
         switch (e.getAction()) {
             case CLICK:
-                if (view.getUIElement(0).inside(x, y)) {
-                    TextField idTF = (TextField) view.getUIElement(7);
-                    TextField emailTF = (TextField) view.getUIElement(8);
+                if (view.getUIElement("enterStudentB").inside(x, y)) {
+
                     if (!idTF.getContent().isEmpty() && !emailTF.getContent().isEmpty()) {
                         if (EmailHandler.isValidEmailAddress(emailTF.getContent())) {
                             model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
@@ -56,46 +58,42 @@ public class EditController extends Controller {
                     } else {
                         System.err.println("Empty fields");
                     }
-                } else if (view.getUIElement(1).inside(x, y)) {
+                } else if (view.getUIElement("selectFileB").inside(x, y)) {
                     selectInputFile();
-                } else if (view.getUIElement(2).inside(x, y)) {
+                } else if (view.getUIElement("backB").inside(x, y)) {
                     //change view to mainView
                     changeState(main);
-                } else if (view.getUIElement(3).inside(x, y)) {
+                } else if (view.getUIElement("addToListB").inside(x, y)) {
                     //TODO: Add aux list to DB list
-                } else if (view.getUIElement(4).inside(x, y)) {
+                } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
                     //TODO: Remove aux list from DB list
-                } else if (view.getUIElement(5).inside(x, y)) {
+                } else if (view.getUIElement("emptyListB").inside(x, y)) {
                     //TODO: Empty DB list
-                } else if (view.getUIElement(7).inside(x, y)) {
-                    TextField idTF = (TextField) view.getUIElement(7);
+                } else if (idTF.inside(x, y)) {
                     idTF.setFocused(true);
-                    TextField emailTF = (TextField) view.getUIElement(8);
                     emailTF.setFocused(false);
-                } else if (view.getUIElement(8).inside(x, y)) {
-                    TextField idTF = (TextField) view.getUIElement(7);
+                } else if (emailTF.inside(x, y)) {
                     idTF.setFocused(false);
-                    TextField emailTF = (TextField) view.getUIElement(8);
                     emailTF.setFocused(true);
                 }
 
-                for (int i = 0; i < 3; i++) {
-                    BaseElement element = view.getUIElement(i);
+                for (String key : view.getElementKeys()) {
+                    BaseElement element = view.getUIElement(key);
                     if (element.isClicked()) {
                         element.isClicked(false);
                     }
                 }
                 break;
             case MouseEvent.MOVE:
-                for (int i = 0; i < view.getElementsSize(); i++) {
-                    BaseElement element = view.getUIElement(i);
+                for (String key : view.getElementKeys()) {
+                    BaseElement element = view.getUIElement(key);
                     element.isHover(element.inside(x, y));
 
                 }
                 break;
             case PRESS:
-                for (int i = 0; i < view.getElementsSize(); i++) {
-                    BaseElement element = view.getUIElement(i);
+                for (String key : view.getElementKeys()) {
+                    BaseElement element = view.getUIElement(key);
                     if (element.inside(x, y)) {
                         element.isClicked(true);
                     }
@@ -104,8 +102,13 @@ public class EditController extends Controller {
                 //release mouse event is unreliable, multiple events per mouse click
                 break;
             case WHEEL:
-                BaseElement list = view.getUIElement(4);
-                //TODO:scroll item list
+                ItemList dbList = (ItemList) view.getUIElement("dbStudentIL");
+                ItemList auxList = (ItemList) view.getUIElement("auxStudentsIL");
+                if (dbList.inside(x, y)) {
+                    dbList.handleInput(e);
+                } else if (auxList.inside(x, y)) {
+                    auxList.handleInput(e);
+                }
         }
         controllerLogic();
     }
@@ -138,18 +141,18 @@ public class EditController extends Controller {
         }
 
         if (model.getInputFile().exists()) {
-            if (UtilParser.checkFileExtension(model.getInputFile().getName(), "txt")) {
-                //TODO: parse txt file
-            } else if (UtilParser.checkFileExtension(model.getInputFile().getName(), "csv")) {
-                try {
-                    Table studentIDTable = parent.loadTable(model.getInputFile().getAbsolutePath(), "header");
-                    System.out.println(studentIDTable.getRowCount());
-                    Set<Student> studentList = generateStudentListFromTable(studentIDTable);
-                    model.addTemporaryStudentList(studentList);
-                } catch (Exception e) {
-                    System.err.println("Error loading the student list from CSV file");
-                }
+            try {
+                Table studentIDTable = parent.loadTable(model.getInputFile().getAbsolutePath(), "header");
+                System.out.println(studentIDTable.getRowCount());
+                Set<Student> studentList = generateStudentListFromTable(studentIDTable);
+/*                for (Student s : studentList) {
+                    System.out.println(s.toString());
+                }*/
+                model.addTemporaryStudentList(studentList);
+            } catch (Exception e) {
+                System.err.println("Error loading the student list from CSV file");
             }
+
         }
     }
 
@@ -166,8 +169,8 @@ public class EditController extends Controller {
     }
 
     private TextField getFocusedTextField() {
-        TextField idTF = (TextField) view.getUIElement(7);
-        TextField emailTF = (TextField) view.getUIElement(8);
+        TextField idTF = (TextField) view.getUIElement("idTF");
+        TextField emailTF = (TextField) view.getUIElement("emailTF");
         if (idTF.isFocused()) {
             return idTF;
         } else {

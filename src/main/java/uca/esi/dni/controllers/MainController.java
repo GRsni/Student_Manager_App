@@ -9,6 +9,7 @@ import uca.esi.dni.data.Student;
 import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
+import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.views.View;
 
 import java.io.File;
@@ -44,17 +45,17 @@ public class MainController extends Controller {
     public void handleMouseEvent(MouseEvent e) {
         switch (e.getAction()) {
             case CLICK:
-                if (view.getUIElement(0).inside(e.getX(), e.getY())) {
+                if (view.getUIElement("editB").inside(e.getX(), e.getY())) {
                     //change view to editView
                     changeState(edit);
-                } else if (view.getUIElement(1).inside(e.getX(), e.getY())) {
+                } else if (view.getUIElement("generateFilesB").inside(e.getX(), e.getY())) {
                     generateExcelFiles();
-                } else if (view.getUIElement(2).inside(e.getX(), e.getY())) {
+                } else if (view.getUIElement("generateStatsB").inside(e.getX(), e.getY())) {
                     //change view to statsView
                     changeState(stats);
                 }
-                for (int i = 0; i < 3; i++) {
-                    BaseElement element = view.getUIElement(i);
+                for (String key : view.getElementKeys()) {
+                    BaseElement element = view.getUIElement(key);
                     if (element.isClicked()) {
                         element.isClicked(false);
                     }
@@ -62,15 +63,15 @@ public class MainController extends Controller {
                 controllerLogic();
                 break;
             case MOVE:
-                for (int i = 0; i < 3; i++) {
-                    BaseElement element = view.getUIElement(i);
+                for (String key : view.getElementKeys()) {
+                    BaseElement element = view.getUIElement(key);
                     element.isHover(element.inside(e.getX(), e.getY()));
 
                 }
                 break;
             case PRESS:
-                for (int i = 0; i < 3; i++) {
-                    BaseElement element = view.getUIElement(i);
+                for (String key : view.getElementKeys()) {
+                    BaseElement element = view.getUIElement(key);
                     if (element.inside(e.getX(), e.getY())) {
                         element.isClicked(true);
                     }
@@ -79,8 +80,8 @@ public class MainController extends Controller {
                 //release mouse event is unreliable, multiple events per mouse click
                 break;
             case WHEEL:
-                BaseElement list = view.getUIElement(4);
-                //TODO:scroll item list
+                ItemList list = (ItemList) view.getUIElement("dbStudentsIL");
+                list.handleInput(e);
         }
     }
 

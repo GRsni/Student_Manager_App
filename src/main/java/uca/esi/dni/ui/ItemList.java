@@ -4,6 +4,7 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PFont;
 import processing.core.PVector;
+import processing.event.MouseEvent;
 import uca.esi.dni.views.View;
 
 import java.util.ArrayList;
@@ -150,4 +151,8 @@ public class ItemList extends BaseElement {
         return h / itemHeight - 1;
     }
 
+    @Override
+    public void handleInput(MouseEvent e) {
+        //TODO: do something with the mouse wheel input
+    }
 }

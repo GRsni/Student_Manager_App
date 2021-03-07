@@ -8,6 +8,8 @@ import uca.esi.dni.ui.Warning;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -17,7 +19,7 @@ public abstract class View {
     public static int WIDTH_UNIT_SIZE;
     public static int HEIGHT_UNIT_SIZE;
 
-    protected final ArrayList<BaseElement> elements = new ArrayList<>();
+    protected final Map<String, BaseElement> elements = new HashMap<>();
 
     protected PImage background;
 
@@ -39,17 +41,17 @@ public abstract class View {
 
     public void show() {
         parent.image(background, 0, 0);
-        for (BaseElement element : elements) {
-            element.display();
+        for (String s : elements.keySet()) {
+            elements.get(s).display();
         }
     }
 
-    public int getElementsSize() {
-        return elements.size();
+    public Set<String> getElementKeys() {
+        return elements.keySet();
     }
 
-    public BaseElement getUIElement(int index) {
-        return elements.get(index);
+    public BaseElement getUIElement(String key) {
+        return elements.get(key);
     }
 
     public static class COLORS {

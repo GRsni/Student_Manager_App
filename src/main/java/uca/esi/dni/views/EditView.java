@@ -37,108 +37,110 @@ public class EditView extends View {
                 HEIGHT_UNIT_SIZE * 2, 3, "Introducir estudiante", true);
         enterStudent.setIcon(parent.loadImage("data/icons/edit-list.png"));
         enterStudent.setFont(bigFont);
-        elements.add(enterStudent);
+        elements.put("enterStudentB", enterStudent);
 
         Button selectFile = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 10.5f, WIDTH_UNIT_SIZE * 4,
                 HEIGHT_UNIT_SIZE * 2, 3, "Seleccionar archivo", true);
         selectFile.setIcon(parent.loadImage("data/icons/txt-file-symbol.png"));
         selectFile.setFont(bigFont);
-        elements.add(selectFile);
+        elements.put("selectFileB", selectFile);
 
         Button back = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 13, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, 3, "Volver atrás", true);
         back.setIcon(parent.loadImage("data/icons/back-arrow.png"));
         back.setFont(smallFont);
-        elements.add(back);
+        elements.put("backB", back);
 
         Button addToList = new Button(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, 3, "Añadir a lista", true);
         addToList.setIcon(parent.loadImage("data/icons/add-to-list.png"));
         addToList.setFont(smallFont);
-        elements.add(addToList);
+        elements.put("addToListB", addToList);
 
         Button deleteFromList = new Button(parent, WIDTH_UNIT_SIZE * 10, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, 3, "Eliminar de lista", true);
         deleteFromList.setIcon(parent.loadImage("data/icons/delete-item.png"));
         deleteFromList.setFont(smallFont);
-        elements.add(deleteFromList);
+        elements.put("deleteFromListB", deleteFromList);
 
         Button emptyList = new Button(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, 3, "Vaciar lista", true);
         emptyList.setIcon(parent.loadImage("data/icons/empty-list.png"));
         emptyList.setFont(smallFont);
-        elements.add(emptyList);
+        elements.put("emptyListB", emptyList);
 
 
         TextField manuallyTF = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 1.5f, WIDTH_UNIT_SIZE * 3,
                 HEIGHT_UNIT_SIZE, "Manualmente:", "");
         manuallyTF.setFont(bigFont);
         manuallyTF.setFontSize(30);
-        elements.add(manuallyTF);
+        elements.put("manuallyTF", manuallyTF);
 
         TextField IDTF = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 3 / 2,
                 HEIGHT_UNIT_SIZE, "", "ID");
         IDTF.setBackgroundColor(COLORS.WHITE);
         IDTF.setFont(smallFont);
         IDTF.setClickable(true);
-        elements.add(IDTF);
+        elements.put("idTF", IDTF);
 
         TextField emailTF = new TextField(parent, WIDTH_UNIT_SIZE * 3.5f, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 3 / 2,
                 HEIGHT_UNIT_SIZE, "", "email");
         emailTF.setBackgroundColor(COLORS.WHITE);
         emailTF.setFont(smallFont);
         emailTF.setClickable(true);
-        elements.add(emailTF);
+        elements.put("emailTF", emailTF);
 
-        TextField currentStudents = new TextField(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
+        TextField auxStudentsCounter = new TextField(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, "Alumnos en lista actual: 0", "");
-        currentStudents.setFont(smallFont);
-        elements.add(currentStudents);
+        auxStudentsCounter.setFont(smallFont);
+        elements.put("auxStudentsTF", auxStudentsCounter);
 
-        TextField DBItems = new TextField(parent, WIDTH_UNIT_SIZE * 12, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
+        TextField dbStudentsCounter = new TextField(parent, WIDTH_UNIT_SIZE * 12, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, "Alumnos en BD: 0", "");
-        DBItems.setFont(smallFont);
-        elements.add(DBItems);
+        dbStudentsCounter.setFont(smallFont);
+        elements.put("dbStudentsTF", dbStudentsCounter);
 
         TextField inputFile = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 9, WIDTH_UNIT_SIZE * 3,
                 HEIGHT_UNIT_SIZE, "", "Archivo de texto");
         inputFile.setBackgroundColor(COLORS.WHITE);
         inputFile.setFont(smallFont);
-        elements.add(inputFile);
+        elements.put("inputFileTF", inputFile);
 
         ItemList auxStudentsItemList = new ItemList(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 4, WIDTH_UNIT_SIZE * 3,
                 HEIGHT_UNIT_SIZE * 10, "Lista previa");
         auxStudentsItemList.setFont(smallFont);
         auxStudentsItemList.setTitleFont(bigFont);
-        elements.add(auxStudentsItemList);
+        elements.put("auxStudentsIL", auxStudentsItemList);
 
         ItemList DBStudentsItemList = new ItemList(parent, WIDTH_UNIT_SIZE * 12, HEIGHT_UNIT_SIZE * 4, WIDTH_UNIT_SIZE * 3,
                 HEIGHT_UNIT_SIZE * 10, "Alumnos en BD");
         DBStudentsItemList.setFont(smallFont);
         DBStudentsItemList.setTitleFont(bigFont);
-        elements.add(DBStudentsItemList);
+        elements.put("dbStudentIL", DBStudentsItemList);
 
     }
 
     @Override
     public void update(Set<Student> dbList, Set<Student> auxList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
 
-        TextField inputFileTF = (TextField) elements.get(11);
+        TextField inputFileTF = (TextField) elements.get("inputFileTF");
         inputFileTF.setContent(inputFile.getName());
 
-        ItemList auxItemList = (ItemList) elements.get(12);
+        TextField auxCounter = (TextField) elements.get("auxStudentsTF");
+        auxCounter.modifyCounter(auxList.size());
+
+        TextField dbCounter = (TextField) elements.get("dbStudentsTF");
+        dbCounter.modifyCounter(dbList.size());
+
+        ItemList auxItemList = (ItemList) elements.get("auxStudentsIL");
         for (Student s : auxList) {
             auxItemList.addItem(s.getID());
         }
-        TextField auxCounter = (TextField) elements.get(9);
-        auxCounter.modifyCounter(auxList.size());
 
-        ItemList dbItemList = (ItemList) elements.get(13);
+        ItemList dbItemList = (ItemList) elements.get("dbStudentIL");
         for (Student s : dbList) {
             dbItemList.addItem(s.getID());
         }
-        TextField dbCounter = (TextField) elements.get(10);
-        dbCounter.modifyCounter(dbList.size());
 
 
     }

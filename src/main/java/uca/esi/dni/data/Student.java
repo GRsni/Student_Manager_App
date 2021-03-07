@@ -44,6 +44,14 @@ public class Student {
         this.hashKey = hashKey;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     private String keyToHash(String key) {
         return Hashing.sha256().hashString(key, Charsets.UTF_8).toString();
     }
@@ -57,5 +65,14 @@ public class Student {
             key.append(VALID_LETTERS.charAt(index));
         }
         return key.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "ID='" + ID + '\'' +
+                ", hashKey='" + hashKey + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

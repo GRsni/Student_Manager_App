@@ -39,27 +39,27 @@ public class MainView extends View {
         editButton.setIcon(parent.loadImage("data/icons/edit-list.png"));
         editButton.setFont(bigFont);
         editButton.setFontSize(10);
-        elements.add(editButton);
+        elements.put("editB", editButton);
 
         Button generateFilesButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 6.5f, WIDTH_UNIT_SIZE * 6,
                 HEIGHT_UNIT_SIZE * 3, 6, "Generar archivos Excel", true);
         generateFilesButton.setIcon(parent.loadImage("data/icons/excel.png"));
         generateFilesButton.setFont(bigFont);
         generateFilesButton.setFontSize(30);
-        elements.add(generateFilesButton);
+        elements.put("generateFilesB", generateFilesButton);
 
         Button generateStatsButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 11f, WIDTH_UNIT_SIZE * 6,
                 HEIGHT_UNIT_SIZE * 3, 6, "Generar estadísticas", true);
         generateStatsButton.setIcon(parent.loadImage("data/icons/statistics.png"));
         generateStatsButton.setFont(bigFont);
         generateStatsButton.setFontSize(30);
-        elements.add(generateStatsButton);
+        elements.put("generateStatsB", generateStatsButton);
 
-        TextField DBItems = new TextField(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
+        TextField dbStudentsCounter = new TextField(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, "Alumnos en BD: 0", "");
-        DBItems.setFont(smallFont);
-        DBItems.setFontSize(10);
-        elements.add(DBItems);
+        dbStudentsCounter.setFont(smallFont);
+        dbStudentsCounter.setFontSize(10);
+        elements.put("dbStudentsTF", dbStudentsCounter);
 
 
         ItemList DBStudentsItemList = new ItemList(parent, WIDTH_UNIT_SIZE * 12, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 3,
@@ -68,16 +68,18 @@ public class MainView extends View {
         DBStudentsItemList.setFontSize(10);
         DBStudentsItemList.setTitleFontSize(20);
         DBStudentsItemList.setTitleFont(bigFont);
-        elements.add(DBStudentsItemList);
+        elements.put("dbStudentsIL", DBStudentsItemList);
     }
 
     @Override
     public void update(Set<Student> dbList, Set<Student> modList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
-        ItemList list = (ItemList) elements.get(4);
+        TextField dbStudentsCounter = (TextField) elements.get("dbStudentsTF");
+        dbStudentsCounter.modifyCounter(dbList.size());
+
+        ItemList list = (ItemList) elements.get("dbStudentsIL");
         for (Student s : dbList) {
             list.addItem(s.getID());
         }
-        TextField dbItems = (TextField) elements.get(3);
-        dbItems.modifyCounter(dbList.size());
+
     }
 }

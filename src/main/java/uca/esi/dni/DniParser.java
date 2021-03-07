@@ -59,8 +59,10 @@ public class DniParser extends PApplet {
         } else {
             String filePath = selection.getAbsolutePath();
             println("user selected: " + filePath);
-            if (UtilParser.checkFileExtension(filePath, "txt") || UtilParser.checkFileExtension(filePath, "csv")) {
+            if (UtilParser.checkFileExtension(filePath, "csv")) {
                 currentController.onContextMenuClosed(selection);
+            } else {
+                System.out.println("File selected is not a CSV file");
             }
         }
         currentController.setClosedContextMenu(true);
