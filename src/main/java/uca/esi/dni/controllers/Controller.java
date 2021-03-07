@@ -1,5 +1,6 @@
 package uca.esi.dni.controllers;
 
+import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.file.DatabaseHandler;
@@ -41,14 +42,19 @@ public abstract class Controller {
         this.closedContextMenu = closedContextMenu;
     }
 
+    public static DatabaseHandler getDbHandler() {
+        return dbHandler;
+    }
+
     public abstract void controllerLogic();
 
-    public abstract void handleEvent(MouseEvent e);
+    public abstract void handleMouseEvent(MouseEvent e);
+
+    public abstract void handleKeyEvent(KeyEvent e);
 
     public abstract void onContextMenuClosed(File file);
 
     public void changeState(VIEW_STATES state) {
-        //TODO: maybe extract into factory method
         switch (state) {
             case edit:
                 DniParser.currentView = new EditView(parent);

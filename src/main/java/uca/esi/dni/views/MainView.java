@@ -10,6 +10,7 @@ import uca.esi.dni.ui.Warning;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Set;
 
 
 public class MainView extends View {
@@ -55,7 +56,7 @@ public class MainView extends View {
         elements.add(generateStatsButton);
 
         TextField DBItems = new TextField(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
-                HEIGHT_UNIT_SIZE, "Alumnos en BD: ");
+                HEIGHT_UNIT_SIZE, "Alumnos en BD: 0", "");
         DBItems.setFont(smallFont);
         DBItems.setFontSize(10);
         elements.add(DBItems);
@@ -71,10 +72,12 @@ public class MainView extends View {
     }
 
     @Override
-    public void update(ArrayList<Student> dbList, ArrayList<Student> modList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
+    public void update(Set<Student> dbList, Set<Student> modList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
         ItemList list = (ItemList) elements.get(4);
         for (Student s : dbList) {
             list.addItem(s.getID());
         }
+        TextField dbItems = (TextField) elements.get(3);
+        dbItems.modifyCounter(dbList.size());
     }
 }

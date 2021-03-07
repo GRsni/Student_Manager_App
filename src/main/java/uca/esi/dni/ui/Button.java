@@ -30,13 +30,13 @@ public class Button extends BaseElement {
     public Button(PApplet parent, float x, float y, int w, int h, int corner, String content, boolean active,
                   int color, int hoverColor, int clickColor, int textColor) {
         super(parent, new PVector(x, y), w, h);
-        this.content = new TextField(parent, x + w * .1f, y + h * .1f, w / 10 * 8, h / 10 * 8, content);
+        this.content = new TextField(parent, x + w * .1f, y + h * .1f, w / 10 * 8, h / 10 * 8, content, "");
         this.cornerR = corner;
         this.active = active;
         this.color = color;
         this.hoverColor = hoverColor;
         this.clickColor = clickColor;
-        this.content.setTextColor(textColor);
+        this.content.setContentColor(textColor);
     }
 
     public TextField getContent() {
@@ -110,11 +110,11 @@ public class Button extends BaseElement {
     }
 
     public int getTextColor() {
-        return content.getTextColor();
+        return content.getContentColor();
     }
 
     public void setTextColor(int textColor) {
-        this.content.setTextColor(textColor);
+        this.content.setContentColor(textColor);
     }
 
     public int getClickColor() {

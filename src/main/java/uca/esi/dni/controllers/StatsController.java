@@ -1,5 +1,6 @@
 package uca.esi.dni.controllers;
 
+import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.models.AppModel;
@@ -20,7 +21,12 @@ public class StatsController extends Controller {
     }
 
     @Override
-    public void handleEvent(MouseEvent e) {
+    public void handleMouseEvent(MouseEvent e) {
+
+    }
+
+    @Override
+    public void handleKeyEvent(KeyEvent e) {
 
     }
 

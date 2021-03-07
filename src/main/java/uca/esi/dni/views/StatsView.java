@@ -6,6 +6,7 @@ import uca.esi.dni.ui.Warning;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Set;
 
 public class StatsView extends View {
 
@@ -25,7 +26,7 @@ public class StatsView extends View {
     }
 
     @Override
-    public void update(ArrayList<Student> dbList, ArrayList<Student> modList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
+    public void update(Set<Student> dbList, Set<Student> modList, File inputFile, String dbReference, ArrayList<Warning> warnings) {
 
     }
 }

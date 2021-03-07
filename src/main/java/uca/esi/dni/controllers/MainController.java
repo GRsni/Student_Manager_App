@@ -2,10 +2,11 @@ package uca.esi.dni.controllers;
 
 import processing.data.JSONObject;
 import processing.data.Table;
+import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
-import uca.esi.dni.file.DatabaseHandler;
-import uca.esi.dni.file.FileManager;
+import uca.esi.dni.data.Student;
+import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.views.View;
@@ -13,6 +14,7 @@ import uca.esi.dni.views.View;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
 import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.edit;
@@ -27,16 +29,19 @@ public class MainController extends Controller {
     }
 
     private void initModelState() {
-
+        model.setDBReference(Controller.getDbHandler().getDBReference(parent, "data/files/databaseURL.json"));
+        if (model.getDBStudents().isEmpty()) {
+            asyncLoadStudentDataFromDB();
+        }
     }
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDBStudents(), model.getModifiedStudents(), model.getInputFile(), model.getDBReference(), model.getWarnings());
+        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getDBReference(), model.getWarnings());
     }
 
     @Override
-    public void handleEvent(MouseEvent e) {
+    public void handleMouseEvent(MouseEvent e) {
         switch (e.getAction()) {
             case CLICK:
                 if (view.getUIElement(0).inside(e.getX(), e.getY())) {
@@ -79,20 +84,24 @@ public class MainController extends Controller {
         }
     }
 
+    @Override
+    public void handleKeyEvent(KeyEvent e) {
+
+    }
+
     public void generateExcelFiles() {
         closedContextMenu = false;
 
         parent.selectFolder("Seleccione la carpeta de destino:", "selectOutputFolder");
         while (!closedContextMenu) {
-            Thread.onSpinWait();
+            Thread.onSpinWait(); //We need to wait for the output folder context menu to be closed before resuming execution
         }
 
         if (model.getDBReference() != null && model.getOutputFolder() != null) {
             try {
-                String usersURL = DatabaseHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Users");
-                String data = dbHandler.connectToDatabase(usersURL);
-                JSONObject studentData = JSONObject.parse(data);
-                Map<String, Map<String, Table>> tableMap = FileManager.createStudentsDataTables(studentData);
+                String usersURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Users");
+                JSONObject studentData = JSONObject.parse(dbHandler.getDataFromDB(usersURL));
+                Map<String, Map<String, Table>> tableMap = UtilParser.createStudentsDataTables(studentData);
                 if (model.getOutputFolder() != null) {
                     saveLabTables(tableMap, model.getOutputFolder());
                 }
@@ -120,6 +129,29 @@ public class MainController extends Controller {
             }
         }
         System.out.println("Generated all files");
+    }
+
+    private void asyncLoadStudentDataFromDB() {
+
+        Runnable runnable = () -> {
+            try {
+                String usersURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
+                JSONObject data = JSONObject.parse(dbHandler.getDataFromDB(usersURL));
+                Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(data);
+                model.addDBStudentList(studentsInDB);
+                controllerLogic();
+            } catch (IOException e) {
+                System.err.println("Error cargando datos de alumnos desde la base de datos.");
+                //Add warning
+            } catch (RuntimeException e) {
+                System.err.println("Error generando la lista de alumnos");
+            }
+
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+
     }
 
     @Override

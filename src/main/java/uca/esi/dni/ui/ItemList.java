@@ -17,12 +17,10 @@ public class ItemList extends BaseElement {
     private final Set<String> items = new HashSet<>();
 
     private int visibleItems = 0;
-    private int itemHeight = HEIGHT_UNIT_SIZE / 2;
+    private final int itemHeight = HEIGHT_UNIT_SIZE / 2;
 
     private int backgroundColor;
     private int textColor;
-
-    private boolean hasShadow = false;
 
     private final TextField title;
 
@@ -36,9 +34,10 @@ public class ItemList extends BaseElement {
         this.visibleItems = calculateNumberOfVisibleItems();
         this.backgroundColor = backgroundColor;
         this.textColor = textColor;
-        this.title = new TextField(parent, x, y, w, HEIGHT_UNIT_SIZE, title);
-        this.title.setTextColor(textColor);
+        this.title = new TextField(parent, x, y, w, HEIGHT_UNIT_SIZE, title, "");
+        this.title.setContentColor(textColor);
         this.title.setBackgroundColor(titleBackgroundColor);
+        this.title.setIsHeader(true);
     }
 
     public int getBackgroundColor() {
@@ -59,7 +58,7 @@ public class ItemList extends BaseElement {
 
     public void setTextColor(int textColor) {
         this.textColor = textColor;
-        this.title.setTextColor(textColor);
+        this.title.setContentColor(textColor);
     }
 
     public PFont getFont() {
@@ -90,7 +89,7 @@ public class ItemList extends BaseElement {
         items.add(item);
     }
 
-    public void addList(ArrayList<String> list) {
+    public void addList(Set<String> list) {
         items.addAll(list);
     }
 
@@ -126,8 +125,8 @@ public class ItemList extends BaseElement {
         for (Iterator<String> it = items.iterator(); it.hasNext() && itemsDisplayed <= visibleItems; itemsDisplayed++) {
             float yOffset = itemHeight * itemsDisplayed;
             String item = getItem(itemsDisplayed, it);
-            TextField textField = new TextField(parent, pos.x, pos.y + yOffset, w, h / visibleItems, item);
-            textField.setTextColor(View.COLORS.BLACK);
+            TextField textField = new TextField(parent, pos.x, pos.y + yOffset, w, h / visibleItems, item, "");
+            textField.setContentColor(View.COLORS.BLACK);
             textField.setFontSize(fontSize);
             textField.setBackgroundColor(View.COLORS.ACCENT);
             textField.setFont(font);

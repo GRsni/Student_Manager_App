@@ -8,20 +8,24 @@ import java.util.Random;
 
 public class Student {
     private final String VALID_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12345678";
-    private final int KEY_LENGTH = 6;
+    private final int KEY_LENGTH = 7;
 
     private String ID;
     private String hashKey;
     private String key;
     private String email;
-    private int numP;
 
-    public Student(String ID, String email, int numP) {
+    public Student(String ID, String email) {
         this.ID = ID;
-        this.numP = numP;
         this.email = email;
         this.key = generateRandomKey();
         this.hashKey = keyToHash(key);
+    }
+
+    public Student(String ID, String email, String hashKey) {
+        this.ID = ID;
+        this.email = email;
+        this.hashKey = hashKey;
     }
 
     public String getID() {
@@ -38,14 +42,6 @@ public class Student {
 
     public void setHashKey(String hashKey) {
         this.hashKey = hashKey;
-    }
-
-    public int getNumP() {
-        return numP;
-    }
-
-    public void setNumP(int numP) {
-        this.numP = numP;
     }
 
     private String keyToHash(String key) {

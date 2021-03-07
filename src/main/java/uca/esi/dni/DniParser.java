@@ -1,11 +1,11 @@
 package uca.esi.dni;
 
 import processing.core.PApplet;
+import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.controllers.Controller;
 import uca.esi.dni.controllers.MainController;
-import uca.esi.dni.file.DatabaseHandler;
-import uca.esi.dni.file.InfoParser;
+import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.views.MainView;
 import uca.esi.dni.views.View;
@@ -30,8 +30,8 @@ public class DniParser extends PApplet {
         surface.setTitle("Manual de laboratorio: Gestor de datos");
         surface.setResizable(false);
         registerMethod("mouseEvent", this);
+        registerMethod("keyEvent", this);
         initMVCObjects();
-        initState();
     }
 
     private void initMVCObjects() {
@@ -40,46 +40,30 @@ public class DniParser extends PApplet {
         currentController = new MainController(this, appModel, currentView);
     }
 
-    private void initState() {
-        appModel.setDBReference(DatabaseHandler.getDBReference(this, "data/files/databaseURL.json"));
-        //TODO: read student list from database
-        currentController.controllerLogic();
-    }
-
-
     public void draw() {
         background(255);
         currentView.show();
     }
 
     public void mouseEvent(MouseEvent e) {
-        currentController.handleEvent(e);
+        currentController.handleMouseEvent(e);
     }
 
-    public void selectTextFile(File selection) {
-        if (selection == null) {
-            println("No file selected");
-
-        } else {
-            String filePath = selection.getAbsolutePath();
-            println("user selected: " + filePath);
-            if (InfoParser.checkFileExtension(filePath, ".txt")) {
-                // textHandler.setFileName(selection.getName());
-            } else {
-            }
-        }
+    public void keyEvent(KeyEvent e) {
+        currentController.handleKeyEvent(e);
     }
 
-    public void selectJSONFile(File selection) {
+    public void selectInputFile(File selection) {
         if (selection == null) {
             println("No file selected");
         } else {
             String filePath = selection.getAbsolutePath();
             println("user selected: " + filePath);
-            if (InfoParser.checkFileExtension(filePath, ".json")) {
-            } else {
+            if (UtilParser.checkFileExtension(filePath, "txt") || UtilParser.checkFileExtension(filePath, "csv")) {
+                currentController.onContextMenuClosed(selection);
             }
         }
+        currentController.setClosedContextMenu(true);
     }
 
     public void selectOutputFolder(File folder) {

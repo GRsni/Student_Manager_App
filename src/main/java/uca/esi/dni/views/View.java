@@ -8,6 +8,7 @@ import uca.esi.dni.ui.Warning;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Set;
 
 
 public abstract class View {
@@ -33,7 +34,7 @@ public abstract class View {
 
     protected abstract void createElements();
 
-    public abstract void update(ArrayList<Student> dbList, ArrayList<Student> modList,
+    public abstract void update(Set<Student> dbList, Set<Student> modList,
                                 File inputFile, String dbReference, ArrayList<Warning> warnings);
 
     public void show() {
@@ -41,6 +42,10 @@ public abstract class View {
         for (BaseElement element : elements) {
             element.display();
         }
+    }
+
+    public int getElementsSize() {
+        return elements.size();
     }
 
     public BaseElement getUIElement(int index) {

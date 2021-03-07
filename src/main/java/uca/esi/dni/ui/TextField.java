@@ -9,16 +9,21 @@ public class TextField extends BaseElement {
 
     private int backgroundColor;
     private boolean hasBackground = false;
-    private int textColor = View.COLORS.BLACK;
+    private int contentColor = View.COLORS.BLACK;
+    private int hintColor = View.COLORS.ACCENT_DARK;
     private String content;
-    private int padding = 4;
+    private final String hint;
+    private final int padding = 4;
     private boolean isClickable = false;
+    private boolean isFocused = false;
+    private boolean isHeader = false;
 
     private boolean hasShadow = false;
 
-    public TextField(PApplet parent, float x, float y, int w, int h, String content) {
+    public TextField(PApplet parent, float x, float y, int w, int h, String content, String hint) {
         super(parent, new PVector(x, y), w, h);
         this.content = content;
+        this.hint = hint;
     }
 
     public PVector getPos() {
@@ -45,12 +50,20 @@ public class TextField extends BaseElement {
         this.h = h;
     }
 
-    public int getTextColor() {
-        return textColor;
+    public int getContentColor() {
+        return contentColor;
     }
 
-    public void setTextColor(int textColor) {
-        this.textColor = textColor;
+    public void setContentColor(int contentColor) {
+        this.contentColor = contentColor;
+    }
+
+    public int getHintColor() {
+        return hintColor;
+    }
+
+    public void setHintColor(int hintColor) {
+        this.hintColor = hintColor;
     }
 
     public String getContent() {
@@ -78,18 +91,76 @@ public class TextField extends BaseElement {
         isClickable = clickable;
     }
 
+    public boolean isFocused() {
+        return isFocused;
+    }
+
+    public void setFocused(boolean focused) {
+        isFocused = focused;
+    }
+
+    public boolean isHeader() {
+        return isHeader;
+    }
+
+    public void setIsHeader(boolean header) {
+        isHeader = header;
+    }
+
     public void display() {
         parent.push();
         if (hasBackground) {
             parent.noStroke();
             parent.fill(backgroundColor);
-            parent.rect(pos.x, pos.y, w, h);
+            if (isHeader) {
+                parent.rect(pos.x, pos.y, w, h, 4, 4, 0, 0);
+            } else {
+                parent.rect(pos.x, pos.y, w, h);
+            }
         }
         parent.textSize(fontSize);
         parent.textFont(font);
-        parent.fill(textColor);
         parent.textAlign(PConstants.LEFT, PConstants.CENTER);
-        parent.text(content, pos.x + padding, pos.y, w, h);
+        if (!content.isEmpty() || isFocused) {
+            parent.fill(contentColor);
+            parent.text(content, pos.x + padding, pos.y, w, h);
+        } else {
+            parent.fill(hintColor);
+            parent.text(hint, pos.x + padding, pos.y, w, h);
+        }
+        if (isFocused) {
+            if ((parent.frameCount >> 5 & 1) == 0) {
+                parent.push();
+                parent.stroke(View.COLORS.BLACK);
+                parent.strokeWeight(3);
+                parent.strokeCap(PConstants.SQUARE);
+                float xOffset = pos.x + padding + parent.textWidth(content);
+                parent.line(xOffset, pos.y + padding, xOffset, pos.y + h - padding);
+
+                parent.pop();
+            }
+
+        }
         parent.pop();
+    }
+
+    public void addCharToContent(char k) {
+        content += k;
+    }
+
+    public void removeCharacter() {
+        content = content.substring(0, Math.max(0, content.length() - 1));
+    }
+
+    public void modifyCounter(int number) {
+        modifyCounter(Integer.toString(number));
+    }
+
+    public void modifyCounter(float number) {
+        modifyCounter(Float.toString(number));
+    }
+
+    public void modifyCounter(String end) {
+        content = content.substring(0, content.lastIndexOf(':') + 2) + end;
     }
 }

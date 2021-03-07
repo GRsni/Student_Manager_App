@@ -5,20 +5,18 @@ import uca.esi.dni.ui.Warning;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AppModel extends Model {
-    private final ArrayList<Student> DBStudents = new ArrayList<>();
-    private final ArrayList<Student> modifiedStudents = new ArrayList<>();
-    private File inputFile;
-    private File outputFolder;
+    private final Set<Student> DBStudents = new HashSet<>();
+    private final Set<Student> temporaryStudents = new HashSet<>();
+    private File inputFile = new File("");
+    private File outputFolder = new File("");
     private String DBReference;
     private final ArrayList<Warning> warnings = new ArrayList<>();
 
     public AppModel() {
-        //testing item list display
-        for (int i = 0; i < 13; i++) {
-            DBStudents.add(new Student(String.valueOf(i * 100), "test@", i));
-        }
     }
 
     public File getInputFile() {
@@ -45,8 +43,16 @@ public class AppModel extends Model {
         this.outputFolder = outputFolder;
     }
 
-    public ArrayList<Student> getDBStudents() {
+    public Set<Student> getDBStudents() {
         return DBStudents;
+    }
+
+    public void addDBStudentList(Set<Student> list) {
+        DBStudents.addAll(list);
+    }
+
+    public void removeDBStudentList(Set<Student> list) {
+        DBStudents.removeAll(list);
     }
 
     public void addDBStudent(Student s) {
@@ -57,24 +63,24 @@ public class AppModel extends Model {
         DBStudents.remove(s);
     }
 
-    public Student getDBStudent(int index) {
-        return DBStudents.get(index);
+    public Set<Student> getTemporaryStudents() {
+        return temporaryStudents;
     }
 
-    public ArrayList<Student> getModifiedStudents() {
-        return modifiedStudents;
+    public void addTemporaryStudent(Student s) {
+        temporaryStudents.add(s);
     }
 
-    public void addModifiedStudent(Student s) {
-        modifiedStudents.add(s);
+    public void addTemporaryStudentList(Set<Student> list) {
+        temporaryStudents.addAll(list);
     }
 
-    public void removeModifiedStudent(Student s) {
-        modifiedStudents.remove(s);
+    public void removeTemporaryStudentList(Set<Student> list) {
+        temporaryStudents.removeAll(list);
     }
 
-    public Student getModifiedStudent(int index) {
-        return modifiedStudents.get(index);
+    public void removeTemporaryStudent(Student s) {
+        temporaryStudents.remove(s);
     }
 
     public ArrayList<Warning> getWarnings() {

@@ -11,9 +11,22 @@ repositories {
 }
 
 dependencies {
+    // processing core library
     implementation files("libs/core.jar")
+    // OKHTTP http API
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
-    implementation "com.google.guava:guava:30.1-jre"
+    // Google's encryption API
+    implementation 'com.google.guava:guava:30.1-jre'
+    // Google's AUTH2 credentials API
+    implementation 'com.google.api-client:google-api-client:1.31.2'
+    // email reception and sending
+    implementation 'com.sun.mail:android-mail:1.6.2'
+    // email registering, checking
+    implementation 'com.sun.mail:android-activation:1.6.2'
+    // https://mvnrepository.com/artifact/org.jfree/jfreechart
+    implementation group: 'org.jfree', name: 'jfreechart', version: '1.5.0'
+
+
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
