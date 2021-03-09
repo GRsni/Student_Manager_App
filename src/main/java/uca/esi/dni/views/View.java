@@ -42,7 +42,9 @@ public abstract class View {
     public void show() {
         parent.image(background, 0, 0);
         for (String s : elements.keySet()) {
-            elements.get(s).display();
+            if (elements.get(s).isVisible()) {
+                elements.get(s).display();
+            }
         }
     }
 

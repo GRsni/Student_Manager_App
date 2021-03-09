@@ -109,15 +109,29 @@ public class TextField extends BaseElement {
 
     public void display() {
         parent.push();
-        if (hasBackground) {
-            parent.noStroke();
-            parent.fill(backgroundColor);
-            if (isHeader) {
-                parent.rect(pos.x, pos.y, w, h, 4, 4, 0, 0);
-            } else {
-                parent.rect(pos.x, pos.y, w, h);
+        renderBackground();
+        renderContent();
+        renderCursor();
+        parent.pop();
+    }
+
+    private void renderCursor() {
+        parent.push();
+        if (isFocused) {
+            if ((parent.frameCount >> 5 & 1) == 0) {
+
+                parent.stroke(View.COLORS.BLACK);
+                parent.strokeWeight(3);
+                parent.strokeCap(PConstants.SQUARE);
+                float xOffset = pos.x + padding + parent.textWidth(content);
+                parent.line(xOffset, pos.y + padding, xOffset, pos.y + h - padding);
             }
         }
+        parent.pop();
+    }
+
+    private void renderContent() {
+        parent.push();
         parent.textSize(fontSize);
         parent.textFont(font);
         parent.textAlign(PConstants.LEFT, PConstants.CENTER);
@@ -128,18 +142,19 @@ public class TextField extends BaseElement {
             parent.fill(hintColor);
             parent.text(hint, pos.x + padding, pos.y, w, h);
         }
-        if (isFocused) {
-            if ((parent.frameCount >> 5 & 1) == 0) {
-                parent.push();
-                parent.stroke(View.COLORS.BLACK);
-                parent.strokeWeight(3);
-                parent.strokeCap(PConstants.SQUARE);
-                float xOffset = pos.x + padding + parent.textWidth(content);
-                parent.line(xOffset, pos.y + padding, xOffset, pos.y + h - padding);
+        parent.pop();
+    }
 
-                parent.pop();
+    private void renderBackground() {
+        parent.push();
+        if (hasBackground) {
+            parent.noStroke();
+            parent.fill(backgroundColor);
+            if (isHeader) {
+                parent.rect(pos.x, pos.y, w, h, 4, 4, 0, 0);
+            } else {
+                parent.rect(pos.x, pos.y, w, h);
             }
-
         }
         parent.pop();
     }

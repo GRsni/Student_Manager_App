@@ -3,6 +3,7 @@ package uca.esi.dni.views;
 import processing.core.PApplet;
 import processing.core.PFont;
 import uca.esi.dni.data.Student;
+import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
@@ -69,6 +70,13 @@ public class EditView extends View {
         emptyList.setFont(smallFont);
         elements.put("emptyListB", emptyList);
 
+        Button confirmEmpty = new Button(parent, WIDTH_UNIT_SIZE * 4, HEIGHT_UNIT_SIZE * 4, WIDTH_UNIT_SIZE * 8,
+                HEIGHT_UNIT_SIZE * 6, 3, "Confirmar vaciar la base de datos", false);
+        confirmEmpty.setIcon(parent.loadImage("data/icons/checked.png"));
+        confirmEmpty.setFont(bigFont);
+        confirmEmpty.setVisible(false);
+        elements.put("confirmEmptyB", confirmEmpty);
+
 
         TextField manuallyTF = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 1.5f, WIDTH_UNIT_SIZE * 3,
                 HEIGHT_UNIT_SIZE, "Manualmente:", "");
@@ -106,6 +114,7 @@ public class EditView extends View {
         inputFile.setFont(smallFont);
         elements.put("inputFileTF", inputFile);
 
+
         ItemList auxStudentsItemList = new ItemList(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 4, WIDTH_UNIT_SIZE * 3,
                 HEIGHT_UNIT_SIZE * 10, "Lista previa");
         auxStudentsItemList.setFont(smallFont);
@@ -133,14 +142,14 @@ public class EditView extends View {
         dbCounter.modifyCounter(dbList.size());
 
         ItemList auxItemList = (ItemList) elements.get("auxStudentsIL");
-        for (Student s : auxList) {
-            auxItemList.addItem(s.getID());
-        }
+        Set<String> auxStrings = UtilParser.studentSetToStringSet(auxList);
+        auxItemList.getContentList().clear();
+        auxItemList.addList(auxStrings);
 
         ItemList dbItemList = (ItemList) elements.get("dbStudentIL");
-        for (Student s : dbList) {
-            dbItemList.addItem(s.getID());
-        }
+        Set<String> dbStrings = UtilParser.studentSetToStringSet(dbList);
+        dbItemList.getContentList().clear();
+        dbItemList.addList(dbStrings);
 
 
     }

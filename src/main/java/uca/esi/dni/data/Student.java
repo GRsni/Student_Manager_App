@@ -15,6 +15,10 @@ public class Student {
     private String key;
     private String email;
 
+    public Student() {
+
+    }
+
     public Student(String ID, String email) {
         this.ID = ID;
         this.email = email;

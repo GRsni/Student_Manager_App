@@ -7,13 +7,17 @@ import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 import uca.esi.dni.file.EmailHandler;
+import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
+import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
 import uca.esi.dni.views.View;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,37 +48,43 @@ public class EditController extends Controller {
 
         switch (e.getAction()) {
             case CLICK:
-                if (view.getUIElement("enterStudentB").inside(x, y)) {
-
-                    if (!idTF.getContent().isEmpty() && !emailTF.getContent().isEmpty()) {
-                        if (EmailHandler.isValidEmailAddress(emailTF.getContent())) {
-                            model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
-                            idTF.setContent("");
-                            emailTF.setContent("");
-                            getFocusedTextField().setFocused(false);
-                        } else {
-                            System.err.println("Error while validating email address");
-                        }
-                    } else {
-                        System.err.println("Empty fields");
+                Button confirmEmpty = (Button) view.getUIElement("confirmEmptyB");
+                if (confirmEmpty.isVisible()) {
+                    if (confirmEmpty.inside(x, y)) {
+                        asyncEmptyDB();
                     }
-                } else if (view.getUIElement("selectFileB").inside(x, y)) {
-                    selectInputFile();
-                } else if (view.getUIElement("backB").inside(x, y)) {
-                    //change view to mainView
-                    changeState(main);
-                } else if (view.getUIElement("addToListB").inside(x, y)) {
-                    //TODO: Add aux list to DB list
-                } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
-                    //TODO: Remove aux list from DB list
-                } else if (view.getUIElement("emptyListB").inside(x, y)) {
-                    //TODO: Empty DB list
-                } else if (idTF.inside(x, y)) {
-                    idTF.setFocused(true);
-                    emailTF.setFocused(false);
-                } else if (emailTF.inside(x, y)) {
-                    idTF.setFocused(false);
-                    emailTF.setFocused(true);
+                    confirmEmpty.setVisible(false);
+                } else {
+                    if (view.getUIElement("enterStudentB").inside(x, y)) {
+                        if (!idTF.getContent().isEmpty() && !emailTF.getContent().isEmpty()) {
+                            if (EmailHandler.isValidEmailAddress(emailTF.getContent())) {
+                                model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
+                                idTF.setContent("");
+                                emailTF.setContent("");
+                                getFocusedTextField().setFocused(false);
+                            } else {
+                                System.err.println("Error while validating email address");
+                            }
+                        } else {
+                            System.err.println("Empty fields");
+                        }
+                    } else if (view.getUIElement("selectFileB").inside(x, y)) {
+                        selectInputFile();
+                    } else if (view.getUIElement("backB").inside(x, y)) {
+                        changeState(main);
+                    } else if (view.getUIElement("addToListB").inside(x, y)) {
+                        asyncAddStudentsToDB();
+                    } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
+                        //TODO: Remove aux list from DB list
+                    } else if (view.getUIElement("emptyListB").inside(x, y)) {
+                        view.getUIElement("confirmEmptyB").setVisible(true);
+                    } else if (idTF.inside(x, y)) {
+                        idTF.setFocused(true);
+                        emailTF.setFocused(false);
+                    } else if (emailTF.inside(x, y)) {
+                        idTF.setFocused(false);
+                        emailTF.setFocused(true);
+                    }
                 }
 
                 for (String key : view.getElementKeys()) {
@@ -132,6 +142,63 @@ public class EditController extends Controller {
         }
     }
 
+    private void asyncAddStudentsToDB() {
+        Runnable runnable = () -> {
+            try {
+                Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
+                System.out.println(Arrays.toString(uniqueStudentSet.toArray()));
+
+                String idList = UtilParser.getStudentKeysJSONString(uniqueStudentSet);
+                String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
+                String responseIDUpdate = dbHandler.updateData(idsURL, idList);
+
+                String emailList = UtilParser.getStudentEmailsJSONString(model.getTemporaryStudents());
+                String emailURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
+                String responseEmailUpdate = dbHandler.updateData(emailURL, emailList);
+
+                model.addDBStudentList(model.getTemporaryStudents());
+                model.getTemporaryStudents().clear();
+                controllerLogic();
+                System.out.println(responseIDUpdate + "\n\n" + responseEmailUpdate);
+            } catch (IOException | NullPointerException e) {
+                System.err.println("[Error while uploading data to the DB]: " + e.getMessage());
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    private void asyncRemoveStudentsFromDB() {
+        Runnable runnable = () -> {
+            try {
+
+            } catch (IOException | NullPointerException e) {
+                System.err.println("[Error while deleting data from the DB]: " + e.getMessage());
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
+    private void asyncEmptyDB() {
+        Runnable runnable = () -> {
+            try {
+                String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
+                String response = dbHandler.emptyDB(baseURL);
+                model.getDBStudents().clear();
+                controllerLogic();
+                System.out.println(response);
+            } catch (IOException e) {
+                System.err.println("Error deleting data from DB: " + e.getMessage());
+            }
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
+
     private void selectInputFile() {
         closedContextMenu = false;
 
@@ -145,9 +212,7 @@ public class EditController extends Controller {
                 Table studentIDTable = parent.loadTable(model.getInputFile().getAbsolutePath(), "header");
                 System.out.println(studentIDTable.getRowCount());
                 Set<Student> studentList = generateStudentListFromTable(studentIDTable);
-/*                for (Student s : studentList) {
-                    System.out.println(s.toString());
-                }*/
+
                 model.addTemporaryStudentList(studentList);
             } catch (Exception e) {
                 System.err.println("Error loading the student list from CSV file");

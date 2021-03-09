@@ -18,7 +18,7 @@ dependencies {
     // Google's encryption API
     implementation 'com.google.guava:guava:30.1-jre'
     // Google's AUTH2 credentials API
-    implementation 'com.google.api-client:google-api-client:1.31.2'
+    implementation 'com.google.auth:google-auth-library-oauth2-http:0.24.1'
     // email reception and sending
     implementation 'com.sun.mail:android-mail:1.6.2'
     // email registering, checking

@@ -86,6 +86,10 @@ public class ItemList extends BaseElement {
         this.title.setFontSize(fontSize);
     }
 
+    public Set<String> getContentList() {
+        return items;
+    }
+
     public void addItem(String item) {
         items.add(item);
     }

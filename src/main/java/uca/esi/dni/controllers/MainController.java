@@ -136,16 +136,19 @@ public class MainController extends Controller {
 
         Runnable runnable = () -> {
             try {
-                String usersURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                JSONObject data = JSONObject.parse(dbHandler.getDataFromDB(usersURL));
-                Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(data);
+                String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
+                JSONObject studentKeys = JSONObject.parse(dbHandler.getDataFromDB(idsURL));
+                String emailsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
+                JSONObject studentEmails = JSONObject.parse(dbHandler.getDataFromDB(emailsURL));
+                Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
+
                 model.addDBStudentList(studentsInDB);
                 controllerLogic();
-            } catch (IOException e) {
-                System.err.println("Error cargando datos de alumnos desde la base de datos.");
+            } catch (IOException | NullPointerException e) {
+                System.err.println("[Error loading data from DB]: " + e.getMessage());
                 //Add warning
             } catch (RuntimeException e) {
-                System.err.println("Error generando la lista de alumnos");
+                System.err.println("[Error generating student list]: " + e.getMessage());
             }
 
         };

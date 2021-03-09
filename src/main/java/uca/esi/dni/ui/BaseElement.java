@@ -13,6 +13,7 @@ public abstract class BaseElement {
 
     protected boolean clicked = false;
     protected boolean hover = false;
+    protected boolean isVisible = true;
 
     protected PFont font;
     protected int fontSize = 10;
@@ -62,6 +63,14 @@ public abstract class BaseElement {
 
     public void isHover(boolean val) {
         hover = val;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 
     public void handleInput(MouseEvent e) {

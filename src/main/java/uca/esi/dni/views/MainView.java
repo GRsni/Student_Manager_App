@@ -3,6 +3,7 @@ package uca.esi.dni.views;
 import processing.core.PApplet;
 import processing.core.PFont;
 import uca.esi.dni.data.Student;
+import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
@@ -76,10 +77,10 @@ public class MainView extends View {
         TextField dbStudentsCounter = (TextField) elements.get("dbStudentsTF");
         dbStudentsCounter.modifyCounter(dbList.size());
 
-        ItemList list = (ItemList) elements.get("dbStudentsIL");
-        for (Student s : dbList) {
-            list.addItem(s.getID());
-        }
+        ItemList studentsIL = (ItemList) elements.get("dbStudentsIL");
+        Set<String> stringSet = UtilParser.studentSetToStringSet(dbList);
+        studentsIL.getContentList().clear();
+        studentsIL.addList(stringSet);
 
     }
 }

@@ -149,18 +149,56 @@ public class UtilParser {
 
     }
 
-    public static Set<Student> generateStudentListFromJSONObject(JSONObject data) throws RuntimeException {
+    public static String getStudentKeysJSONString(Set<Student> students) {
+        JSONObject jsonObject = new JSONObject();
+        for (Student student : students) {
+            jsonObject.setString(student.getID(), student.getHashKey());
+        }
+        return jsonObject.toString();
+    }
+
+    public static String getStudentEmailsJSONString(Set<Student> students) {
+        JSONObject jsonObject = new JSONObject();
+        for (Student student : students) {
+            jsonObject.setString(student.getID(), student.getEmail());
+        }
+        return jsonObject.toString();
+    }
+
+    public static Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws RuntimeException {
         Set<Student> students = new HashSet<>();
-        ArrayList<String> ids = getKeysInJSONObject(data);
+        ArrayList<String> ids = getKeysInJSONObject(emails);
         for (String id : ids) {
-            Student student = generateStudentFromJSONObject(id, data.getJSONObject(id));
+            Student student = new Student(id, emails.getString(id), hashKeys.getString(id));
             students.add(student);
         }
         return students;
     }
 
-    private static Student generateStudentFromJSONObject(String id, JSONObject jsonStudent) throws RuntimeException {
-        return new Student(id, jsonStudent.getString("email"), jsonStudent.getString("hashKey"));
+    public static Set<String> studentSetToStringSet(Set<Student> students) {
+        Set<String> stringSet = new HashSet<>();
+        for (Student s : students) {
+            stringSet.add(s.getID());
+        }
+        return stringSet;
+    }
+
+    public static Set<Student> getUniqueStudentSet(Set<Student> set1, Set<Student> set2) {
+        Set<Student> unique = new HashSet<>();
+        for (Student s : set1) {
+            boolean found = false;
+            for (Student s2 : set2) {
+                if (s.getID().equals(s2.getID())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                System.out.println("not found: " + s.getID());
+                unique.add(s);
+            }
+        }
+        return unique;
     }
 
 }
