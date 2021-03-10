@@ -1,41 +1,17 @@
 package uca.esi.dni.file;
 
-import processing.core.PApplet;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 
-import java.io.File;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class UtilParser {
     private static final Pattern idPattern = Pattern.compile("u[a-zA-Z0-9]{8}");
-
-    public static ArrayList<String> getCorrectLines(File text) {
-        ArrayList<String> goodLines = new ArrayList<>();
-
-        String[] lines = getLinesFromText(text);
-        for (String line : lines) {
-            String possibleId = findValidIDInLine(line);
-            if (!possibleId.equals("")) {
-                goodLines.add(possibleId);
-            }
-        }
-
-        return goodLines;
-    }
-
-    public static String[] getLinesFromText(File text) {
-        return PApplet.loadStrings(text);
-    }
-
-    private static String findValidIDInLine(String line) {
-        return extractId(line.toLowerCase());
-    }
 
     public static String extractId(String line) {
 
@@ -55,18 +31,6 @@ public class UtilParser {
         String fileExtension = DniParser.checkExtension(file);
         return fileExtension.equals(ext);
     }
-
-    private static ArrayList<String> getIdsFromIDList(JSONObject object) {
-        ArrayList<String> ids = new ArrayList<>();
-        ArrayList<String> idKeys = getKeysInJSONObject(object);
-
-        for (String key : idKeys) {
-            ids.add(object.getString(key));
-        }
-
-        return ids;
-    }
-
 
     public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) {
         Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
@@ -149,20 +113,31 @@ public class UtilParser {
 
     }
 
-    public static String getStudentKeysJSONString(Set<Student> students) {
-        JSONObject jsonObject = new JSONObject();
-        for (Student student : students) {
-            jsonObject.setString(student.getID(), student.getHashKey());
+    public static String generateMultiPathJSONString(Map<String, JSONObject> urlContentsMap) {
+        JSONObject multipath = new JSONObject();
+        for (String url : urlContentsMap.keySet()) {
+            ArrayList<String> secondLevelKeys = getKeysInJSONObject(urlContentsMap.get(url));
+            for (String key : secondLevelKeys) {
+                multipath.put(url + "/" + key, urlContentsMap.get(url).get(key));
+            }
         }
-        return jsonObject.toString();
+        return multipath.toString();
     }
 
-    public static String getStudentEmailsJSONString(Set<Student> students) {
+    public static JSONObject getStudentAttributeJSONObject(Set<Student> students, String attribute) {
         JSONObject jsonObject = new JSONObject();
         for (Student student : students) {
-            jsonObject.setString(student.getID(), student.getEmail());
+            jsonObject.setString(student.getID(), student.getAttributeFromStudent(attribute));
         }
-        return jsonObject.toString();
+        return jsonObject;
+    }
+
+    public static JSONObject getStudentNullJSONObject(Set<Student> students) {
+        JSONObject jsonObject = new JSONObject();
+        for (Student student : students) {
+            jsonObject.put(student.getID(), JSONObject.NULL);
+        }
+        return jsonObject;
     }
 
     public static Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws RuntimeException {
@@ -201,4 +176,16 @@ public class UtilParser {
         return unique;
     }
 
+    public static Set<Student> getCoincidentStudentSet(Set<Student> set1, Set<Student> set2) {
+        Set<Student> coincident = new HashSet<>();
+        for (Student s : set1) {
+            for (Student s2 : set2) {
+                if (s.getID().equals(s2.getID())) {
+                    coincident.add(s2);
+                    break;
+                }
+            }
+        }
+        return coincident;
+    }
 }

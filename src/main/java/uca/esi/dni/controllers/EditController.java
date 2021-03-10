@@ -1,5 +1,6 @@
 package uca.esi.dni.controllers;
 
+import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
 import processing.event.KeyEvent;
@@ -17,8 +18,9 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static processing.core.PConstants.ENTER;
@@ -76,6 +78,7 @@ public class EditController extends Controller {
                         asyncAddStudentsToDB();
                     } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
                         //TODO: Remove aux list from DB list
+                        asyncRemoveStudentsFromDB();
                     } else if (view.getUIElement("emptyListB").inside(x, y)) {
                         view.getUIElement("confirmEmptyB").setVisible(true);
                     } else if (idTF.inside(x, y)) {
@@ -146,20 +149,23 @@ public class EditController extends Controller {
         Runnable runnable = () -> {
             try {
                 Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
-                System.out.println(Arrays.toString(uniqueStudentSet.toArray()));
 
-                String idList = UtilParser.getStudentKeysJSONString(uniqueStudentSet);
-                String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                String responseIDUpdate = dbHandler.updateData(idsURL, idList);
+                JSONObject idList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "ID");
+                JSONObject emailList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "email");
+                Map<String, JSONObject> urlContentsMap = new HashMap<>();
+                urlContentsMap.put("Ids", idList);
+                urlContentsMap.put("Emails", emailList);
 
-                String emailList = UtilParser.getStudentEmailsJSONString(model.getTemporaryStudents());
-                String emailURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
-                String responseEmailUpdate = dbHandler.updateData(emailURL, emailList);
+                String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
 
-                model.addDBStudentList(model.getTemporaryStudents());
+                String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
+                String responseDataUpdate = dbHandler.updateData(baseURL, combined);
+
+
                 model.getTemporaryStudents().clear();
                 controllerLogic();
-                System.out.println(responseIDUpdate + "\n\n" + responseEmailUpdate);
+                asyncLoadStudentDataFromDB();
+                System.out.println(responseDataUpdate);
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error while uploading data to the DB]: " + e.getMessage());
             }
@@ -172,7 +178,22 @@ public class EditController extends Controller {
     private void asyncRemoveStudentsFromDB() {
         Runnable runnable = () -> {
             try {
+                Set<Student> coincidentStudentSet = UtilParser.getCoincidentStudentSet(model.getTemporaryStudents(), model.getDBStudents());
+                JSONObject nullList = UtilParser.getStudentNullJSONObject(coincidentStudentSet);
+                Map<String, JSONObject> urlContentsMap = new HashMap<>();
+                urlContentsMap.put("Ids", nullList);
+                urlContentsMap.put("Emails", nullList);
+                urlContentsMap.put("Users", nullList);
 
+                String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
+
+                String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
+                String responseDataDelete = dbHandler.updateData(baseURL, combined);
+
+                model.getTemporaryStudents().clear();
+                controllerLogic();
+                asyncLoadStudentDataFromDB();
+                System.out.println(responseDataDelete);
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error while deleting data from the DB]: " + e.getMessage());
             }

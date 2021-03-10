@@ -115,16 +115,15 @@ public class TextField extends BaseElement {
         parent.pop();
     }
 
-    private void renderCursor() {
+    private void renderBackground() {
         parent.push();
-        if (isFocused) {
-            if ((parent.frameCount >> 5 & 1) == 0) {
-
-                parent.stroke(View.COLORS.BLACK);
-                parent.strokeWeight(3);
-                parent.strokeCap(PConstants.SQUARE);
-                float xOffset = pos.x + padding + parent.textWidth(content);
-                parent.line(xOffset, pos.y + padding, xOffset, pos.y + h - padding);
+        if (hasBackground) {
+            parent.noStroke();
+            parent.fill(backgroundColor);
+            if (isHeader) {
+                parent.rect(pos.x, pos.y, w, h, 4, 4, 0, 0);
+            } else {
+                parent.rect(pos.x, pos.y, w, h);
             }
         }
         parent.pop();
@@ -145,19 +144,22 @@ public class TextField extends BaseElement {
         parent.pop();
     }
 
-    private void renderBackground() {
+    private void renderCursor() {
         parent.push();
-        if (hasBackground) {
-            parent.noStroke();
-            parent.fill(backgroundColor);
-            if (isHeader) {
-                parent.rect(pos.x, pos.y, w, h, 4, 4, 0, 0);
-            } else {
-                parent.rect(pos.x, pos.y, w, h);
+        if (isFocused) {
+            if ((parent.frameCount >> 5 & 1) == 0) {
+
+                parent.stroke(View.COLORS.BLACK);
+                parent.strokeWeight(3);
+                parent.strokeCap(PConstants.SQUARE);
+                parent.textFont(font);
+                float xOffset = pos.x + padding + parent.textWidth(content);
+                parent.line(xOffset, pos.y + padding, xOffset, pos.y + h - padding);
             }
         }
         parent.pop();
     }
+
 
     public void addCharToContent(char k) {
         content += k;

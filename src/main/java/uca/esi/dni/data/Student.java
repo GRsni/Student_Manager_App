@@ -71,6 +71,19 @@ public class Student {
         return key.toString();
     }
 
+    public String getAttributeFromStudent(String attribute) {
+        switch (attribute) {
+            case "ID":
+                return ID;
+            case "email":
+                return email;
+            case "hashKey":
+                return hashKey;
+            default:
+                return "";
+        }
+    }
+
     @Override
     public String toString() {
         return "Student{" +

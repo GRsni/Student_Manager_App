@@ -132,32 +132,6 @@ public class MainController extends Controller {
         System.out.println("Generated all files");
     }
 
-    private void asyncLoadStudentDataFromDB() {
-
-        Runnable runnable = () -> {
-            try {
-                String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                JSONObject studentKeys = JSONObject.parse(dbHandler.getDataFromDB(idsURL));
-                String emailsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
-                JSONObject studentEmails = JSONObject.parse(dbHandler.getDataFromDB(emailsURL));
-                Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
-
-                model.addDBStudentList(studentsInDB);
-                controllerLogic();
-            } catch (IOException | NullPointerException e) {
-                System.err.println("[Error loading data from DB]: " + e.getMessage());
-                //Add warning
-            } catch (RuntimeException e) {
-                System.err.println("[Error generating student list]: " + e.getMessage());
-            }
-
-        };
-
-        Thread thread = new Thread(runnable);
-        thread.start();
-
-    }
-
     @Override
     public void onContextMenuClosed(File folder) {
         model.setOutputFolder(folder);

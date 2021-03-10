@@ -1,9 +1,12 @@
 package uca.esi.dni.controllers;
 
+import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
+import uca.esi.dni.data.Student;
 import uca.esi.dni.file.DatabaseHandler;
+import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.views.EditView;
 import uca.esi.dni.views.MainView;
@@ -11,6 +14,8 @@ import uca.esi.dni.views.StatsView;
 import uca.esi.dni.views.View;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Set;
 
 public abstract class Controller {
 
@@ -70,6 +75,32 @@ public abstract class Controller {
                 break;
         }
         loadInitialState();
+    }
+
+    protected void asyncLoadStudentDataFromDB() {
+
+        Runnable runnable = () -> {
+            try {
+                String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
+                JSONObject studentKeys = JSONObject.parse(dbHandler.getDataFromDB(idsURL));
+                String emailsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
+                JSONObject studentEmails = JSONObject.parse(dbHandler.getDataFromDB(emailsURL));
+                Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
+
+                model.addDBStudentList(studentsInDB);
+                controllerLogic();
+            } catch (IOException | NullPointerException e) {
+                System.err.println("[Error loading data from DB]: " + e.getMessage());
+                //Add warning
+            } catch (RuntimeException e) {
+                System.err.println("[Error generating student list]: " + e.getMessage());
+            }
+
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.start();
+
     }
 
     private void loadInitialState() {
