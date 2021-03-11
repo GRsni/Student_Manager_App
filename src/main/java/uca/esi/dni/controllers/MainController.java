@@ -5,7 +5,6 @@ import processing.data.Table;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
-import uca.esi.dni.data.Student;
 import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
@@ -15,7 +14,6 @@ import uca.esi.dni.views.View;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
 import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.edit;
@@ -53,6 +51,8 @@ public class MainController extends Controller {
                 } else if (view.getUIElement("generateStatsB").inside(e.getX(), e.getY())) {
                     //change view to statsView
                     changeState(stats);
+                } else if (view.getUIElement("dbStudentsIL").inside(e.getX(), e.getY())) {
+                    System.out.println("Clicked on db IL");
                 }
                 for (String key : view.getElementKeys()) {
                     BaseElement element = view.getUIElement(key);
@@ -63,19 +63,10 @@ public class MainController extends Controller {
                 controllerLogic();
                 break;
             case MOVE:
-                for (String key : view.getElementKeys()) {
-                    BaseElement element = view.getUIElement(key);
-                    element.isHover(element.inside(e.getX(), e.getY()));
-
-                }
+                checkHover(e.getX(), e.getY());
                 break;
             case PRESS:
-                for (String key : view.getElementKeys()) {
-                    BaseElement element = view.getUIElement(key);
-                    if (element.inside(e.getX(), e.getY())) {
-                        element.isClicked(true);
-                    }
-                }
+                checkPress(e.getX(), e.getY());
             case RELEASE:
                 //release mouse event is unreliable, multiple events per mouse click
                 break;

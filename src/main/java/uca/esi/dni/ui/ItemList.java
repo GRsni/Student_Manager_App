@@ -24,6 +24,7 @@ public class ItemList extends BaseElement {
     private int textColor;
 
     private final TextField title;
+    private int selectedItemIndex = -1;
 
     public ItemList(PApplet parent, float x, float y, int w, int h, String title) {
         this(parent, x, y, w, h, title, View.COLORS.ACCENT, View.COLORS.PRIMARY, View.COLORS.WHITE);
@@ -155,8 +156,16 @@ public class ItemList extends BaseElement {
         return h / itemHeight - 1;
     }
 
-    @Override
-    public void handleInput(MouseEvent e) {
+    public void handleScroll(MouseEvent e) {
         //TODO: do something with the mouse wheel input
+    }
+
+    public void selectItemField(int x, int y) {
+
+    }
+
+    @Override
+    public boolean inside(int x, int y) {
+        return x > pos.x && x < pos.x + w && y > pos.y + title.h && y < pos.y + h;
     }
 }

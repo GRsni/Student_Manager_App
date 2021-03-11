@@ -8,6 +8,7 @@ import uca.esi.dni.data.Student;
 import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
+import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.views.EditView;
 import uca.esi.dni.views.MainView;
 import uca.esi.dni.views.StatsView;
@@ -77,16 +78,49 @@ public abstract class Controller {
         loadInitialState();
     }
 
+    public void checkHover(int x, int y) {
+        if (!view.isModalActive()) {
+            for (String key : view.getElementKeys()) {
+                BaseElement element = view.getUIElement(key);
+                element.isHover(element.inside(x, y));
+            }
+        } else {
+            for (String key : view.getModalElementKeys()) {
+                BaseElement element = view.getUIModalElement(key);
+                element.isHover(element.inside(x, y));
+            }
+        }
+    }
+
+    public void checkPress(int x, int y) {
+        if (!view.isModalActive()) {
+            for (String key : view.getElementKeys()) {
+                BaseElement element = view.getUIElement(key);
+                element.isClicked(element.inside(x, y));
+            }
+        } else {
+            for (String key : view.getModalElementKeys()) {
+                BaseElement element = view.getUIModalElement(key);
+                element.isClicked(element.inside(x, y));
+            }
+        }
+    }
+
     protected void asyncLoadStudentDataFromDB() {
 
         Runnable runnable = () -> {
             try {
                 String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                JSONObject studentKeys = JSONObject.parse(dbHandler.getDataFromDB(idsURL));
+                String responseIDs = dbHandler.getDataFromDB(idsURL);
+
                 String emailsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
-                JSONObject studentEmails = JSONObject.parse(dbHandler.getDataFromDB(emailsURL));
+                String responseEmails = dbHandler.getDataFromDB(emailsURL);
+
+                JSONObject studentKeys = JSONObject.parse(responseIDs);
+                JSONObject studentEmails = JSONObject.parse(responseEmails);
                 Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
 
+                model.getDBStudents().clear();
                 model.addDBStudentList(studentsInDB);
                 controllerLogic();
             } catch (IOException | NullPointerException e) {

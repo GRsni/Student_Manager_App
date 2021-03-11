@@ -11,7 +11,6 @@ import uca.esi.dni.file.EmailHandler;
 import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
-import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
 import uca.esi.dni.views.View;
@@ -45,30 +44,25 @@ public class EditController extends Controller {
         int x = e.getX();
         int y = e.getY();
 
-        TextField idTF = (TextField) view.getUIElement("idTF");
-        TextField emailTF = (TextField) view.getUIElement("emailTF");
-
         switch (e.getAction()) {
             case CLICK:
-                Button confirmEmpty = (Button) view.getUIElement("confirmEmptyB");
-                if (confirmEmpty.isVisible()) {
-                    if (confirmEmpty.inside(x, y)) {
+                if (view.isModalActive()) {
+                    if (view.getUIModalElement("confirmEmptyB").inside(x, y)) {
                         asyncEmptyDB();
                     }
-                    confirmEmpty.setVisible(false);
+                    setModalVisibility(false);
                 } else {
+                    TextField idTF = (TextField) view.getUIElement("idTF");
+                    TextField emailTF = (TextField) view.getUIElement("emailTF");
                     if (view.getUIElement("enterStudentB").inside(x, y)) {
-                        if (!idTF.getContent().isEmpty() && !emailTF.getContent().isEmpty()) {
-                            if (EmailHandler.isValidEmailAddress(emailTF.getContent())) {
-                                model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
-                                idTF.setContent("");
-                                emailTF.setContent("");
-                                getFocusedTextField().setFocused(false);
-                            } else {
-                                System.err.println("Error while validating email address");
-                            }
-                        } else {
-                            System.err.println("Empty fields");
+                        if (checkManualStudentData(idTF, emailTF)) {
+                            addManualDataToAuxList(idTF, emailTF);
+                            clearTextFields(idTF, emailTF);
+                        }
+                    } else if (view.getUIElement("removeStudentAuxB").inside(x, y)) {
+                        if (checkManualStudentData(idTF, emailTF)) {
+                            removeStudentFromAuxList(idTF.getContent());
+                            clearTextFields(idTF, emailTF);
                         }
                     } else if (view.getUIElement("selectFileB").inside(x, y)) {
                         selectInputFile();
@@ -77,16 +71,19 @@ public class EditController extends Controller {
                     } else if (view.getUIElement("addToListB").inside(x, y)) {
                         asyncAddStudentsToDB();
                     } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
-                        //TODO: Remove aux list from DB list
                         asyncRemoveStudentsFromDB();
                     } else if (view.getUIElement("emptyListB").inside(x, y)) {
-                        view.getUIElement("confirmEmptyB").setVisible(true);
+                        setModalVisibility(true);
                     } else if (idTF.inside(x, y)) {
                         idTF.setFocused(true);
                         emailTF.setFocused(false);
                     } else if (emailTF.inside(x, y)) {
                         idTF.setFocused(false);
                         emailTF.setFocused(true);
+                    } else if (view.getUIElement("dbStudentIL").inside(x, y)) {
+                        System.out.println("clicked db IL");
+                    } else if (view.getUIElement("auxStudentsIL").inside(x, y)) {
+                        System.out.println("clicked aux IL");
                     }
                 }
 
@@ -98,19 +95,10 @@ public class EditController extends Controller {
                 }
                 break;
             case MouseEvent.MOVE:
-                for (String key : view.getElementKeys()) {
-                    BaseElement element = view.getUIElement(key);
-                    element.isHover(element.inside(x, y));
-
-                }
+                checkHover(x, y);
                 break;
             case PRESS:
-                for (String key : view.getElementKeys()) {
-                    BaseElement element = view.getUIElement(key);
-                    if (element.inside(x, y)) {
-                        element.isClicked(true);
-                    }
-                }
+                checkPress(x, y);
             case RELEASE:
                 //release mouse event is unreliable, multiple events per mouse click
                 break;
@@ -118,9 +106,9 @@ public class EditController extends Controller {
                 ItemList dbList = (ItemList) view.getUIElement("dbStudentIL");
                 ItemList auxList = (ItemList) view.getUIElement("auxStudentsIL");
                 if (dbList.inside(x, y)) {
-                    dbList.handleInput(e);
+                    dbList.handleScroll(e);
                 } else if (auxList.inside(x, y)) {
-                    auxList.handleInput(e);
+                    auxList.handleScroll(e);
                 }
         }
         controllerLogic();
@@ -145,15 +133,62 @@ public class EditController extends Controller {
         }
     }
 
+    private void setModalVisibility(boolean visibility) {
+        view.setModalActive(visibility);
+        for (String key : view.getModalElementKeys()) {
+            view.getUIModalElement(key).setVisible(visibility);
+        }
+    }
+
+    private void addManualDataToAuxList(TextField idTF, TextField emailTF) {
+        model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
+
+    }
+
+    private void clearTextFields(TextField idTF, TextField emailTF) {
+        idTF.setContent("");
+        emailTF.setContent("");
+        getFocusedTextField().setFocused(false);
+    }
+
+
+    private boolean checkManualStudentData(TextField idTF, TextField emailTF) {
+        if (!idTF.getContent().isEmpty()) {
+            if (!emailTF.getContent().isEmpty()) {
+                if (EmailHandler.isValidEmailAddress(emailTF.getContent())) {
+                    return true;
+                } else {
+                    System.err.println("[Error validating email address].");
+                    return false;
+                }
+            } else {
+                return true;
+            }
+        } else {
+            System.err.println("[Error while reading student data]: Empty ID field");
+            return false;
+        }
+    }
+
+    private void removeStudentFromAuxList(String id) {
+        for (Student student : model.getTemporaryStudents()) {
+            if (student.getID().equals(id)) {
+                model.removeTemporaryStudent(student);
+                break;
+            }
+        }
+    }
+
+
     private void asyncAddStudentsToDB() {
         Runnable runnable = () -> {
             try {
                 Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
 
-                JSONObject idList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "ID");
+                JSONObject hashKeyList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "hashKey");
                 JSONObject emailList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "email");
                 Map<String, JSONObject> urlContentsMap = new HashMap<>();
-                urlContentsMap.put("Ids", idList);
+                urlContentsMap.put("Ids", hashKeyList);
                 urlContentsMap.put("Emails", emailList);
 
                 String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
@@ -236,7 +271,7 @@ public class EditController extends Controller {
 
                 model.addTemporaryStudentList(studentList);
             } catch (Exception e) {
-                System.err.println("Error loading the student list from CSV file");
+                System.err.println("[Error loading the student list from CSV file]: " + e.getMessage());
             }
 
         }
@@ -245,7 +280,8 @@ public class EditController extends Controller {
     private Set<Student> generateStudentListFromTable(Table studentIDTable) {
         Set<Student> students = new HashSet<>();
         for (TableRow row : studentIDTable.rows()) {
-            String id = row.getString("DNI");
+            String id = row.getString(0);
+            System.out.println(studentIDTable.getColumnIndex("email"));
             String email = row.getString("email");
             if (EmailHandler.isValidEmailAddress(email)) {
                 students.add(new Student(id, email));

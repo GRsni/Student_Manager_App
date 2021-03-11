@@ -2,12 +2,10 @@ package uca.esi.dni.views;
 
 import processing.core.PApplet;
 import processing.core.PFont;
+import processing.core.PImage;
 import uca.esi.dni.data.Student;
 import uca.esi.dni.file.UtilParser;
-import uca.esi.dni.ui.Button;
-import uca.esi.dni.ui.ItemList;
-import uca.esi.dni.ui.TextField;
-import uca.esi.dni.ui.Warning;
+import uca.esi.dni.ui.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,11 +32,16 @@ public class EditView extends View {
         PFont smallFont = parent.loadFont("data/fonts/Calibri-14.vlw");
         PFont bigFont = parent.loadFont("data/fonts/Calibri-30.vlw");
 
-        Button enterStudent = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 4.5f, WIDTH_UNIT_SIZE * 4,
+        Button enterStudent = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 4.5f, WIDTH_UNIT_SIZE * 27 / 10,
                 HEIGHT_UNIT_SIZE * 2, 3, "Introducir estudiante", true);
         enterStudent.setIcon(parent.loadImage("data/icons/edit-list.png"));
         enterStudent.setFont(bigFont);
         elements.put("enterStudentB", enterStudent);
+
+        Button removeStudent = new Button(parent, WIDTH_UNIT_SIZE * 4, HEIGHT_UNIT_SIZE * 4.5f, WIDTH_UNIT_SIZE,
+                HEIGHT_UNIT_SIZE * 2, 3, "Borrar estudiante", true);
+        removeStudent.setFont(smallFont);
+        elements.put("removeStudentAuxB", removeStudent);
 
         Button selectFile = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 10.5f, WIDTH_UNIT_SIZE * 4,
                 HEIGHT_UNIT_SIZE * 2, 3, "Seleccionar archivo", true);
@@ -69,13 +72,6 @@ public class EditView extends View {
         emptyList.setIcon(parent.loadImage("data/icons/empty-list.png"));
         emptyList.setFont(smallFont);
         elements.put("emptyListB", emptyList);
-
-        Button confirmEmpty = new Button(parent, WIDTH_UNIT_SIZE * 4, HEIGHT_UNIT_SIZE * 4, WIDTH_UNIT_SIZE * 8,
-                HEIGHT_UNIT_SIZE * 6, 3, "Confirmar vaciar la base de datos", false);
-        confirmEmpty.setIcon(parent.loadImage("data/icons/checked.png"));
-        confirmEmpty.setFont(bigFont);
-        confirmEmpty.setVisible(false);
-        elements.put("confirmEmptyB", confirmEmpty);
 
 
         TextField manuallyTF = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 1.5f, WIDTH_UNIT_SIZE * 3,
@@ -127,6 +123,18 @@ public class EditView extends View {
         DBStudentsItemList.setTitleFont(bigFont);
         elements.put("dbStudentIL", DBStudentsItemList);
 
+        PImage modal = parent.loadImage("data/background/edit_modal.png");
+        ModalCard modalCard = new ModalCard(parent, 0, 0, WIDTH_UNIT_SIZE * 16, HEIGHT_UNIT_SIZE * 16, modal);
+        modalCard.setVisible(false);
+        elementsOverModal.put("modalCard", modalCard);
+
+        Button confirmEmpty = new Button(parent, WIDTH_UNIT_SIZE * 4, HEIGHT_UNIT_SIZE * 4, WIDTH_UNIT_SIZE * 8,
+                HEIGHT_UNIT_SIZE * 6, 3, "Confirmar vaciar la base de datos", false);
+        confirmEmpty.setIcon(parent.loadImage("data/icons/checked.png"));
+        confirmEmpty.setFont(bigFont);
+        confirmEmpty.setVisible(false);
+        elementsOverModal.put("confirmEmptyB", confirmEmpty);
+
     }
 
     @Override
@@ -136,9 +144,11 @@ public class EditView extends View {
         inputFileTF.setContent(inputFile.getName());
 
         TextField auxCounter = (TextField) elements.get("auxStudentsTF");
+        //System.out.println("Added " + auxList.size() + " elements to aux counter");
         auxCounter.modifyCounter(auxList.size());
 
         TextField dbCounter = (TextField) elements.get("dbStudentsTF");
+        //System.out.println("Added " + dbList.size() + " elements to db counter");
         dbCounter.modifyCounter(dbList.size());
 
         ItemList auxItemList = (ItemList) elements.get("auxStudentsIL");

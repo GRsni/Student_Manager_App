@@ -20,8 +20,10 @@ public abstract class View {
     public static int HEIGHT_UNIT_SIZE;
 
     protected final Map<String, BaseElement> elements = new HashMap<>();
+    protected final Map<String, BaseElement> elementsOverModal = new HashMap<>();
 
     protected PImage background;
+    protected boolean modalActive = false;
 
     protected View(PApplet parent) {
         this.parent = parent;
@@ -46,14 +48,35 @@ public abstract class View {
                 elements.get(s).display();
             }
         }
+        for (String s : elementsOverModal.keySet()) {
+            if (elementsOverModal.get(s).isVisible()) {
+                elementsOverModal.get(s).display();
+            }
+        }
     }
 
     public Set<String> getElementKeys() {
         return elements.keySet();
     }
 
+    public Set<String> getModalElementKeys() {
+        return elementsOverModal.keySet();
+    }
+
     public BaseElement getUIElement(String key) {
         return elements.get(key);
+    }
+
+    public BaseElement getUIModalElement(String key) {
+        return elementsOverModal.get(key);
+    }
+
+    public boolean isModalActive() {
+        return modalActive;
+    }
+
+    public void setModalActive(boolean modalActive) {
+        this.modalActive = modalActive;
     }
 
     public static class COLORS {
