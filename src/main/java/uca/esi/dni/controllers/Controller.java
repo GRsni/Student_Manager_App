@@ -16,9 +16,12 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public abstract class Controller {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public enum VIEW_STATES {
         main,
@@ -111,13 +114,13 @@ public abstract class Controller {
         Runnable runnable = () -> {
             try {
                 String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                String responseIDs = dbHandler.getDataFromDB(idsURL);
+                ArrayList<String> responseIDs = dbHandler.getDataFromDB(idsURL);
 
                 String emailsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
-                String responseEmails = dbHandler.getDataFromDB(emailsURL);
+                ArrayList<String> responseEmails = dbHandler.getDataFromDB(emailsURL);
 
-                JSONObject studentKeys = JSONObject.parse(responseIDs);
-                JSONObject studentEmails = JSONObject.parse(responseEmails);
+                JSONObject studentKeys = JSONObject.parse(responseIDs.get(1));
+                JSONObject studentEmails = JSONObject.parse(responseEmails.get((1)));
                 Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
 
                 model.getDBStudents().clear();
@@ -125,9 +128,11 @@ public abstract class Controller {
                 controllerLogic();
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error loading data from DB]: " + e.getMessage());
+                LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
                 //Add warning
             } catch (RuntimeException e) {
                 System.err.println("[Error generating student list]: " + e.getMessage());
+                LOGGER.warning("[Error generating student list]: " + e.getMessage());
             }
 
         };

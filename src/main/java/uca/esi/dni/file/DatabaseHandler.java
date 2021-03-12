@@ -9,6 +9,7 @@ import processing.data.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DatabaseHandler {
@@ -29,54 +30,58 @@ public class DatabaseHandler {
         return url + directory + ".json?access_token=" + authToken;
     }
 
-    public String getDataFromDB(String url) throws IOException, NullPointerException {
-        String responseString = "";
+    public ArrayList<String> getDataFromDB(String url) throws IOException, NullPointerException {
+        ArrayList<String> responseStrings = new ArrayList<>();
         Request request = new Request.Builder()
                 .url(url)
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            responseString = response.body().string();
+            responseStrings.add(Integer.toString(response.code()));
+            responseStrings.add(response.body().string());
         }
-        return responseString;
+        return responseStrings;
     }
 
-    public String putDataToDB(String url, String jsonString) throws IOException, NullPointerException {
-        String responseString = "";
+    public ArrayList<String> putDataToDB(String url, String jsonString) throws IOException, NullPointerException {
+        ArrayList<String> responseStrings = new ArrayList<>();
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .put(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            responseString = response.body().string();
+            responseStrings.add(Integer.toString(response.code()));
+            responseStrings.add(response.body().string());
         }
-        return responseString;
+        return responseStrings;
     }
 
-    public String updateData(String url, String jsonString) throws IOException, NullPointerException {
-        String responseString = "";
+    public ArrayList<String> updateData(String url, String jsonString) throws IOException, NullPointerException {
+        ArrayList<String> responseStrings = new ArrayList<>();
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .patch(body)
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            responseString = response.body().string();
+            responseStrings.add(Integer.toString(response.code()));
+            responseStrings.add(response.body().string());
         }
-        return responseString;
+        return responseStrings;
     }
 
-    public String emptyDB(String url) throws IOException, NullPointerException {
-        String responseString = "";
+    public ArrayList<String> emptyDB(String url) throws IOException, NullPointerException {
+        ArrayList<String> responseStrings = new ArrayList<>();
         Request request = new Request.Builder()
                 .url(url)
                 .delete()
                 .build();
         try (Response response = client.newCall(request).execute()) {
-            responseString = response.body().string();
+            responseStrings.add(Integer.toString(response.code()));
+            responseStrings.add(response.body().string());
         }
-        return responseString;
+        return responseStrings;
     }
 
     private String generateAuthToken() throws IOException {

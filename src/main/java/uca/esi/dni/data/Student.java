@@ -88,6 +88,7 @@ public class Student {
     public String toString() {
         return "Student{" +
                 "ID='" + ID + '\'' +
+                ", plainKey='" + key + '\'' +
                 ", hashKey='" + hashKey + '\'' +
                 ", email='" + email + '\'' +
                 '}';

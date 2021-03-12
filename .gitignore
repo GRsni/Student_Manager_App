@@ -16,3 +16,5 @@ gradle-app.setting
 
 #Important files
 /data/files
+Log.txt
+Log.txt.lck

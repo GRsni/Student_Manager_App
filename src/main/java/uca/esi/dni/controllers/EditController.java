@@ -15,12 +15,12 @@ import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
 import uca.esi.dni.views.View;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Logger;
 
 import static processing.core.PConstants.ENTER;
 import static processing.core.PConstants.*;
@@ -29,6 +29,7 @@ import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.main;
 
 public class EditController extends Controller {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public EditController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
@@ -81,9 +82,9 @@ public class EditController extends Controller {
                         idTF.setFocused(false);
                         emailTF.setFocused(true);
                     } else if (view.getUIElement("dbStudentIL").inside(x, y)) {
-                        System.out.println("clicked db IL");
+                        view.getUIElement("dbStudentsIL").handleInput(e);
                     } else if (view.getUIElement("auxStudentsIL").inside(x, y)) {
-                        System.out.println("clicked aux IL");
+                        view.getUIElement("auxStudentsIL").handleInput(e);
                     }
                 }
 
@@ -159,6 +160,7 @@ public class EditController extends Controller {
                     return true;
                 } else {
                     System.err.println("[Error validating email address].");
+                    LOGGER.warning("[Error validating email address]: No valid address.");
                     return false;
                 }
             } else {
@@ -166,6 +168,7 @@ public class EditController extends Controller {
             }
         } else {
             System.err.println("[Error while reading student data]: Empty ID field");
+            LOGGER.warning("[Error while reading student data]:Empty ID field.");
             return false;
         }
     }
@@ -184,6 +187,7 @@ public class EditController extends Controller {
         Runnable runnable = () -> {
             try {
                 Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
+                savePlainStudentData(uniqueStudentSet);
 
                 JSONObject hashKeyList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "hashKey");
                 JSONObject emailList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "email");
@@ -194,15 +198,17 @@ public class EditController extends Controller {
                 String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
 
                 String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
-                String responseDataUpdate = dbHandler.updateData(baseURL, combined);
+                ArrayList<String> responseDataUpdate = dbHandler.updateData(baseURL, combined);
 
 
                 model.getTemporaryStudents().clear();
                 controllerLogic();
                 asyncLoadStudentDataFromDB();
                 System.out.println(responseDataUpdate);
+                LOGGER.info("[Response from DB]: " + responseDataUpdate.get(0));
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error while uploading data to the DB]: " + e.getMessage());
+                LOGGER.warning("[Error while uploading data to the DB]: " + e.getMessage());
             }
         };
 
@@ -223,14 +229,18 @@ public class EditController extends Controller {
                 String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
 
                 String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
-                String responseDataDelete = dbHandler.updateData(baseURL, combined);
+                ArrayList<String> responseDataDelete = dbHandler.updateData(baseURL, combined);
+
+                System.out.println(responseDataDelete);
+                LOGGER.info("[Response data from DB]: " + responseDataDelete.get(0));
 
                 model.getTemporaryStudents().clear();
                 controllerLogic();
                 asyncLoadStudentDataFromDB();
-                System.out.println(responseDataDelete);
+
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error while deleting data from the DB]: " + e.getMessage());
+                LOGGER.warning("[Error while deleting data from the DB]: " + e.getMessage());
             }
         };
 
@@ -242,12 +252,14 @@ public class EditController extends Controller {
         Runnable runnable = () -> {
             try {
                 String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
-                String response = dbHandler.emptyDB(baseURL);
+                ArrayList<String> response = dbHandler.emptyDB(baseURL);
                 model.getDBStudents().clear();
                 controllerLogic();
                 System.out.println(response);
+                LOGGER.info("[Response from DB]: " + response);
             } catch (IOException e) {
-                System.err.println("Error deleting data from DB: " + e.getMessage());
+                System.err.println("[Error deleting data from DB]: " + e.getMessage());
+                LOGGER.warning("[Error deleting data from DB]: " + e.getMessage());
             }
         };
 
@@ -266,12 +278,12 @@ public class EditController extends Controller {
         if (model.getInputFile().exists()) {
             try {
                 Table studentIDTable = parent.loadTable(model.getInputFile().getAbsolutePath(), "header");
-                System.out.println(studentIDTable.getRowCount());
                 Set<Student> studentList = generateStudentListFromTable(studentIDTable);
 
                 model.addTemporaryStudentList(studentList);
             } catch (Exception e) {
                 System.err.println("[Error loading the student list from CSV file]: " + e.getMessage());
+                LOGGER.warning("[Error loading the student list from CSV file]: " + e.getMessage());
             }
 
         }
@@ -281,7 +293,6 @@ public class EditController extends Controller {
         Set<Student> students = new HashSet<>();
         for (TableRow row : studentIDTable.rows()) {
             String id = row.getString(0);
-            System.out.println(studentIDTable.getColumnIndex("email"));
             String email = row.getString("email");
             if (EmailHandler.isValidEmailAddress(email)) {
                 students.add(new Student(id, email));
@@ -297,6 +308,20 @@ public class EditController extends Controller {
             return idTF;
         } else {
             return emailTF;
+        }
+    }
+
+    private void savePlainStudentData(Set<Student> students) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("data/files/student_data_backup.txt", true));
+            for (Student student : students) {
+                writer.append(student.toString()).append("\n");
+            }
+            writer.close();
+
+        } catch (IOException e) {
+            System.err.println("[Error saving plain student data]: " + e.getMessage());
+            LOGGER.warning("[Error saving plain student data]: " + e.getMessage());
         }
     }
 

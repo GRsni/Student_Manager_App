@@ -123,7 +123,7 @@ public class EditView extends View {
         DBStudentsItemList.setTitleFont(bigFont);
         elements.put("dbStudentIL", DBStudentsItemList);
 
-        PImage modal = parent.loadImage("data/background/edit_modal.png");
+        PImage modal = parent.loadImage("data/background/modal.png");
         ModalCard modalCard = new ModalCard(parent, 0, 0, WIDTH_UNIT_SIZE * 16, HEIGHT_UNIT_SIZE * 16, modal);
         modalCard.setVisible(false);
         elementsOverModal.put("modalCard", modalCard);
@@ -144,11 +144,9 @@ public class EditView extends View {
         inputFileTF.setContent(inputFile.getName());
 
         TextField auxCounter = (TextField) elements.get("auxStudentsTF");
-        //System.out.println("Added " + auxList.size() + " elements to aux counter");
         auxCounter.modifyCounter(auxList.size());
 
         TextField dbCounter = (TextField) elements.get("dbStudentsTF");
-        //System.out.println("Added " + dbList.size() + " elements to db counter");
         dbCounter.modifyCounter(dbList.size());
 
         ItemList auxItemList = (ItemList) elements.get("auxStudentsIL");

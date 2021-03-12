@@ -13,13 +13,16 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.edit;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.stats;
 
 public class MainController extends Controller {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public MainController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
@@ -52,7 +55,7 @@ public class MainController extends Controller {
                     //change view to statsView
                     changeState(stats);
                 } else if (view.getUIElement("dbStudentsIL").inside(e.getX(), e.getY())) {
-                    System.out.println("Clicked on db IL");
+                    view.getUIElement("dbStudentsIL").handleInput(e);
                 }
                 for (String key : view.getElementKeys()) {
                     BaseElement element = view.getUIElement(key);
@@ -92,15 +95,18 @@ public class MainController extends Controller {
         if (model.getDBReference() != null && model.getOutputFolder() != null) {
             try {
                 String usersURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Users");
-                JSONObject studentData = JSONObject.parse(dbHandler.getDataFromDB(usersURL));
+                ArrayList<String> response = dbHandler.getDataFromDB(usersURL);
+                JSONObject studentData = JSONObject.parse(response.get(1));
                 Map<String, Map<String, Table>> tableMap = UtilParser.createStudentsDataTables(studentData);
                 if (model.getOutputFolder() != null) {
                     saveLabTables(tableMap, model.getOutputFolder());
                 }
             } catch (IOException e) {
                 System.err.println("IOException when reading database");
+                LOGGER.warning("[IOException when reading database]: " + e.getMessage());
             } catch (NullPointerException e) {
                 System.err.println("Empty response from database");
+                LOGGER.warning("[Empty response from database]: " + e.getMessage());
             }
         }
     }
@@ -116,11 +122,13 @@ public class MainController extends Controller {
                 try {
                     parent.saveTable(labTable, pathToFolderStudentType, "csv");
                 } catch (Exception e) {
-                    System.err.println("Error while saving the student data tables");
+                    System.err.println("[Error while saving the student data tables]: " + e.getMessage());
+                    LOGGER.warning("[Error while saving the student data tables]: " + e.getMessage());
                 }
             }
         }
         System.out.println("Generated all files");
+        LOGGER.info("Generated all files.");
     }
 
     @Override

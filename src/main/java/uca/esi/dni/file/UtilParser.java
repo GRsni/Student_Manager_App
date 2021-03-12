@@ -7,11 +7,13 @@ import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class UtilParser {
     private static final Pattern idPattern = Pattern.compile("u[a-zA-Z0-9]{8}");
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public static String extractId(String line) {
 
@@ -20,8 +22,6 @@ public class UtilParser {
 
         // if we find a match, get the group
         if (m.find()) {
-            // we're only looking for one group, so get it
-            // and print it out for verification
             match = m.group(0);
         }
         return match;
@@ -106,8 +106,8 @@ public class UtilParser {
                     row.setString(k, stringToUse);
                 }
             } catch (Exception e2) {
-                System.err.println("exception: " + e2);
-                e2.printStackTrace();
+                System.err.println("[Exception while reading JSONObject]: " + e2.getMessage());
+                LOGGER.warning("[Exception while reading JSONObject]: " + e2.getMessage());
             }
         }
 
@@ -169,7 +169,6 @@ public class UtilParser {
                 }
             }
             if (!found) {
-                System.out.println("not found: " + s.getID());
                 unique.add(s);
             }
         }
