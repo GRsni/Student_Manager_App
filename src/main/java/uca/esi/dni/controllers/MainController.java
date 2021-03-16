@@ -63,20 +63,26 @@ public class MainController extends Controller {
                         element.isClicked(false);
                     }
                 }
-                controllerLogic();
+
                 break;
             case MOVE:
                 checkHover(e.getX(), e.getY());
                 break;
             case PRESS:
                 checkPress(e.getX(), e.getY());
+                break;
             case RELEASE:
                 //release mouse event is unreliable, multiple events per mouse click
                 break;
             case WHEEL:
                 ItemList list = (ItemList) view.getUIElement("dbStudentsIL");
-                list.handleInput(e);
+                if (list.inside(e.getX(), e.getY())) {
+                    list.handleInput(e);
+                    System.out.println("input in IL" + System.currentTimeMillis());
+                }
+                break;
         }
+        controllerLogic();
     }
 
     @Override
@@ -92,7 +98,7 @@ public class MainController extends Controller {
             Thread.onSpinWait(); //We need to wait for the output folder context menu to be closed before resuming execution
         }
 
-        if (model.getDBReference() != null && model.getOutputFolder() != null) {
+        if (model.getDBReference() != null && model.getOutputFolder().exists()) {
             try {
                 String usersURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Users");
                 ArrayList<String> response = dbHandler.getDataFromDB(usersURL);
@@ -107,6 +113,9 @@ public class MainController extends Controller {
             } catch (NullPointerException e) {
                 System.err.println("Empty response from database");
                 LOGGER.warning("[Empty response from database]: " + e.getMessage());
+            } catch (RuntimeException e) {
+                System.err.println("[Error while generating the CSV files]: " + e.getMessage());
+                LOGGER.severe("[Error while generating the CSV files]: \" + e.getMessage()");
             }
         }
     }

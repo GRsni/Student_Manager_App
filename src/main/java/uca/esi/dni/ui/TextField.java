@@ -108,11 +108,9 @@ public class TextField extends BaseElement {
     }
 
     public void display() {
-        parent.push();
         renderBackground();
         renderContent();
         renderCursor();
-        parent.pop();
     }
 
     private void renderBackground() {

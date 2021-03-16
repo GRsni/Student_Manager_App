@@ -94,6 +94,7 @@ public class EditController extends Controller {
                         element.isClicked(false);
                     }
                 }
+
                 break;
             case MouseEvent.MOVE:
                 checkHover(x, y);
@@ -107,10 +108,11 @@ public class EditController extends Controller {
                 ItemList dbList = (ItemList) view.getUIElement("dbStudentIL");
                 ItemList auxList = (ItemList) view.getUIElement("auxStudentsIL");
                 if (dbList.inside(x, y)) {
-                    dbList.handleScroll(e);
+                    dbList.handleInput(e);
                 } else if (auxList.inside(x, y)) {
-                    auxList.handleScroll(e);
+                    auxList.handleInput(e);
                 }
+                break;
         }
         controllerLogic();
     }
