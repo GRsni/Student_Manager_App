@@ -3,7 +3,7 @@ package uca.esi.dni.file;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilParserTest {
 
@@ -45,5 +45,28 @@ public class UtilParserTest {
         String test="u11111111u22222222";
         assertEquals(UtilParser.extractId(test), "u11111111",
                 "ID returned should be u11111111");
+    }
+
+    @Test
+    @DisplayName("checkFileExtension should return true when the extension matched the file extension")
+    public void givenAFileAndMatchingExtensionReturnTrue(){
+        String file="test.txt";
+        assertTrue(UtilParser.checkFileExtension(file, "txt"),
+                "Should return true");
+    }
+
+    @Test
+    @DisplayName("checkFileExtension should return false when the file provided has no extension")
+    public void givenAFileWithNoExtensionReturnFalse(){
+        String file="file";
+        assertFalse(UtilParser.checkFileExtension(file, "txt"),
+                "Should return false");
+    }
+
+    @Test
+    @DisplayName("checkFileExtension shoudl return false when no file is provided")
+    public void givenAnEmptyFileReturnFalse(){
+        assertFalse(UtilParser.checkFileExtension("", "txt"),
+                "Test should return false");
     }
 }

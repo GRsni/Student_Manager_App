@@ -29,7 +29,11 @@ public class UtilParser {
 
     public static boolean checkFileExtension(String file, String ext) {
         String fileExtension = DniParser.checkExtension(file);
-        return fileExtension.equals(ext);
+        if (fileExtension == null) {
+            return false;
+        } else {
+            return fileExtension.equals(ext);
+        }
     }
 
     public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) {
@@ -99,8 +103,7 @@ public class UtilParser {
                     double floatToUse = ((Number) v).doubleValue();
                     row.setDouble(k, floatToUse);
                 } else if (JSONObject.NULL.equals(v)) {
-                    Object nullToUse = null;
-
+                    row.setString(k, "null");
                 } else {
                     String stringToUse = practica.getString(k);
                     row.setString(k, stringToUse);
