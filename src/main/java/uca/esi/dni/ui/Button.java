@@ -10,7 +10,6 @@ public class Button extends BaseElement {
 
     private final int cornerR;
     private boolean active;
-    private boolean hasShadow = false;
 
     private PImage icon;
     private boolean isIconLoaded = false;
@@ -177,7 +176,7 @@ public class Button extends BaseElement {
 
     private void renderIcon() {
         if (isIconLoaded) {
-            parent.image(icon, pos.x + (int) (h * .2), pos.y + h / 2 - iconSize / 2);
+            parent.image(icon, pos.x + (int) (h * .2), pos.y + h / 2.0f - iconSize / 2.0f);
         }
     }
 

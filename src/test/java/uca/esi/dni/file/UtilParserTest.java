@@ -48,7 +48,7 @@ public class UtilParserTest {
     }
 
     @Test
-    @DisplayName("checkFileExtension should return true when the extension matched the file extension")
+    @DisplayName("checkFileExtension should return true when the extension matches the file extension")
     public void givenAFileAndMatchingExtensionReturnTrue(){
         String file="test.txt";
         assertTrue(UtilParser.checkFileExtension(file, "txt"),
@@ -64,9 +64,34 @@ public class UtilParserTest {
     }
 
     @Test
-    @DisplayName("checkFileExtension shoudl return false when no file is provided")
+    @DisplayName("checkFileExtension should return false when no file is provided")
     public void givenAnEmptyFileReturnFalse(){
         assertFalse(UtilParser.checkFileExtension("", "txt"),
                 "Test should return false");
     }
+
+    @Test
+    @DisplayName("checkFileExtension should return false when the extension doesn't match the file extension")
+    public void givenAnIncorrectExtensionReturnFalse(){
+        String file="test.txt";
+        assertFalse(UtilParser.checkFileExtension(file, "zip"),
+                "Test should return false");
+    }
+
+    @Test
+    @DisplayName("checkFileExtension should return false when the extension provided is empty")
+    public void givenAnEmptyExtensionReturnFalse(){
+        String file="file.txt";
+        assertFalse(UtilParser.checkFileExtension(file, ""),
+                "Test should return false");
+    }
+
+    @Test
+    @DisplayName("checkFileExtension should return false when the extension provided is null")
+    public void givenANullExtensionReturnFalse(){
+        String file="file.txt";
+        assertFalse(UtilParser.checkFileExtension(file, null),
+                "Test should return false");
+    }
+
 }

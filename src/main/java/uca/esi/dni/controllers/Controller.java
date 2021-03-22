@@ -6,6 +6,7 @@ import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 import uca.esi.dni.file.DatabaseHandler;
+import uca.esi.dni.file.EmailHandler;
 import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
@@ -29,7 +30,8 @@ public abstract class Controller {
         stats
     }
 
-    protected static DatabaseHandler dbHandler = new DatabaseHandler();
+    protected static final DatabaseHandler dbHandler = new DatabaseHandler();
+    protected static EmailHandler emailHandler;
     protected final AppModel model;
     protected final View view;
     protected final DniParser parent;
@@ -41,6 +43,7 @@ public abstract class Controller {
         this.parent = parent;
         this.model = model;
         this.view = view;
+        emailHandler = new EmailHandler(parent);
     }
 
     public boolean isClosedContextMenu() {

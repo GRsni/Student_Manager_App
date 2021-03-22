@@ -34,7 +34,7 @@ public class InputButton {
         parent.push();
         parent.textAlign(PApplet.LEFT, PApplet.CENTER);
         parent.textSize(14);
-        parent.text(filename, pos.x - 5 + inputB.getW() + 10, pos.y + inputB.getH() / 2 - 2);
+        parent.text(filename, pos.x - 5 + inputB.getW() + 10, pos.y + inputB.getH() / 2.0f - 2);
         parent.pop();
     }
 

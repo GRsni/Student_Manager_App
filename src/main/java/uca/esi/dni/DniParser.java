@@ -1,6 +1,7 @@
 package uca.esi.dni;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.controllers.Controller;
@@ -22,17 +23,21 @@ public class DniParser extends PApplet {
     public static View currentView;
     public static Controller currentController;
 
+    private static PImage icon;
+
     public static void main(String[] args) {
         PApplet.main(new String[]{DniParser.class.getName()});
     }
 
     public void settings() {
         size(displayWidth / 2, displayHeight / 2);
+        icon = loadImage("data/icons/server-storage_filled.png");
     }
 
     public void setup() {
         surface.setTitle("Manual de laboratorio: Gestor de datos");
         surface.setResizable(false);
+        surface.setIcon(icon);
         registerMethod("mouseEvent", this);
         registerMethod("keyEvent", this);
 

@@ -1,5 +1,7 @@
 package uca.esi.dni.file;
 
+import com.google.common.base.Charsets;
+import com.google.common.hash.Hashing;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
@@ -34,6 +36,10 @@ public class UtilParser {
         } else {
             return fileExtension.equals(ext);
         }
+    }
+
+    public static String getSHA256HashedString(String plain) {
+        return Hashing.sha256().hashString(plain, Charsets.UTF_8).toString();
     }
 
     public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) {
@@ -130,15 +136,11 @@ public class UtilParser {
     public static JSONObject getStudentAttributeJSONObject(Set<Student> students, String attribute) {
         JSONObject jsonObject = new JSONObject();
         for (Student student : students) {
-            jsonObject.setString(student.getID(), student.getAttributeFromStudent(attribute));
-        }
-        return jsonObject;
-    }
-
-    public static JSONObject getStudentNullJSONObject(Set<Student> students) {
-        JSONObject jsonObject = new JSONObject();
-        for (Student student : students) {
-            jsonObject.put(student.getID(), JSONObject.NULL);
+            if (attribute != null) {
+                jsonObject.setString(student.getID(), student.getAttributeFromStudent(attribute));
+            } else {
+                jsonObject.put(student.getID(), JSONObject.NULL);
+            }
         }
         return jsonObject;
     }

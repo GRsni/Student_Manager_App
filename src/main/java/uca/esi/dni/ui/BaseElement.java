@@ -18,7 +18,7 @@ public abstract class BaseElement {
     protected PFont font;
     protected int fontSize = 10;
 
-    private boolean hasShadow = false;
+    private final boolean hasShadow = false;
 
     public BaseElement(PApplet parent, PVector pos, int w, int h) {
         this.parent = parent;

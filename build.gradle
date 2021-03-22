@@ -20,9 +20,9 @@ dependencies {
     // Google's AUTH2 credentials API
     implementation 'com.google.auth:google-auth-library-oauth2-http:0.24.1'
     // email reception and sending
-    implementation 'com.sun.mail:android-mail:1.6.2'
+    // https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail
+    implementation group: 'com.sun.mail', name: 'jakarta.mail', version: '2.0.0'
     // email registering, checking
-    implementation 'com.sun.mail:android-activation:1.6.2'
     // https://mvnrepository.com/artifact/org.jfree/jfreechart
     implementation group: 'org.jfree', name: 'jfreechart', version: '1.5.0'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3

@@ -56,19 +56,19 @@ public class EditView extends View {
         elements.put("backB", back);
 
         Button addToList = new Button(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 2,
-                HEIGHT_UNIT_SIZE, 3, "Añadir a lista", true);
+                HEIGHT_UNIT_SIZE, 3, "Añadir a base de datos", true);
         addToList.setIcon(parent.loadImage("data/icons/add-to-list.png"));
         addToList.setFont(smallFont);
         elements.put("addToListB", addToList);
 
         Button deleteFromList = new Button(parent, WIDTH_UNIT_SIZE * 10, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 2,
-                HEIGHT_UNIT_SIZE, 3, "Eliminar de lista", true);
+                HEIGHT_UNIT_SIZE, 3, "Eliminar de base de datos", true);
         deleteFromList.setIcon(parent.loadImage("data/icons/delete-item.png"));
         deleteFromList.setFont(smallFont);
         elements.put("deleteFromListB", deleteFromList);
 
         Button emptyList = new Button(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 2,
-                HEIGHT_UNIT_SIZE, 3, "Vaciar lista", true);
+                HEIGHT_UNIT_SIZE, 3, "Vaciar base de datos", true);
         emptyList.setIcon(parent.loadImage("data/icons/empty-list.png"));
         emptyList.setFont(smallFont);
         elements.put("emptyListB", emptyList);
@@ -87,7 +87,7 @@ public class EditView extends View {
         IDTF.setClickable(true);
         elements.put("idTF", IDTF);
 
-        TextField emailTF = new TextField(parent, WIDTH_UNIT_SIZE * 3.5f, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 3 / 2,
+        TextField emailTF = new TextField(parent, WIDTH_UNIT_SIZE * 3f, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, "", "email");
         emailTF.setBackgroundColor(COLORS.WHITE);
         emailTF.setFont(smallFont);
@@ -104,7 +104,7 @@ public class EditView extends View {
         dbStudentsCounter.setFont(smallFont);
         elements.put("dbStudentsTF", dbStudentsCounter);
 
-        TextField inputFile = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 9, WIDTH_UNIT_SIZE * 3,
+        TextField inputFile = new TextField(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 9, WIDTH_UNIT_SIZE * 4,
                 HEIGHT_UNIT_SIZE, "", "Archivo de texto");
         inputFile.setBackgroundColor(COLORS.WHITE);
         inputFile.setFont(smallFont);

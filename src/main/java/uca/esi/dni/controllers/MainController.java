@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.edit;
-import static uca.esi.dni.controllers.Controller.VIEW_STATES.stats;
 
 public class MainController extends Controller {
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -31,7 +30,7 @@ public class MainController extends Controller {
     }
 
     private void initModelState() {
-        model.setDBReference(Controller.getDbHandler().getDBReference(parent, "data/files/databaseURL.json"));
+        model.setDBReference(Controller.getDbHandler().getDBReference(parent, "data/files/settings.json"));
         if (model.getDBStudents().isEmpty()) {
             asyncLoadStudentDataFromDB();
         }
@@ -53,7 +52,8 @@ public class MainController extends Controller {
                     generateExcelFiles();
                 } else if (view.getUIElement("generateStatsB").inside(e.getX(), e.getY())) {
                     //change view to statsView
-                    changeState(stats);
+                    //TODO: Implement stats view
+                    //changeState(stats);
                 } else if (view.getUIElement("dbStudentsIL").inside(e.getX(), e.getY())) {
                     view.getUIElement("dbStudentsIL").handleInput(e);
                 }
@@ -63,7 +63,6 @@ public class MainController extends Controller {
                         element.isClicked(false);
                     }
                 }
-
                 break;
             case MOVE:
                 checkHover(e.getX(), e.getY());

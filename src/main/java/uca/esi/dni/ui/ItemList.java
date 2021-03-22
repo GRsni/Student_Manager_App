@@ -173,15 +173,11 @@ public class ItemList extends BaseElement {
     }
 
     public void handleInput(MouseEvent e) {
-        //TODO: do something with the mouse wheel input
-
         if (SystemUtils.IS_OS_MAC_OSX) {
             scrollIndex = Math.min(maxScroll, Math.max(0, scrollIndex - e.getCount()));
         } else {
             scrollIndex = Math.min(maxScroll, Math.max(0, scrollIndex + e.getCount()));
         }
-        System.out.println("Scroll index: " + scrollIndex);
-
     }
 
     public void selectItemField(int x, int y) {

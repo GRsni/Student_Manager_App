@@ -17,11 +17,11 @@ public class DatabaseHandler {
             = MediaType.parse("application/json; charset=utf-8");
 
 
-    OkHttpClient client = new OkHttpClient();
+    final OkHttpClient client = new OkHttpClient();
 
     public String getDBReference(PApplet parent, String filename) {
         JSONObject object = parent.loadJSONObject(filename);
-        return object.getString("URL");
+        return object.getString("databaseURL");
     }
 
     public String generateDatabaseDirectoryURL(String url, String directory) throws IOException {
@@ -31,39 +31,40 @@ public class DatabaseHandler {
     }
 
     public ArrayList<String> getDataFromDB(String url) throws IOException, NullPointerException {
-        ArrayList<String> responseStrings = new ArrayList<>();
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            responseStrings.add(Integer.toString(response.code()));
-            responseStrings.add(response.body().string());
-        }
-        return responseStrings;
+        return callAndParseResponse(request);
     }
 
     public ArrayList<String> putDataToDB(String url, String jsonString) throws IOException, NullPointerException {
-        ArrayList<String> responseStrings = new ArrayList<>();
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .put(body)
                 .build();
-        try (Response response = client.newCall(request).execute()) {
-            responseStrings.add(Integer.toString(response.code()));
-            responseStrings.add(response.body().string());
-        }
-        return responseStrings;
+        return callAndParseResponse(request);
     }
 
     public ArrayList<String> updateData(String url, String jsonString) throws IOException, NullPointerException {
-        ArrayList<String> responseStrings = new ArrayList<>();
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .patch(body)
                 .build();
+        return callAndParseResponse(request);
+    }
+
+    public ArrayList<String> emptyDB(String url) throws IOException, NullPointerException {
+        Request request = new Request.Builder()
+                .url(url)
+                .delete()
+                .build();
+        return callAndParseResponse(request);
+    }
+
+    private ArrayList<String> callAndParseResponse(Request request) throws IOException {
+        ArrayList<String> responseStrings = new ArrayList<>();
         try (Response response = client.newCall(request).execute()) {
             responseStrings.add(Integer.toString(response.code()));
             responseStrings.add(response.body().string());
@@ -71,18 +72,6 @@ public class DatabaseHandler {
         return responseStrings;
     }
 
-    public ArrayList<String> emptyDB(String url) throws IOException, NullPointerException {
-        ArrayList<String> responseStrings = new ArrayList<>();
-        Request request = new Request.Builder()
-                .url(url)
-                .delete()
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            responseStrings.add(Integer.toString(response.code()));
-            responseStrings.add(response.body().string());
-        }
-        return responseStrings;
-    }
 
     private String generateAuthToken() throws IOException {
 

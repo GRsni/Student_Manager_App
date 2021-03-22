@@ -1,14 +1,13 @@
 package uca.esi.dni.data;
 
-import com.google.common.base.Charsets;
-import com.google.common.hash.Hashing;
+import uca.esi.dni.file.UtilParser;
 
 import java.security.SecureRandom;
 import java.util.Random;
 
 public class Student {
-    private final String VALID_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12345678";
-    private final int KEY_LENGTH = 7;
+    private static final String VALID_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12345678";
+    private static final int KEY_LENGTH = 7;
 
     private String ID;
     private String hashKey;
@@ -40,6 +39,10 @@ public class Student {
         this.ID = ID;
     }
 
+    public String getKey() {
+        return key;
+    }
+
     public String getHashKey() {
         return hashKey;
     }
@@ -57,7 +60,7 @@ public class Student {
     }
 
     private String keyToHash(String key) {
-        return Hashing.sha256().hashString(key, Charsets.UTF_8).toString();
+        return UtilParser.getSHA256HashedString(key);
     }
 
     private String generateRandomKey() {

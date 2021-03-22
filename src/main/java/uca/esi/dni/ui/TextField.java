@@ -18,7 +18,6 @@ public class TextField extends BaseElement {
     private boolean isFocused = false;
     private boolean isHeader = false;
 
-    private boolean hasShadow = false;
 
     public TextField(PApplet parent, float x, float y, int w, int h, String content, String hint) {
         super(parent, new PVector(x, y), w, h);

@@ -1,5 +1,6 @@
 package uca.esi.dni.controllers;
 
+import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
@@ -33,6 +34,7 @@ public class EditController extends Controller {
 
     public EditController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
+        controllerLogic();
     }
 
     @Override
@@ -70,7 +72,7 @@ public class EditController extends Controller {
                     } else if (view.getUIElement("backB").inside(x, y)) {
                         changeState(main);
                     } else if (view.getUIElement("addToListB").inside(x, y)) {
-                        asyncAddStudentsToDB();
+                        addStudentsToDBListButtonHook();
                     } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
                         asyncRemoveStudentsFromDB();
                     } else if (view.getUIElement("emptyListB").inside(x, y)) {
@@ -185,32 +187,27 @@ public class EditController extends Controller {
     }
 
 
-    private void asyncAddStudentsToDB() {
+    private void addStudentsToDBListButtonHook() {
         Runnable runnable = () -> {
-            try {
-                Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
-                savePlainStudentData(uniqueStudentSet);
 
-                JSONObject hashKeyList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "hashKey");
-                JSONObject emailList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "email");
-                Map<String, JSONObject> urlContentsMap = new HashMap<>();
-                urlContentsMap.put("Ids", hashKeyList);
-                urlContentsMap.put("Emails", emailList);
+            Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
+            if (uniqueStudentSet.size() > 0) {
+                try {
+                    savePlainStudentData(uniqueStudentSet);
+                    ArrayList<String> responseDataUpdate = uploadStudentListToDB(uniqueStudentSet);
+                    System.out.println(responseDataUpdate);
 
-                String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
+                    emailHandler.sendSecretKeyEmails(uniqueStudentSet);
 
-                String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
-                ArrayList<String> responseDataUpdate = dbHandler.updateData(baseURL, combined);
+                    model.getTemporaryStudents().clear();
+                    controllerLogic();
+                    asyncLoadStudentDataFromDB();
 
-
-                model.getTemporaryStudents().clear();
-                controllerLogic();
-                asyncLoadStudentDataFromDB();
-                System.out.println(responseDataUpdate);
-                LOGGER.info("[Response from DB]: " + responseDataUpdate.get(0));
-            } catch (IOException | NullPointerException e) {
-                System.err.println("[Error while uploading data to the DB]: " + e.getMessage());
-                LOGGER.warning("[Error while uploading data to the DB]: " + e.getMessage());
+                    LOGGER.info("[Response from DB]: " + responseDataUpdate.get(0));
+                } catch (IOException | NullPointerException e) {
+                    System.err.println("[Error while uploading data to the DB]: " + e.getMessage() + Arrays.toString(e.getStackTrace()));
+                    LOGGER.severe("[Error while uploading data to the DB]: " + e.getMessage());
+                }
             }
         };
 
@@ -218,15 +215,28 @@ public class EditController extends Controller {
         thread.start();
     }
 
+    private ArrayList<String> uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException {
+        Map<String, JSONObject> urlContentsMap = getHashKeyEmailMap(uniqueStudentSet);
+        String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
+        String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
+        return dbHandler.updateData(baseURL, combined);
+    }
+
+    @NotNull
+    private Map<String, JSONObject> getHashKeyEmailMap(Set<Student> uniqueStudentSet) {
+        JSONObject hashKeyList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "hashKey");
+        JSONObject emailList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "email");
+        Map<String, JSONObject> urlContentsMap = new HashMap<>();
+        urlContentsMap.put("Ids", hashKeyList);
+        urlContentsMap.put("Emails", emailList);
+        return urlContentsMap;
+    }
+
     private void asyncRemoveStudentsFromDB() {
         Runnable runnable = () -> {
             try {
                 Set<Student> coincidentStudentSet = UtilParser.getCoincidentStudentSet(model.getTemporaryStudents(), model.getDBStudents());
-                JSONObject nullList = UtilParser.getStudentNullJSONObject(coincidentStudentSet);
-                Map<String, JSONObject> urlContentsMap = new HashMap<>();
-                urlContentsMap.put("Ids", nullList);
-                urlContentsMap.put("Emails", nullList);
-                urlContentsMap.put("Users", nullList);
+                Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersMap(coincidentStudentSet);
 
                 String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
 
@@ -248,6 +258,16 @@ public class EditController extends Controller {
 
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    @NotNull
+    private Map<String, JSONObject> getIDsEmailsUsersMap(Set<Student> coincidentStudentSet) {
+        JSONObject nullList = UtilParser.getStudentAttributeJSONObject(coincidentStudentSet, null);
+        Map<String, JSONObject> urlContentsMap = new HashMap<>();
+        urlContentsMap.put("Ids", nullList);
+        urlContentsMap.put("Emails", nullList);
+        urlContentsMap.put("Users", nullList);
+        return urlContentsMap;
     }
 
     private void asyncEmptyDB() {
