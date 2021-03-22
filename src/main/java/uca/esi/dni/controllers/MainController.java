@@ -30,7 +30,7 @@ public class MainController extends Controller {
     }
 
     private void initModelState() {
-        model.setDBReference(Controller.getDbHandler().getDBReference(parent, "data/files/settings.json"));
+        model.setDBReference(dbHandler.getDBReference(parent, "data/files/settings.json"));
         if (model.getDBStudents().isEmpty()) {
             asyncLoadStudentDataFromDB();
         }
@@ -99,9 +99,9 @@ public class MainController extends Controller {
 
         if (model.getDBReference() != null && model.getOutputFolder().exists()) {
             try {
-                String usersURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Users");
+                String usersURL = dbHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
                 ArrayList<String> response = dbHandler.getDataFromDB(usersURL);
-                JSONObject studentData = JSONObject.parse(response.get(1));
+                JSONObject studentData = UtilParser.parseJSONObject(response.get(1));
                 Map<String, Map<String, Table>> tableMap = UtilParser.createStudentsDataTables(studentData);
                 if (model.getOutputFolder() != null) {
                     saveLabTables(tableMap, model.getOutputFolder());

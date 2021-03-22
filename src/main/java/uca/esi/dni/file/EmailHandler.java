@@ -1,13 +1,16 @@
 package uca.esi.dni.file;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
 import jakarta.mail.*;
-import jakarta.mail.internet.AddressException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.*;
 import processing.core.PApplet;
 import processing.data.JSONObject;
 import uca.esi.dni.data.Student;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -36,6 +39,14 @@ public class EmailHandler {
         loadSettings();
     }
 
+    public static String getSender() {
+        return sender;
+    }
+
+    public static void setSender(String sender) {
+        EmailHandler.sender = sender;
+    }
+
     public static boolean isValidEmailAddress(String email) {
         boolean result = true;
         try {
@@ -48,15 +59,26 @@ public class EmailHandler {
     }
 
     public void sendSecretKeyEmails(Set<Student> students) {
-        Session session = generateSessionObject();
-
+        Map<String, String> emailContentMap = new HashMap<>();
         for (Student student : students) {
             String formattedMessage = String.format(contentText, student.getKey(), student.getID(), sender);
-            sendHTMLEmail(student.getEmail(), subjectText, formattedMessage, session);
-
+            emailContentMap.put(student.getEmail(), formattedMessage);
         }
+        sendEmailCollection(emailContentMap);
         System.out.println("[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size());
         LOGGER.info("[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size());
+    }
+
+    public void sendUniqueEmail(String dest, String header, String contentText, String attachment) {
+        Session session = generateSessionObject();
+        sendHTMLEmail(dest, header, contentText, attachment, session);
+    }
+
+    private void sendEmailCollection(Map<String, String> emailContentMap) {
+        Session session = generateSessionObject();
+        for (String email : emailContentMap.keySet()) {
+            sendHTMLEmail(email, EmailHandler.subjectText, emailContentMap.get(email), session);
+        }
     }
 
     private Session generateSessionObject() {
@@ -80,12 +102,19 @@ public class EmailHandler {
     }
 
     private void sendHTMLEmail(String dest, String header, String contentText, Session session) {
+        sendHTMLEmail(dest, header, contentText, "", session);
+    }
+
+    private void sendHTMLEmail(String dest, String header, String contentText, String attachment, Session session) {
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(sender));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
             message.setSubject(header);
             message.setContent(contentText, "text/html; charset=UTF-8");
+            if (attachment != null && !attachment.isEmpty()) {
+                setAttachment(message, attachment);
+            }
             Transport.send(message);
         } catch (MessagingException e) {
             System.err.println("[Error sending email]: " + e.getMessage());
@@ -93,6 +122,21 @@ public class EmailHandler {
         }
     }
 
+
+    public static void setAttachment(Message message, String filename) throws MessagingException {
+        // create a multipart message
+        Multipart multipart = new MimeMultipart();
+        BodyPart messageBodyPart = new MimeBodyPart();
+
+        // specify your file
+        DataSource source = new FileDataSource(filename);
+        messageBodyPart.setDataHandler(new DataHandler(source));
+        messageBodyPart.setFileName(filename);
+
+        //Add the file part
+        multipart.addBodyPart(messageBodyPart);
+        message.setContent(multipart);
+    }
 
     private void loadSettings() {
         JSONObject settingsObject = EmailHandler.parent.loadJSONObject("data/files/settings.json");

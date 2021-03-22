@@ -42,6 +42,14 @@ public class UtilParser {
         return Hashing.sha256().hashString(plain, Charsets.UTF_8).toString();
     }
 
+    public static JSONObject parseJSONObject(String text) {
+        if (text != null && !text.isEmpty() && !text.equals("null")) {
+            return JSONObject.parse(text);
+        } else {
+            return new JSONObject();
+        }
+    }
+
     public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) {
         Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
         ArrayList<String> ids = getKeysInJSONObject(allStudentsList);
@@ -77,28 +85,28 @@ public class UtilParser {
         return keys;
     }
 
-    private static Table parseJSONDataIntoTable(JSONObject labsOneType) {
+    private static Table parseJSONDataIntoTable(JSONObject jsonObject) {
         Table table = new Table();
-        ArrayList<String> labsKeys = getKeysInJSONObject(labsOneType);
-        ArrayList<String> labDataKeys = getKeysInJSONObject(labsOneType.getJSONObject(labsKeys.get(0)));
+        ArrayList<String> entries = getKeysInJSONObject(jsonObject);
+        ArrayList<String> entryKeys = getKeysInJSONObject(jsonObject.getJSONObject(entries.get(0)));
 
-        for (String key : labDataKeys) {
+        for (String key : entryKeys) {
             table.addColumn(key);
         }
 
-        for (String entryKey : labsKeys) {
-            JSONObject entry = labsOneType.getJSONObject(entryKey);
+        for (String entry : entries) {
+            JSONObject entryJSONObject = jsonObject.getJSONObject(entry);
             TableRow row = table.addRow();
-            populateRowFromPracticaObject(entry, row);
+            populateRowFromPracticaObject(entryJSONObject, row);
         }
 
         return table;
     }
 
-    private static void populateRowFromPracticaObject(JSONObject practica, TableRow row) {
-        for (String k : getKeysInJSONObject(practica)) {
+    private static void populateRowFromPracticaObject(JSONObject jsonObject, TableRow row) {
+        for (String k : getKeysInJSONObject(jsonObject)) {
             try {
-                Object v = practica.get(k);
+                Object v = jsonObject.get(k);
                 if (v instanceof Integer || v instanceof Long) {
                     long intToUse = ((Number) v).longValue();
                     row.setLong(k, intToUse);
@@ -111,7 +119,7 @@ public class UtilParser {
                 } else if (JSONObject.NULL.equals(v)) {
                     row.setString(k, "null");
                 } else {
-                    String stringToUse = practica.getString(k);
+                    String stringToUse = jsonObject.getString(k);
                     row.setString(k, stringToUse);
                 }
             } catch (Exception e2) {

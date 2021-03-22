@@ -8,6 +8,7 @@ import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
+import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.EmailHandler;
 import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
@@ -16,9 +17,7 @@ import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
 import uca.esi.dni.views.View;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -51,7 +50,7 @@ public class EditController extends Controller {
             case CLICK:
                 if (view.isModalActive()) {
                     if (view.getUIModalElement("confirmEmptyB").inside(x, y)) {
-                        asyncEmptyDB();
+                        asyncEmptyDBButtonHook();
                     }
                     setModalVisibility(false);
                 } else {
@@ -72,9 +71,9 @@ public class EditController extends Controller {
                     } else if (view.getUIElement("backB").inside(x, y)) {
                         changeState(main);
                     } else if (view.getUIElement("addToListB").inside(x, y)) {
-                        addStudentsToDBListButtonHook();
+                        asyncAddStudentsToDBListButtonHook();
                     } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
-                        asyncRemoveStudentsFromDB();
+                        asyncRemoveStudentsFromDBButtonHook();
                     } else if (view.getUIElement("emptyListB").inside(x, y)) {
                         setModalVisibility(true);
                     } else if (idTF.inside(x, y)) {
@@ -187,23 +186,25 @@ public class EditController extends Controller {
     }
 
 
-    private void addStudentsToDBListButtonHook() {
+    private void asyncAddStudentsToDBListButtonHook() {
         Runnable runnable = () -> {
 
             Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
             if (uniqueStudentSet.size() > 0) {
                 try {
-                    savePlainStudentData(uniqueStudentSet);
                     ArrayList<String> responseDataUpdate = uploadStudentListToDB(uniqueStudentSet);
-                    System.out.println(responseDataUpdate);
+                    if (responseDataUpdate.get(0).equals("200")) {
+                        LOGGER.info("[General information]: Added " + uniqueStudentSet.size() + " students to DB.");
+                        savePlainStudentDataToFile(uniqueStudentSet);
+                        emailHandler.sendSecretKeyEmails(uniqueStudentSet);
+                        emailHandler.sendUniqueEmail(EmailHandler.getSender(), "Copia de seguridad de datos de alumnos.",
+                                "Se adjunta la lista de contraseñas en texto plano de los alumnos añadidos a la base de datos",
+                                "data/files/student_data_backup.json");
+                        model.getTemporaryStudents().clear();
+                        controllerLogic();
 
-                    emailHandler.sendSecretKeyEmails(uniqueStudentSet);
-
-                    model.getTemporaryStudents().clear();
-                    controllerLogic();
-                    asyncLoadStudentDataFromDB();
-
-                    LOGGER.info("[Response from DB]: " + responseDataUpdate.get(0));
+                        asyncLoadStudentDataFromDB();
+                    }
                 } catch (IOException | NullPointerException e) {
                     System.err.println("[Error while uploading data to the DB]: " + e.getMessage() + Arrays.toString(e.getStackTrace()));
                     LOGGER.severe("[Error while uploading data to the DB]: " + e.getMessage());
@@ -218,7 +219,7 @@ public class EditController extends Controller {
     private ArrayList<String> uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException {
         Map<String, JSONObject> urlContentsMap = getHashKeyEmailMap(uniqueStudentSet);
         String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
-        String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
+        String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "");
         return dbHandler.updateData(baseURL, combined);
     }
 
@@ -232,23 +233,26 @@ public class EditController extends Controller {
         return urlContentsMap;
     }
 
-    private void asyncRemoveStudentsFromDB() {
+    private void asyncRemoveStudentsFromDBButtonHook() {
         Runnable runnable = () -> {
+
+            Set<Student> coincidentStudentSet = UtilParser.getCoincidentStudentSet(model.getTemporaryStudents(), model.getDBStudents());
             try {
-                Set<Student> coincidentStudentSet = UtilParser.getCoincidentStudentSet(model.getTemporaryStudents(), model.getDBStudents());
-                Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersMap(coincidentStudentSet);
+                if (coincidentStudentSet.size() > 0) {
+                    Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersMap(coincidentStudentSet);
+                    String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
 
-                String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
+                    String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "");
+                    ArrayList<String> responseDataDelete = dbHandler.updateData(baseURL, combined);
+                    if (responseDataDelete.get(0).equals("200")) {
+                        LOGGER.info("[General information]: Removed " + coincidentStudentSet.size() + " students from DB.");
+                        removePlainStudentDataFromFile(coincidentStudentSet);
+                        model.getTemporaryStudents().clear();
+                        controllerLogic();
 
-                String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
-                ArrayList<String> responseDataDelete = dbHandler.updateData(baseURL, combined);
-
-                System.out.println(responseDataDelete);
-                LOGGER.info("[Response data from DB]: " + responseDataDelete.get(0));
-
-                model.getTemporaryStudents().clear();
-                controllerLogic();
-                asyncLoadStudentDataFromDB();
+                        asyncLoadStudentDataFromDB();
+                    }
+                }
 
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error while deleting data from the DB]: " + e.getMessage());
@@ -270,15 +274,17 @@ public class EditController extends Controller {
         return urlContentsMap;
     }
 
-    private void asyncEmptyDB() {
+    private void asyncEmptyDBButtonHook() {
         Runnable runnable = () -> {
             try {
-                String baseURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "");
+                String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "");
                 ArrayList<String> response = dbHandler.emptyDB(baseURL);
-                model.getDBStudents().clear();
-                controllerLogic();
-                System.out.println(response);
-                LOGGER.info("[Response from DB]: " + response);
+                if (response.get(0).equals("200")) {
+                    LOGGER.info("[General information]: Emptied data from DB.");
+                    removePlainStudentDataFromFile(model.getDBStudents());
+                    model.getDBStudents().clear();
+                    controllerLogic();
+                }
             } catch (IOException e) {
                 System.err.println("[Error deleting data from DB]: " + e.getMessage());
                 LOGGER.warning("[Error deleting data from DB]: " + e.getMessage());
@@ -332,21 +338,6 @@ public class EditController extends Controller {
             return emailTF;
         }
     }
-
-    private void savePlainStudentData(Set<Student> students) {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("data/files/student_data_backup.txt", true));
-            for (Student student : students) {
-                writer.append(student.toString()).append("\n");
-            }
-            writer.close();
-
-        } catch (IOException e) {
-            System.err.println("[Error saving plain student data]: " + e.getMessage());
-            LOGGER.warning("[Error saving plain student data]: " + e.getMessage());
-        }
-    }
-
 
     @Override
     public void onContextMenuClosed(File file) {

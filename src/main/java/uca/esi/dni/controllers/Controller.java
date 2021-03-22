@@ -1,5 +1,6 @@
 package uca.esi.dni.controllers;
 
+import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
@@ -116,19 +117,19 @@ public abstract class Controller {
 
         Runnable runnable = () -> {
             try {
-                String idsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Ids");
+                String idsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Ids");
                 ArrayList<String> responseIDs = dbHandler.getDataFromDB(idsURL);
 
-                String emailsURL = dbHandler.generateDatabaseDirectoryURL(model.getDBReference(), "Emails");
+                String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Emails");
                 ArrayList<String> responseEmails = dbHandler.getDataFromDB(emailsURL);
-
-                JSONObject studentKeys = JSONObject.parse(responseIDs.get(1));
-                JSONObject studentEmails = JSONObject.parse(responseEmails.get((1)));
-                Set<Student> studentsInDB = UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
-
-                model.getDBStudents().clear();
-                model.addDBStudentList(studentsInDB);
-                controllerLogic();
+                if (responseIDs.get(0).equals("200") && responseEmails.get(0).equals("200")) {
+                    Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
+                    model.getDBStudents().clear();
+                    model.addDBStudentList(studentsInDB);
+                    controllerLogic();
+                    System.out.println(" Loaded " + studentsInDB.size() + " students from DB.");
+                    LOGGER.info("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
+                }
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error loading data from DB]: " + e.getMessage());
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
@@ -142,7 +143,39 @@ public abstract class Controller {
 
         Thread thread = new Thread(runnable);
         thread.start();
+    }
 
+    protected void savePlainStudentDataToFile(Set<Student> students) {
+        try {
+            JSONObject studentBackup = parent.loadJSONObject("data/files/student_data_backup.json");
+            for (Student student : students) {
+                studentBackup.setString(student.getID(), student.toString());
+            }
+            parent.saveJSONObject(studentBackup, "data/files/student_data_backup.json");
+        } catch (NullPointerException e) {
+            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
+        }
+    }
+
+    protected void removePlainStudentDataFromFile(Set<Student> students) {
+        try {
+            JSONObject studentBackup = parent.loadJSONObject("data/files/student_data_backup.json");
+            for (Student student : students) {
+                if (studentBackup.keys().contains(student.getID())) {
+                    studentBackup.remove(student.getID());
+                }
+            }
+            parent.saveJSONObject(studentBackup, "data/files/student_data_backup.json");
+        } catch (NullPointerException e) {
+            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
+        }
+    }
+
+    @NotNull
+    private Set<Student> generateStudentSetFromDB(ArrayList<String> responseIDs, ArrayList<String> responseEmails) {
+        JSONObject studentKeys = UtilParser.parseJSONObject(responseIDs.get(1));
+        JSONObject studentEmails = UtilParser.parseJSONObject(responseEmails.get((1)));
+        return UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
     }
 
     private void loadInitialState() {

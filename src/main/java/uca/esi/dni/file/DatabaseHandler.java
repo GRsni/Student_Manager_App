@@ -24,10 +24,28 @@ public class DatabaseHandler {
         return object.getString("databaseURL");
     }
 
-    public String generateDatabaseDirectoryURL(String url, String directory) throws IOException {
+    public static String getDatabaseDirectoryURL(String url, String directory) throws IOException {
         String authToken = generateAuthToken();
 
         return url + directory + ".json?access_token=" + authToken;
+    }
+
+    private static String generateAuthToken() throws IOException {
+
+        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("data/files/manualdetorsion-firebase-adminsdk-mgqwd-f49108aaae.json"));
+        GoogleCredentials scoped = credentials.createScoped(
+                Arrays.asList(
+                        "https://www.googleapis.com/auth/firebase.database",
+                        "https://www.googleapis.com/auth/userinfo.email"
+                )
+        );
+        scoped.refreshIfExpired();
+        AccessToken token = scoped.getAccessToken();
+
+        // See the "Using the access token" section below for information
+        // on how to use the access token to send authenticated requests to the
+        // Realtime Database REST API.
+        return token.getTokenValue();
     }
 
     public ArrayList<String> getDataFromDB(String url) throws IOException, NullPointerException {
@@ -72,22 +90,4 @@ public class DatabaseHandler {
         return responseStrings;
     }
 
-
-    private String generateAuthToken() throws IOException {
-
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("data/files/manualdetorsion-firebase-adminsdk-mgqwd-f49108aaae.json"));
-        GoogleCredentials scoped = credentials.createScoped(
-                Arrays.asList(
-                        "https://www.googleapis.com/auth/firebase.database",
-                        "https://www.googleapis.com/auth/userinfo.email"
-                )
-        );
-        scoped.refreshIfExpired();
-        AccessToken token = scoped.getAccessToken();
-
-        // See the "Using the access token" section below for information
-        // on how to use the access token to send authenticated requests to the
-        // Realtime Database REST API.
-        return token.getTokenValue();
-    }
 }
