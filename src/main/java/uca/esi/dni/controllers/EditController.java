@@ -145,7 +145,12 @@ public class EditController extends Controller {
     }
 
     private void addManualDataToAuxList(TextField idTF, TextField emailTF) {
-        model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
+        try {
+            model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
+        } catch (NullPointerException e) {
+            System.err.println("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+            LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+        }
 
     }
 
@@ -323,7 +328,12 @@ public class EditController extends Controller {
             String id = row.getString(0);
             String email = row.getString("email");
             if (EmailHandler.isValidEmailAddress(email)) {
-                students.add(new Student(id, email));
+                try {
+                    students.add(new Student(id, email));
+                } catch (NullPointerException e) {
+                    System.err.println("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+                    LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+                }
             }
         }
         return students;

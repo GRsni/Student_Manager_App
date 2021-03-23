@@ -147,7 +147,7 @@ public abstract class Controller {
 
     protected void savePlainStudentDataToFile(Set<Student> students) {
         try {
-            JSONObject studentBackup = parent.loadJSONObject("data/files/student_data_backup.json");
+            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
             for (Student student : students) {
                 studentBackup.setString(student.getID(), student.toString());
             }
@@ -159,7 +159,7 @@ public abstract class Controller {
 
     protected void removePlainStudentDataFromFile(Set<Student> students) {
         try {
-            JSONObject studentBackup = parent.loadJSONObject("data/files/student_data_backup.json");
+            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
             for (Student student : students) {
                 if (studentBackup.keys().contains(student.getID())) {
                     studentBackup.remove(student.getID());

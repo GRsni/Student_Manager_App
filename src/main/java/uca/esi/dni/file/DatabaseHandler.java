@@ -20,7 +20,7 @@ public class DatabaseHandler {
     final OkHttpClient client = new OkHttpClient();
 
     public String getDBReference(PApplet parent, String filename) {
-        JSONObject object = parent.loadJSONObject(filename);
+        JSONObject object = UtilParser.loadJSONObject(filename);
         return object.getString("databaseURL");
     }
 

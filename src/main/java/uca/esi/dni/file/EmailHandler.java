@@ -139,7 +139,7 @@ public class EmailHandler {
     }
 
     private void loadSettings() {
-        JSONObject settingsObject = EmailHandler.parent.loadJSONObject("data/files/settings.json");
+        JSONObject settingsObject = UtilParser.loadJSONObject("data/files/settings.json");
         sender = settingsObject.getString("senderEmail");
         username = settingsObject.getString("senderUsername");
         password = settingsObject.getString("senderPassword");

@@ -1,13 +1,19 @@
 package uca.esi.dni.data;
 
+import org.jetbrains.annotations.NotNull;
 import uca.esi.dni.file.UtilParser;
+import uca.esi.dni.logger.AppLogger;
 
 import java.security.SecureRandom;
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class Student {
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
     private static final String VALID_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12345678";
     private static final int KEY_LENGTH = 7;
+
 
     private String ID;
     private String hashKey;
@@ -18,7 +24,7 @@ public class Student {
 
     }
 
-    public Student(String ID, String email) {
+    public Student(String ID, String email) throws NullPointerException {
         this.ID = ID;
         this.email = email;
         this.key = generateRandomKey();
@@ -59,8 +65,14 @@ public class Student {
         this.email = email;
     }
 
-    private String keyToHash(String key) {
-        return UtilParser.getSHA256HashedString(key);
+    private String keyToHash(@NotNull String key) throws NullPointerException {
+        try {
+            return UtilParser.getSHA256HashedString(key);
+        } catch (NullPointerException e) {
+            System.err.println("[Error while generating hashedKey]: " + e.getMessage());
+            LOGGER.severe("[Error while generating hashedKey]: " + e.getMessage());
+            throw e;
+        }
     }
 
     private String generateRandomKey() {

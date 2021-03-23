@@ -2,12 +2,15 @@ package uca.esi.dni.file;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
+import org.jetbrains.annotations.NotNull;
+import processing.core.PApplet;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -38,8 +41,27 @@ public class UtilParser {
         }
     }
 
+    @NotNull
     public static String getSHA256HashedString(String plain) {
         return Hashing.sha256().hashString(plain, Charsets.UTF_8).toString();
+    }
+
+    public static JSONObject loadJSONObject(String filepath) {
+        if (filepath != null) {
+            File file = new File(filepath);
+            if (file.exists() && checkFileExtension(filepath, "json")) {
+                try {
+                    InputStream inputStream = new FileInputStream(file);
+                    String fileContent = readFromInputStream(inputStream);
+                    return parseJSONObject(fileContent);
+                } catch (IOException e) {
+                    System.err.println("[Error while reading JSON file]: " + e.getMessage());
+                    LOGGER.severe("[Error while reading JSON file]: " + e.getMessage());
+                    return new JSONObject();
+                }
+            }
+        }
+        return new JSONObject();
     }
 
     public static JSONObject parseJSONObject(String text) {
@@ -50,6 +72,19 @@ public class UtilParser {
         }
     }
 
+    private static String readFromInputStream(InputStream inputStream)
+            throws IOException {
+        StringBuilder resultStringBuilder = new StringBuilder();
+        try (BufferedReader br
+                     = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                resultStringBuilder.append(line).append("\n");
+            }
+        }
+        return resultStringBuilder.toString();
+    }
+
     public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) {
         Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
         ArrayList<String> ids = getKeysInJSONObject(allStudentsList);
@@ -58,14 +93,14 @@ public class UtilParser {
             Map<String, Table> tableMap = new HashMap<>();
             JSONObject studentData = allStudentsList.getJSONObject(id);
 
-            JSONObject practicas = studentData.getJSONObject("practicas");
-            if (practicas != null) {
-                ArrayList<String> tiposPracticas = getKeysInJSONObject(practicas);
-                for (String tipo : tiposPracticas) {
-                    JSONObject practica = practicas.getJSONObject(tipo);
-                    if (practica != null) {
-                        Table dataTable = parseJSONDataIntoTable(practica);
-                        tableMap.put(tipo, dataTable);
+            JSONObject labs = studentData.getJSONObject("practicas");
+            if (labs != null) {
+                ArrayList<String> labTypes = getKeysInJSONObject(labs);
+                for (String labType : labTypes) {
+                    JSONObject labRun = labs.getJSONObject(labType);
+                    if (labRun != null) {
+                        Table dataTable = parseJSONDataIntoTable(labRun);
+                        tableMap.put(labType, dataTable);
                     }
                 }
             }
@@ -97,13 +132,13 @@ public class UtilParser {
         for (String entry : entries) {
             JSONObject entryJSONObject = jsonObject.getJSONObject(entry);
             TableRow row = table.addRow();
-            populateRowFromPracticaObject(entryJSONObject, row);
+            populateRowFromLabRunObject(entryJSONObject, row);
         }
 
         return table;
     }
 
-    private static void populateRowFromPracticaObject(JSONObject jsonObject, TableRow row) {
+    private static void populateRowFromLabRunObject(JSONObject jsonObject, TableRow row) {
         for (String k : getKeysInJSONObject(jsonObject)) {
             try {
                 Object v = jsonObject.get(k);
@@ -153,7 +188,8 @@ public class UtilParser {
         return jsonObject;
     }
 
-    public static Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws RuntimeException {
+    public static Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws
+            RuntimeException {
         Set<Student> students = new HashSet<>();
         ArrayList<String> ids = getKeysInJSONObject(emails);
         for (String id : ids) {
