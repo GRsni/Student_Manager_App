@@ -5,24 +5,19 @@ import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
-import processing.core.PApplet;
 import processing.data.JSONObject;
 import uca.esi.dni.data.Student;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class EmailHandler {
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    private static PApplet parent;
-
     private static String sender;
     private static String username;
     private static String password;
+    private static String backupEmail;
     private static final String host = "smtp.gmail.com";
 
     private static final String subjectText = "Clave segura para aplicación de Manual de Laboratorio Escuela Superior de Ingeniería";
@@ -34,17 +29,11 @@ public class EmailHandler {
             "<p>Este mensaje ha sido generado de forma automática. Si has recibido este mensaje por error, puedes ignorarlo. Si tu identificador único de la UCA " +
             "no coincide con el mostrado en el mensaje, envía un correo electrónico a la dirección: %s .</p>";
 
-    public EmailHandler(PApplet parent) {
-        EmailHandler.parent = parent;
+    private static final String backupHeaderText = "Archivo de copia de seguridad de datos de alumnos [%s]";
+    private static final String backupContentText = "<p>Se adjunta la lista de contraseñas en texto plano de los alumnos añadidos a la base de datos.</p>";
+
+    public EmailHandler() {
         loadSettings();
-    }
-
-    public static String getSender() {
-        return sender;
-    }
-
-    public static void setSender(String sender) {
-        EmailHandler.sender = sender;
     }
 
     public static boolean isValidEmailAddress(String email) {
@@ -58,7 +47,7 @@ public class EmailHandler {
         return result;
     }
 
-    public void sendSecretKeyEmails(Set<Student> students) {
+    public static void sendSecretKeyEmails(Set<Student> students) {
         Map<String, String> emailContentMap = new HashMap<>();
         for (Student student : students) {
             String formattedMessage = String.format(contentText, student.getKey(), student.getID(), sender);
@@ -69,19 +58,20 @@ public class EmailHandler {
         LOGGER.info("[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size());
     }
 
-    public void sendUniqueEmail(String dest, String header, String contentText, String attachment) {
-        Session session = generateSessionObject();
-        sendHTMLEmail(dest, header, contentText, attachment, session);
+    public static void sendBackupEmail(String attachment) {
+        Session session = getSessionObject();
+        String header = String.format(backupHeaderText, new Date().toString());
+        sendHTMLEmail(backupEmail, header, backupContentText, attachment, session);
     }
 
-    private void sendEmailCollection(Map<String, String> emailContentMap) {
-        Session session = generateSessionObject();
+    private static void sendEmailCollection(Map<String, String> emailContentMap) {
+        Session session = getSessionObject();
         for (String email : emailContentMap.keySet()) {
             sendHTMLEmail(email, EmailHandler.subjectText, emailContentMap.get(email), session);
         }
     }
 
-    private Session generateSessionObject() {
+    private static Session getSessionObject() {
         Properties props = generatePropertiesObject();
         //create the Session object
         return Session.getInstance(props,
@@ -92,7 +82,7 @@ public class EmailHandler {
                 });
     }
 
-    private Properties generatePropertiesObject() {
+    private static Properties generatePropertiesObject() {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -101,11 +91,11 @@ public class EmailHandler {
         return props;
     }
 
-    private void sendHTMLEmail(String dest, String header, String contentText, Session session) {
+    private static void sendHTMLEmail(String dest, String header, String contentText, Session session) {
         sendHTMLEmail(dest, header, contentText, "", session);
     }
 
-    private void sendHTMLEmail(String dest, String header, String contentText, String attachment, Session session) {
+    private static void sendHTMLEmail(String dest, String header, String contentText, String attachment, Session session) {
         try {
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(sender));
@@ -143,5 +133,6 @@ public class EmailHandler {
         sender = settingsObject.getString("senderEmail");
         username = settingsObject.getString("senderUsername");
         password = settingsObject.getString("senderPassword");
+        backupEmail = settingsObject.getString("backupEmail");
     }
 }

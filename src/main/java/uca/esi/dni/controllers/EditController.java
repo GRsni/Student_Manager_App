@@ -201,11 +201,8 @@ public class EditController extends Controller {
                     if (responseDataUpdate.get(0).equals("200")) {
                         LOGGER.info("[General information]: Added " + uniqueStudentSet.size() + " students to DB.");
                         savePlainStudentDataToFile(uniqueStudentSet);
-                        emailHandler.sendSecretKeyEmails(uniqueStudentSet);
-                        emailHandler.sendUniqueEmail(EmailHandler.getSender(), "Copia de seguridad de datos de alumnos.",
-                                "Se adjunta la lista de contraseñas en texto plano de los alumnos añadidos a la base de datos",
-                                "data/files/student_data_backup.json");
-                        model.getTemporaryStudents().clear();
+                        EmailHandler.sendSecretKeyEmails(uniqueStudentSet);
+                        EmailHandler.sendBackupEmail("data/json/student_data_backup.json");
                         controllerLogic();
 
                         asyncLoadStudentDataFromDB();

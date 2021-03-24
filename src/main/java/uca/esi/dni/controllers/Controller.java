@@ -44,7 +44,7 @@ public abstract class Controller {
         this.parent = parent;
         this.model = model;
         this.view = view;
-        emailHandler = new EmailHandler(parent);
+        emailHandler = new EmailHandler();
     }
 
     public boolean isClosedContextMenu() {
@@ -53,10 +53,6 @@ public abstract class Controller {
 
     public void setClosedContextMenu(boolean closedContextMenu) {
         this.closedContextMenu = closedContextMenu;
-    }
-
-    public static DatabaseHandler getDbHandler() {
-        return dbHandler;
     }
 
     public abstract void controllerLogic();

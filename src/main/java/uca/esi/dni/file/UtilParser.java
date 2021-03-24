@@ -3,7 +3,6 @@ package uca.esi.dni.file;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import org.jetbrains.annotations.NotNull;
-import processing.core.PApplet;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
@@ -85,17 +84,17 @@ public class UtilParser {
         return resultStringBuilder.toString();
     }
 
-    public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) {
+    public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) throws NullPointerException {
         Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
-        ArrayList<String> ids = getKeysInJSONObject(allStudentsList);
-
+        ArrayList<String> ids = getJSONObjectKeys(allStudentsList);
         for (String id : ids) {
+            System.out.println(id);
             Map<String, Table> tableMap = new HashMap<>();
             JSONObject studentData = allStudentsList.getJSONObject(id);
 
             JSONObject labs = studentData.getJSONObject("practicas");
             if (labs != null) {
-                ArrayList<String> labTypes = getKeysInJSONObject(labs);
+                ArrayList<String> labTypes = getJSONObjectKeys(labs);
                 for (String labType : labTypes) {
                     JSONObject labRun = labs.getJSONObject(labType);
                     if (labRun != null) {
@@ -103,18 +102,16 @@ public class UtilParser {
                         tableMap.put(labType, dataTable);
                     }
                 }
+                studentTableMap.put(id, tableMap);
             }
-            studentTableMap.put(id, tableMap);
         }
         return studentTableMap;
     }
 
-    private static ArrayList<String> getKeysInJSONObject(JSONObject object) {
+    private static ArrayList<String> getJSONObjectKeys(JSONObject object) throws NullPointerException {
         ArrayList<String> keys = new ArrayList<>();
 
-        Object[] keysArray = object.keys().toArray();
-
-        for (Object key : keysArray) {
+        for (Object key : object.keys()) {
             keys.add((String) key);
         }
         return keys;
@@ -122,8 +119,8 @@ public class UtilParser {
 
     private static Table parseJSONDataIntoTable(JSONObject jsonObject) {
         Table table = new Table();
-        ArrayList<String> entries = getKeysInJSONObject(jsonObject);
-        ArrayList<String> entryKeys = getKeysInJSONObject(jsonObject.getJSONObject(entries.get(0)));
+        ArrayList<String> entries = getJSONObjectKeys(jsonObject);
+        ArrayList<String> entryKeys = getJSONObjectKeys(jsonObject.getJSONObject(entries.get(0)));
 
         for (String key : entryKeys) {
             table.addColumn(key);
@@ -139,7 +136,7 @@ public class UtilParser {
     }
 
     private static void populateRowFromLabRunObject(JSONObject jsonObject, TableRow row) {
-        for (String k : getKeysInJSONObject(jsonObject)) {
+        for (String k : getJSONObjectKeys(jsonObject)) {
             try {
                 Object v = jsonObject.get(k);
                 if (v instanceof Integer || v instanceof Long) {
@@ -165,10 +162,10 @@ public class UtilParser {
 
     }
 
-    public static String generateMultiPathJSONString(Map<String, JSONObject> urlContentsMap) {
+    public static String generateMultiPathJSONString(@NotNull Map<String, JSONObject> urlContentsMap) throws NullPointerException {
         JSONObject multipath = new JSONObject();
         for (String url : urlContentsMap.keySet()) {
-            ArrayList<String> secondLevelKeys = getKeysInJSONObject(urlContentsMap.get(url));
+            ArrayList<String> secondLevelKeys = getJSONObjectKeys(urlContentsMap.get(url));
             for (String key : secondLevelKeys) {
                 multipath.put(url + "/" + key, urlContentsMap.get(url).get(key));
             }
@@ -191,7 +188,7 @@ public class UtilParser {
     public static Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws
             RuntimeException {
         Set<Student> students = new HashSet<>();
-        ArrayList<String> ids = getKeysInJSONObject(emails);
+        ArrayList<String> ids = getJSONObjectKeys(emails);
         for (String id : ids) {
             Student student = new Student(id, emails.getString(id), hashKeys.getString(id));
             students.add(student);
@@ -199,7 +196,7 @@ public class UtilParser {
         return students;
     }
 
-    public static Set<String> studentSetToStringSet(Set<Student> students) {
+    public static Set<String> studentSetToStringSet(@NotNull Set<Student> students) {
         Set<String> stringSet = new HashSet<>();
         for (Student s : students) {
             stringSet.add(s.getID());

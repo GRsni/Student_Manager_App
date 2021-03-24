@@ -5,6 +5,7 @@ import processing.data.Table;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.DniParser;
+import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.UtilParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
@@ -99,22 +100,25 @@ public class MainController extends Controller {
 
         if (model.getDBReference() != null && model.getOutputFolder().exists()) {
             try {
-                String usersURL = dbHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
+                String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
                 ArrayList<String> response = dbHandler.getDataFromDB(usersURL);
-                JSONObject studentData = UtilParser.parseJSONObject(response.get(1));
-                Map<String, Map<String, Table>> tableMap = UtilParser.createStudentsDataTables(studentData);
-                if (model.getOutputFolder() != null) {
-                    saveLabTables(tableMap, model.getOutputFolder());
+                if (response.get(0).equals("200")) {
+                    JSONObject studentData = UtilParser.parseJSONObject(response.get(1));
+                    Map<String, Map<String, Table>> tableMap = UtilParser.createStudentsDataTables(studentData);
+                    if (model.getOutputFolder() != null) {
+                        saveLabTables(tableMap, model.getOutputFolder());
+                    }
                 }
             } catch (IOException e) {
                 System.err.println("IOException when reading database");
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
             } catch (NullPointerException e) {
-                System.err.println("Empty response from database");
-                LOGGER.warning("[Empty response from database]: " + e.getMessage());
+                System.err.println("NullPointerException when generating the excel files.");
+                LOGGER.warning("[NullPointerException when generating the excel files]: " + e.getMessage());
             } catch (RuntimeException e) {
                 System.err.println("[Error while generating the CSV files]: " + e.getMessage());
                 LOGGER.severe("[Error while generating the CSV files]: \" + e.getMessage()");
+
             }
         }
     }
