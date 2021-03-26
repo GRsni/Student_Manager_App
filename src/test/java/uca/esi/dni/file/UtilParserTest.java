@@ -291,4 +291,48 @@ public class UtilParserTest {
         assertThrows(NullPointerException.class, () -> UtilParser.studentSetToStringSet(testSet),
                 "Input Student set cannot have null items");
     }
+
+    @Test
+    @DisplayName("getUniqueStudentSet should throw a NPE if any of the sets is null")
+    public void givenAnyTwoNullStudentSetWhenGettingAnUniqueSetThrowANullPointerException() {
+        assertThrows(NullPointerException.class, () -> UtilParser.getUniqueStudentSet(null, new HashSet<>()),
+                "First student set cannot be null");
+        assertThrows(NullPointerException.class, () -> UtilParser.getUniqueStudentSet(new HashSet<>(), null),
+                "Second student set cannot be null");
+    }
+
+    @Test
+    @DisplayName("getUniqueStudentSet should throw a NPE if any of the student objects are null")
+    public void givenAnyTwoStudentSetsWithNullObjectsWhenGettingAnUniqueSetThrowANullPointerException() {
+        Set<Student> testSetNull = new HashSet<>();
+        Set<Student> testSet = new HashSet<>();
+        testSetNull.add(null);
+        testSet.add(new Student("u99999999", "test"));
+        assertThrows(NullPointerException.class, () -> UtilParser.getUniqueStudentSet(testSetNull, testSet),
+                "First set cannot contain null objects");
+        assertThrows(NullPointerException.class, () -> UtilParser.getUniqueStudentSet(testSet, testSetNull),
+                "Second set cannot contain null objects");
+    }
+
+    @Test
+    @DisplayName("getUniqueStudentSet should throw a NPE if any of the sets is null")
+    public void givenAnyTwoNullStudentSetWhenGettingAnIntersectionSetThrowANullPointerException() {
+        assertThrows(NullPointerException.class, () -> UtilParser.getIntersectionOfStudentSets(null, new HashSet<>()),
+                "First student set cannot be null");
+        assertThrows(NullPointerException.class, () -> UtilParser.getIntersectionOfStudentSets(new HashSet<>(), null),
+                "Second student set cannot be null");
+    }
+
+    @Test
+    @DisplayName("getUniqueStudentSet should throw a NPE if any of the student objects are null")
+    public void givenAnyTwoStudentSetsWithNullObjectsWhenGettingAnIntersectionSetThrowANullPointerException() {
+        Set<Student> testSetNull = new HashSet<>();
+        Set<Student> testSet = new HashSet<>();
+        testSetNull.add(null);
+        testSet.add(new Student("u99999999", "test"));
+        assertThrows(NullPointerException.class, () -> UtilParser.getIntersectionOfStudentSets(testSetNull, testSet),
+                "First set cannot contain null objects");
+        assertThrows(NullPointerException.class, () -> UtilParser.getIntersectionOfStudentSets(testSet, testSetNull),
+                "Second set cannot contain null objects");
+    }
 }

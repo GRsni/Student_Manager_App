@@ -63,6 +63,10 @@ public abstract class Controller {
 
     public abstract void onContextMenuClosed(File file);
 
+    public void addWarning(String contentString, int fadeout, boolean isGood) {
+        view.getWarnings().add(View.generateWarning(parent, contentString, fadeout, isGood));
+    }
+
     public void changeState(VIEW_STATES state) {
         switch (state) {
             case edit:
@@ -122,6 +126,7 @@ public abstract class Controller {
                     Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
                     model.getDBStudents().clear();
                     model.addDBStudentList(studentsInDB);
+                    addWarning("Cargados datos de la base de datos.", 250, true);
                     controllerLogic();
                     System.out.println(" Loaded " + studentsInDB.size() + " students from DB.");
                     LOGGER.info("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
@@ -129,42 +134,17 @@ public abstract class Controller {
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error loading data from DB]: " + e.getMessage());
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
-                //Add warning
+                addWarning("Error leyendo la base de datos.", 200, false);
             } catch (RuntimeException e) {
                 System.err.println("[Error generating student list]: " + e.getMessage());
                 LOGGER.warning("[Error generating student list]: " + e.getMessage());
+                addWarning("Error generando la lista de alumnos.", 200, false);
             }
 
         };
 
         Thread thread = new Thread(runnable);
         thread.start();
-    }
-
-    protected void savePlainStudentDataToFile(Set<Student> students) {
-        try {
-            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
-            for (Student student : students) {
-                studentBackup.setString(student.getID(), student.toString());
-            }
-            parent.saveJSONObject(studentBackup, "data/files/student_data_backup.json");
-        } catch (NullPointerException e) {
-            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
-        }
-    }
-
-    protected void removePlainStudentDataFromFile(Set<Student> students) {
-        try {
-            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
-            for (Student student : students) {
-                if (studentBackup.keys().contains(student.getID())) {
-                    studentBackup.remove(student.getID());
-                }
-            }
-            parent.saveJSONObject(studentBackup, "data/files/student_data_backup.json");
-        } catch (NullPointerException e) {
-            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
-        }
     }
 
     @NotNull

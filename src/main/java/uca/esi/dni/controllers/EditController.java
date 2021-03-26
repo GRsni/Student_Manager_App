@@ -38,7 +38,7 @@ public class EditController extends Controller {
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getDBReference(), model.getWarnings());
+        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getDBReference());
     }
 
     @Override
@@ -147,9 +147,11 @@ public class EditController extends Controller {
     private void addManualDataToAuxList(TextField idTF, TextField emailTF) {
         try {
             model.addTemporaryStudent(new Student(idTF.getContent(), emailTF.getContent()));
+            addWarning("Alumno introducido correctamente.", 250, true);
         } catch (NullPointerException e) {
             System.err.println("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
             LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+            addWarning("Error al introducir el alumno.", 200, false);
         }
 
     }
@@ -169,6 +171,7 @@ public class EditController extends Controller {
                 } else {
                     System.err.println("[Error validating email address].");
                     LOGGER.warning("[Error validating email address]: No valid address.");
+                    addWarning("Email no válido.", 200, false);
                     return false;
                 }
             } else {
@@ -177,6 +180,7 @@ public class EditController extends Controller {
         } else {
             System.err.println("[Error while reading student data]: Empty ID field");
             LOGGER.warning("[Error while reading student data]:Empty ID field.");
+            addWarning("Identificador no introducido.", 200, false);
             return false;
         }
     }
@@ -185,6 +189,7 @@ public class EditController extends Controller {
         for (Student student : model.getTemporaryStudents()) {
             if (student.getID().equals(id)) {
                 model.removeTemporaryStudent(student);
+                addWarning("Alumno eliminado de la lista temporal.", 100, true);
                 break;
             }
         }
@@ -203,6 +208,7 @@ public class EditController extends Controller {
                         savePlainStudentDataToFile(uniqueStudentSet);
                         EmailHandler.sendSecretKeyEmails(uniqueStudentSet);
                         EmailHandler.sendBackupEmail("data/json/student_data_backup.json");
+                        addWarning("Alumnos añadidos a la base de datos.", 100, true);
                         controllerLogic();
 
                         asyncLoadStudentDataFromDB();
@@ -210,12 +216,25 @@ public class EditController extends Controller {
                 } catch (IOException | NullPointerException e) {
                     System.err.println("[Error while uploading data to the DB]: " + e.getMessage() + Arrays.toString(e.getStackTrace()));
                     LOGGER.severe("[Error while uploading data to the DB]: " + e.getMessage());
+                    addWarning("Error subiendo datos.", 200, false);
                 }
             }
         };
 
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    private void savePlainStudentDataToFile(Set<Student> students) {
+        try {
+            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
+            for (Student student : students) {
+                studentBackup.setString(student.getID(), student.toString());
+            }
+            parent.saveJSONObject(studentBackup, "data/files/student_data_backup.json");
+        } catch (NullPointerException e) {
+            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
+        }
     }
 
     private ArrayList<String> uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException {
@@ -238,7 +257,7 @@ public class EditController extends Controller {
     private void asyncRemoveStudentsFromDBButtonHook() {
         Runnable runnable = () -> {
 
-            Set<Student> coincidentStudentSet = UtilParser.getCoincidentStudentSet(model.getTemporaryStudents(), model.getDBStudents());
+            Set<Student> coincidentStudentSet = UtilParser.getIntersectionOfStudentSets(model.getTemporaryStudents(), model.getDBStudents());
             try {
                 if (coincidentStudentSet.size() > 0) {
                     Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersMap(coincidentStudentSet);
@@ -250,6 +269,7 @@ public class EditController extends Controller {
                         LOGGER.info("[General information]: Removed " + coincidentStudentSet.size() + " students from DB.");
                         removePlainStudentDataFromFile(coincidentStudentSet);
                         model.getTemporaryStudents().clear();
+                        addWarning("Borrados alumnos de la base de datos.", 250, true);
                         controllerLogic();
 
                         asyncLoadStudentDataFromDB();
@@ -258,12 +278,27 @@ public class EditController extends Controller {
 
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error while deleting data from the DB]: " + e.getMessage());
-                LOGGER.warning("[Error while deleting data from the DB]: " + e.getMessage());
+                LOGGER.severe("[Error while deleting data from the DB]: " + e.getMessage());
+                addWarning("Error eliminando alumnos.", 200, false);
             }
         };
 
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    private void removePlainStudentDataFromFile(Set<Student> students) {
+        try {
+            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
+            for (Student student : students) {
+                if (studentBackup.keys().contains(student.getID())) {
+                    studentBackup.remove(student.getID());
+                }
+            }
+            parent.saveJSONObject(studentBackup, "data/files/student_data_backup.json");
+        } catch (NullPointerException e) {
+            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
+        }
     }
 
     @NotNull
@@ -285,11 +320,13 @@ public class EditController extends Controller {
                     LOGGER.info("[General information]: Emptied data from DB.");
                     removePlainStudentDataFromFile(model.getDBStudents());
                     model.getDBStudents().clear();
+                    addWarning("Base de datos vaciada.", 250, true);
                     controllerLogic();
                 }
             } catch (IOException e) {
                 System.err.println("[Error deleting data from DB]: " + e.getMessage());
-                LOGGER.warning("[Error deleting data from DB]: " + e.getMessage());
+                LOGGER.severe("[Error deleting data from DB]: " + e.getMessage());
+                addWarning("Error vaciando la base de datos.", 200, false);
             }
         };
 

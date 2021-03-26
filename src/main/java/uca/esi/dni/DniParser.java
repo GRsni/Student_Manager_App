@@ -71,6 +71,7 @@ public class DniParser extends PApplet {
         if (selection == null) {
             System.err.println("No file selected.");
             LOGGER.warning("[Error while selecting input file]: No file selected.");
+            currentController.addWarning("Archivo no seleccionado.", 150, false);
         } else {
             String filePath = selection.getAbsolutePath();
             System.err.println("user selected: " + filePath);
@@ -89,13 +90,14 @@ public class DniParser extends PApplet {
         if (folder == null) {
             System.err.println("No folder selected");
             LOGGER.warning("[Error while selecting output folder]: No folder selected.");
+            currentController.addWarning("Carpeta no seleccionada.", 150, false);
         } else {
             String folderPath = folder.getAbsolutePath();
             System.err.println("user selected: " + folderPath);
-            LOGGER.warning("[General information]: File selected: " + folderPath);
+            LOGGER.info("[General information]: File selected: " + folderPath);
             if (folder.isDirectory()) {
                 currentController.onContextMenuClosed(folder);
-            }else{
+            } else {
                 System.err.println("Path selected is not a directory.");
                 LOGGER.warning("[Error in selected directory]: Path selected is not a directory.");
             }

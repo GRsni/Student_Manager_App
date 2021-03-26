@@ -39,7 +39,7 @@ public class MainController extends Controller {
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getDBReference(), model.getWarnings());
+        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getDBReference());
     }
 
     @Override
@@ -107,18 +107,17 @@ public class MainController extends Controller {
                     Map<String, Map<String, Table>> tableMap = UtilParser.createStudentsDataTables(studentData);
                     if (model.getOutputFolder() != null) {
                         saveLabTables(tableMap, model.getOutputFolder());
+                        addWarning("Generados archivos de alumnos.", 250, true);
                     }
                 }
             } catch (IOException e) {
                 System.err.println("IOException when reading database");
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
-            } catch (NullPointerException e) {
-                System.err.println("NullPointerException when generating the excel files.");
-                LOGGER.warning("[NullPointerException when generating the excel files]: " + e.getMessage());
+                addWarning("Error leyendo la base de datos.", 250, false);
             } catch (RuntimeException e) {
                 System.err.println("[Error while generating the CSV files]: " + e.getMessage());
-                LOGGER.severe("[Error while generating the CSV files]: \" + e.getMessage()");
-
+                LOGGER.severe("[NullPointerException when generating the CSV files]: " + e.getMessage());
+                addWarning("Error generando los archivos.", 250, false);
             }
         }
     }

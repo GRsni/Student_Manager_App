@@ -14,7 +14,6 @@ public class AppModel extends Model {
     private File inputFile = new File("");
     private File outputFolder = new File("");
     private String DBReference;
-    private final ArrayList<Warning> warnings = new ArrayList<>();
 
     public AppModel() {
     }
@@ -81,22 +80,6 @@ public class AppModel extends Model {
 
     public void removeTemporaryStudent(Student s) {
         temporaryStudents.remove(s);
-    }
-
-    public ArrayList<Warning> getWarnings() {
-        return warnings;
-    }
-
-    public void addWarning(Warning w) {
-        warnings.add(w);
-    }
-
-    public void removeWarning(Warning w) {
-        warnings.remove(w);
-    }
-
-    public Warning getWarning(int index) {
-        return warnings.get(index);
     }
 
 }

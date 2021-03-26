@@ -196,7 +196,7 @@ public class UtilParser {
         return students;
     }
 
-    public static Set<String> studentSetToStringSet(@NotNull Set<Student> students) {
+    public static Set<String> studentSetToStringSet(@NotNull Set<Student> students) throws NullPointerException {
         Set<String> stringSet = new HashSet<>();
         for (Student s : students) {
             stringSet.add(s.getID());
@@ -204,33 +204,41 @@ public class UtilParser {
         return stringSet;
     }
 
-    public static Set<Student> getUniqueStudentSet(Set<Student> set1, Set<Student> set2) {
-        Set<Student> unique = new HashSet<>();
-        for (Student s : set1) {
-            boolean found = false;
-            for (Student s2 : set2) {
-                if (s.getID().equals(s2.getID())) {
-                    found = true;
-                    break;
+    public static Set<Student> getUniqueStudentSet(Set<Student> set1, Set<Student> set2) throws NullPointerException {
+        if (set1 == null || set2 == null) {
+            throw new NullPointerException("Student set cannot be null");
+        } else {
+            Set<Student> unique = new HashSet<>();
+            for (Student s : set1) {
+                boolean found = false;
+                for (Student s2 : set2) {
+                    if (s.getID().equals(s2.getID())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    unique.add(s);
                 }
             }
-            if (!found) {
-                unique.add(s);
-            }
+            return unique;
         }
-        return unique;
     }
 
-    public static Set<Student> getCoincidentStudentSet(Set<Student> set1, Set<Student> set2) {
-        Set<Student> coincident = new HashSet<>();
-        for (Student s : set1) {
-            for (Student s2 : set2) {
-                if (s.getID().equals(s2.getID())) {
-                    coincident.add(s2);
-                    break;
+    public static Set<Student> getIntersectionOfStudentSets(Set<Student> set1, Set<Student> set2) throws NullPointerException {
+        if (set1 == null || set2 == null) {
+            throw new NullPointerException("Student set cannot be null");
+        } else {
+            Set<Student> coincident = new HashSet<>();
+            for (Student s : set1) {
+                for (Student s2 : set2) {
+                    if (s.getID().equals(s2.getID())) {
+                        coincident.add(s2);
+                        break;
+                    }
                 }
             }
+            return coincident;
         }
-        return coincident;
     }
 }

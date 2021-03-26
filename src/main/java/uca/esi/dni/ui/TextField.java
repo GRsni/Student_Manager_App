@@ -17,6 +17,7 @@ public class TextField extends BaseElement {
     private boolean isClickable = false;
     private boolean isFocused = false;
     private boolean isHeader = false;
+    private boolean isCentered = false;
 
 
     public TextField(PApplet parent, float x, float y, int w, int h, String content, String hint) {
@@ -106,6 +107,14 @@ public class TextField extends BaseElement {
         isHeader = header;
     }
 
+    public boolean isCentered() {
+        return isCentered;
+    }
+
+    public void setCentered(boolean centered) {
+        isCentered = centered;
+    }
+
     public void display() {
         renderBackground();
         renderContent();
@@ -130,14 +139,20 @@ public class TextField extends BaseElement {
         parent.push();
         parent.textSize(fontSize);
         parent.textFont(font);
-        parent.textAlign(PConstants.LEFT, PConstants.CENTER);
+        if (!isCentered) {
+            parent.textAlign(PConstants.LEFT, PConstants.CENTER);
+        } else {
+            parent.textAlign(PConstants.CENTER, PConstants.CENTER);
+        }
+        String text;
         if (!content.isEmpty() || isFocused) {
             parent.fill(contentColor);
-            parent.text(content, pos.x + padding, pos.y, w, h);
+            text = content;
         } else {
             parent.fill(hintColor);
-            parent.text(hint, pos.x + padding, pos.y, w, h);
+            text = hint;
         }
+        parent.text(text, pos.x + padding, pos.y, w, h);
         parent.pop();
     }
 
