@@ -24,7 +24,7 @@ public class LoggerFormatter extends Formatter {
 
 
     private String calcDate(long millis) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEEEEEE\t, dd/MM/yyyy kk:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE., dd/MM/yyyy kk:mm");
         Date resultDate = new Date(millis);
         return dateFormat.format(resultDate);
     }

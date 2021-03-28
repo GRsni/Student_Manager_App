@@ -62,6 +62,8 @@ public class EmailHandler {
         Session session = getSessionObject();
         String header = String.format(backupHeaderText, new Date().toString());
         sendHTMLEmail(backupEmail, header, backupContentText, attachment, session);
+        System.out.println("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
+        LOGGER.info("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
     }
 
     private static void sendEmailCollection(Map<String, String> emailContentMap) {

@@ -13,11 +13,16 @@ public class TextField extends BaseElement {
     private int hintColor = View.COLORS.ACCENT_DARK;
     private String content;
     private final String hint;
+
+    private boolean hasMaxLength = false;
+    private int maxLength;
     private final int padding = 4;
     private boolean isClickable = false;
     private boolean isFocused = false;
     private boolean isHeader = false;
     private boolean isCentered = false;
+    private boolean isScrollable = false;
+    private boolean isCuttable = false;
 
 
     public TextField(PApplet parent, float x, float y, int w, int h, String content, String hint) {
@@ -83,6 +88,15 @@ public class TextField extends BaseElement {
         hasBackground = true;
     }
 
+    public int getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+        hasMaxLength = true;
+    }
+
     public boolean isClickable() {
         return isClickable;
     }
@@ -113,6 +127,22 @@ public class TextField extends BaseElement {
 
     public void setCentered(boolean centered) {
         isCentered = centered;
+    }
+
+    public boolean isScrollable() {
+        return isScrollable;
+    }
+
+    public void setScrollable(boolean scrollable) {
+        isScrollable = scrollable;
+    }
+
+    public boolean isCuttable() {
+        return isCuttable;
+    }
+
+    public void setCuttable(boolean cuttable) {
+        isCuttable = cuttable;
     }
 
     public void display() {
@@ -152,8 +182,20 @@ public class TextField extends BaseElement {
             parent.fill(hintColor);
             text = hint;
         }
+        if (parent.textWidth(text) > w) {
+            if (isCuttable) {
+                text = text.substring(0, maxNumCharacters());
+                text += "...";
+            } else if (isScrollable) {
+                text = text.substring(text.length() - maxNumCharacters(), text.length() - 1);
+            }
+        }
         parent.text(text, pos.x + padding, pos.y, w, h);
         parent.pop();
+    }
+
+    private int maxNumCharacters() {
+        return w / (font.getSize() / 2);
     }
 
     private void renderCursor() {
@@ -165,16 +207,27 @@ public class TextField extends BaseElement {
                 parent.strokeWeight(3);
                 parent.strokeCap(PConstants.SQUARE);
                 parent.textFont(font);
-                float xOffset = pos.x + padding + parent.textWidth(content);
+                float xCursorPos = getCursorXPos();
+                float xOffset = pos.x + padding + xCursorPos;
                 parent.line(xOffset, pos.y + padding, xOffset, pos.y + h - padding);
             }
         }
         parent.pop();
     }
 
+    private float getCursorXPos() {
+        return Math.max(0, Math.min(w, parent.textWidth(content)));
+    }
+
 
     public void addCharToContent(char k) {
-        content += k;
+        if (hasMaxLength) {
+            if (content.length() < maxLength) {
+                content += k;
+            }
+        } else {
+            content += k;
+        }
     }
 
     public void removeCharacter() {

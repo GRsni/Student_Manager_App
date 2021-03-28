@@ -196,7 +196,6 @@ public class UtilParserTest {
     @DisplayName("createStudentDataTables should return an empty map if the JSONObject doesnt contain practicas innerJSONObjects")
     public void givenAJSONObjectWhenTheContentsDontMatchReturnAnEmptyMap() {
         JSONObject testObject = JSONObject.parse("{ \"u11111111\":{}}");
-        System.out.println(Arrays.toString(testObject.keys().toArray()));
         assertEquals(0, UtilParser.createStudentsDataTables(testObject).size(),
                 "Map should be empty if contents dont match");
     }

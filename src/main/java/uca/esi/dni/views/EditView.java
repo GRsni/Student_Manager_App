@@ -84,13 +84,16 @@ public class EditView extends View {
         IDTF.setBackgroundColor(COLORS.WHITE);
         IDTF.setFont(FONT_SMALL);
         IDTF.setClickable(true);
+        IDTF.setMaxLength(10);
         elements.put("idTF", IDTF);
 
         TextField emailTF = new TextField(parent, WIDTH_UNIT_SIZE * 3f, HEIGHT_UNIT_SIZE * 3, WIDTH_UNIT_SIZE * 2,
                 HEIGHT_UNIT_SIZE, "", "email");
         emailTF.setBackgroundColor(COLORS.WHITE);
         emailTF.setFont(FONT_SMALL);
+        emailTF.setMaxLength(10000);
         emailTF.setClickable(true);
+        emailTF.setScrollable(true);
         elements.put("emailTF", emailTF);
 
         TextField auxStudentsCounter = new TextField(parent, WIDTH_UNIT_SIZE * 7, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
@@ -107,6 +110,7 @@ public class EditView extends View {
                 HEIGHT_UNIT_SIZE, "", "Archivo de texto");
         inputFile.setBackgroundColor(COLORS.WHITE);
         inputFile.setFont(FONT_SMALL);
+        inputFile.setCuttable(true);
         elements.put("inputFileTF", inputFile);
 
 

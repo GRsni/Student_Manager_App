@@ -13,8 +13,12 @@ gradle-app.setting
 
 #Idea files
 /.idea
+/out
 
 #Important files
+/src/main/resources/data/files
 /data/files
 Log.txt
-Log.txt.lck
+*.lck
+*.1
+student_data_backup.json

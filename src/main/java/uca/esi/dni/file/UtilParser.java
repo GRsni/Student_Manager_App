@@ -9,7 +9,10 @@ import processing.data.TableRow;
 import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -47,13 +50,12 @@ public class UtilParser {
 
     public static JSONObject loadJSONObject(String filepath) {
         if (filepath != null) {
-            File file = new File(filepath);
-            if (file.exists() && checkFileExtension(filepath, "json")) {
+            if (checkFileExtension(filepath, "json")) {
                 try {
-                    InputStream inputStream = new FileInputStream(file);
+                    InputStream inputStream = UtilParser.class.getClassLoader().getResourceAsStream(filepath);
                     String fileContent = readFromInputStream(inputStream);
                     return parseJSONObject(fileContent);
-                } catch (IOException e) {
+                } catch (IOException | NullPointerException e) {
                     System.err.println("[Error while reading JSON file]: " + e.getMessage());
                     LOGGER.severe("[Error while reading JSON file]: " + e.getMessage());
                     return new JSONObject();
@@ -74,8 +76,7 @@ public class UtilParser {
     private static String readFromInputStream(InputStream inputStream)
             throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
-        try (BufferedReader br
-                     = new BufferedReader(new InputStreamReader(inputStream))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             while ((line = br.readLine()) != null) {
                 resultStringBuilder.append(line).append("\n");
@@ -88,7 +89,6 @@ public class UtilParser {
         Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
         ArrayList<String> ids = getJSONObjectKeys(allStudentsList);
         for (String id : ids) {
-            System.out.println(id);
             Map<String, Table> tableMap = new HashMap<>();
             JSONObject studentData = allStudentsList.getJSONObject(id);
 

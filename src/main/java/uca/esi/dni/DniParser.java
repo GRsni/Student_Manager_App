@@ -44,7 +44,6 @@ public class DniParser extends PApplet {
         AppLogger.setup();
         LOGGER.setLevel(Level.INFO);
         LOGGER.info("[General information]: Started app.");
-
         initMVCObjects();
     }
 
@@ -69,17 +68,16 @@ public class DniParser extends PApplet {
 
     public void selectInputFile(File selection) {
         if (selection == null) {
-            System.err.println("No file selected.");
+            System.err.println("[Error while selecting input file]: No file selected.");
             LOGGER.warning("[Error while selecting input file]: No file selected.");
             currentController.addWarning("Archivo no seleccionado.", 150, false);
         } else {
             String filePath = selection.getAbsolutePath();
-            System.err.println("user selected: " + filePath);
             LOGGER.info("[General information]: File selected: " + filePath);
             if (UtilParser.checkFileExtension(filePath, "csv")) {
                 currentController.onContextMenuClosed(selection);
             } else {
-                System.err.println("File selected is not a CSV file.");
+                System.err.println("[Error in selected file]: File selected is not a CSV file.");
                 LOGGER.warning("[Error in selected file]: File selected is not a CSV file.");
             }
         }
@@ -88,20 +86,23 @@ public class DniParser extends PApplet {
 
     public void selectOutputFolder(File folder) {
         if (folder == null) {
-            System.err.println("No folder selected");
+            System.err.println("[Error while selecting output folder]: No folder selected.");
             LOGGER.warning("[Error while selecting output folder]: No folder selected.");
             currentController.addWarning("Carpeta no seleccionada.", 150, false);
         } else {
             String folderPath = folder.getAbsolutePath();
-            System.err.println("user selected: " + folderPath);
             LOGGER.info("[General information]: File selected: " + folderPath);
             if (folder.isDirectory()) {
                 currentController.onContextMenuClosed(folder);
             } else {
-                System.err.println("Path selected is not a directory.");
+                System.err.println("[Error in selected directory]: Path selected is not a directory.");
                 LOGGER.warning("[Error in selected directory]: Path selected is not a directory.");
             }
         }
         currentController.setClosedContextMenu(true);
+    }
+
+    public void stop() {
+        LOGGER.info("[General information]: Closing app");
     }
 }

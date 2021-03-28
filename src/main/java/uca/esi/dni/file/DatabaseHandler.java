@@ -4,13 +4,12 @@ package uca.esi.dni.file;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import okhttp3.*;
-import processing.core.PApplet;
 import processing.data.JSONObject;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class DatabaseHandler {
     private static final MediaType JSON
@@ -19,20 +18,24 @@ public class DatabaseHandler {
 
     final OkHttpClient client = new OkHttpClient();
 
-    public String getDBReference(PApplet parent, String filename) {
+    public static String getDBReference(String filename) {
         JSONObject object = UtilParser.loadJSONObject(filename);
         return object.getString("databaseURL");
     }
 
-    public static String getDatabaseDirectoryURL(String url, String directory) throws IOException {
+    public static String getDatabaseDirectoryURL(String url) throws IOException, NullPointerException {
+        return getDatabaseDirectoryURL(url, "");
+    }
+
+    public static String getDatabaseDirectoryURL(String url, String directory) throws IOException, NullPointerException {
         String authToken = generateAuthToken();
 
         return url + directory + ".json?access_token=" + authToken;
     }
 
-    private static String generateAuthToken() throws IOException {
-
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream("data/files/manualdetorsion-firebase-adminsdk-mgqwd-f49108aaae.json"));
+    private static String generateAuthToken() throws IOException, NullPointerException {
+        GoogleCredentials credentials = GoogleCredentials.fromStream(
+                Objects.requireNonNull(DatabaseHandler.class.getClassLoader().getResourceAsStream("data/files/manualdetorsion-firebase.json")));
         GoogleCredentials scoped = credentials.createScoped(
                 Arrays.asList(
                         "https://www.googleapis.com/auth/firebase.database",

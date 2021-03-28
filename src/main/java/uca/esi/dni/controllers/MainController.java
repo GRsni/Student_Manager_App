@@ -31,7 +31,7 @@ public class MainController extends Controller {
     }
 
     private void initModelState() {
-        model.setDBReference(dbHandler.getDBReference(parent, "data/files/settings.json"));
+        model.setDBReference(DatabaseHandler.getDBReference("data/files/settings.json"));
         if (model.getDBStudents().isEmpty()) {
             asyncLoadStudentDataFromDB();
         }
@@ -78,7 +78,6 @@ public class MainController extends Controller {
                 ItemList list = (ItemList) view.getUIElement("dbStudentsIL");
                 if (list.inside(e.getX(), e.getY())) {
                     list.handleInput(e);
-                    System.out.println("input in IL" + System.currentTimeMillis());
                 }
                 break;
         }
@@ -95,7 +94,7 @@ public class MainController extends Controller {
 
         parent.selectFolder("Seleccione la carpeta de destino:", "selectOutputFolder");
         while (!closedContextMenu) {
-            Thread.onSpinWait(); //We need to wait for the output folder context menu to be closed before resuming execution
+            Thread.yield(); //We need to wait for the output folder context menu to be closed before resuming execution
         }
 
         if (model.getDBReference() != null && model.getOutputFolder().exists()) {
@@ -111,7 +110,7 @@ public class MainController extends Controller {
                     }
                 }
             } catch (IOException e) {
-                System.err.println("IOException when reading database");
+                System.err.println("[IOException when reading database]: \" + e.getMessage()");
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
                 addWarning("Error leyendo la base de datos.", 250, false);
             } catch (RuntimeException e) {
@@ -138,8 +137,8 @@ public class MainController extends Controller {
                 }
             }
         }
-        System.out.println("Generated all files");
-        LOGGER.info("Generated all files.");
+        System.out.println("[General information]: Generated all CSV files.");
+        LOGGER.info("[General information]: Generated all CSV files.");
     }
 
     @Override

@@ -122,13 +122,14 @@ public abstract class Controller {
 
                 String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Emails");
                 ArrayList<String> responseEmails = dbHandler.getDataFromDB(emailsURL);
+
                 if (responseIDs.get(0).equals("200") && responseEmails.get(0).equals("200")) {
                     Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
                     model.getDBStudents().clear();
                     model.addDBStudentList(studentsInDB);
                     addWarning("Cargados datos de la base de datos.", 250, true);
                     controllerLogic();
-                    System.out.println(" Loaded " + studentsInDB.size() + " students from DB.");
+                    System.out.println("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
                     LOGGER.info("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
                 }
             } catch (IOException | NullPointerException e) {
