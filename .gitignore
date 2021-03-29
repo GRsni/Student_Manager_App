@@ -21,4 +21,5 @@ gradle-app.setting
 Log.txt
 *.lck
 *.1
-student_data_backup.json
+src/main/resources/data/files/student_data_backup.json
+src/main/resources/data/files/settings.json

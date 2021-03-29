@@ -2,7 +2,7 @@ package uca.esi.dni.views;
 
 import processing.core.PApplet;
 import uca.esi.dni.data.Student;
-import uca.esi.dni.file.UtilParser;
+import uca.esi.dni.file.Util;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
@@ -68,12 +68,12 @@ public class MainView extends View {
     }
 
     @Override
-    public void update(Set<Student> dbList, Set<Student> modList, File inputFile, String dbReference) {
+    public void update(Set<Student> dbList, Set<Student> modList, File inputFile) {
         TextField dbStudentsCounter = (TextField) elements.get("dbStudentsTF");
         dbStudentsCounter.modifyCounter(dbList.size());
 
         ItemList studentsIL = (ItemList) elements.get("dbStudentsIL");
-        Set<String> stringSet = UtilParser.studentSetToStringSet(dbList);
+        Set<String> stringSet = Util.studentSetToStringSet(dbList);
         studentsIL.getContentList().clear();
         studentsIL.addList(stringSet);
 

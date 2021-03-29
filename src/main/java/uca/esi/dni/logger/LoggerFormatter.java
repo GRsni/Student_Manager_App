@@ -8,18 +8,16 @@ import java.util.logging.LogRecord;
 public class LoggerFormatter extends Formatter {
 
     public String format(LogRecord rec) {
-        StringBuilder buf = new StringBuilder(1000);
-        buf.append("[");
-        buf.append(calcDate(rec.getMillis()));
-        buf.append("]::[");
-        buf.append(rec.getLevel());
-        buf.append("]\t (");
-        buf.append(rec.getSourceClassName());
-        buf.append("): ");
-        buf.append(rec.getMessage());
-        buf.append("\n");
 
-        return buf.toString();
+        return "[" +
+                calcDate(rec.getMillis()) +
+                "]::[" +
+                rec.getLevel() +
+                "] (" +
+                rec.getSourceClassName() +
+                ") :: " +
+                rec.getMessage() +
+                "\n";
     }
 
 

@@ -4,13 +4,14 @@ import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.DniParser;
+import uca.esi.dni.main.DniParser;
 import uca.esi.dni.data.Student;
 import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.EmailHandler;
-import uca.esi.dni.file.UtilParser;
+import uca.esi.dni.file.Util;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
+import uca.esi.dni.ui.Warning;
 import uca.esi.dni.views.EditView;
 import uca.esi.dni.views.MainView;
 import uca.esi.dni.views.StatsView;
@@ -63,8 +64,8 @@ public abstract class Controller {
 
     public abstract void onContextMenuClosed(File file);
 
-    public void addWarning(String contentString, int fadeout, boolean isGood) {
-        view.getWarnings().add(View.generateWarning(parent, contentString, fadeout, isGood));
+    public void addWarning(String contentString, Warning.DURATION duration, boolean isGood) {
+        view.getWarnings().add(View.generateWarning(parent, contentString, duration, isGood));
     }
 
     public void changeState(VIEW_STATES state) {
@@ -127,7 +128,7 @@ public abstract class Controller {
                     Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
                     model.getDBStudents().clear();
                     model.addDBStudentList(studentsInDB);
-                    addWarning("Cargados datos de la base de datos.", 250, true);
+                    addWarning("Cargados datos de la base de datos.", Warning.DURATION.SHORT, true);
                     controllerLogic();
                     System.out.println("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
                     LOGGER.info("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
@@ -135,11 +136,11 @@ public abstract class Controller {
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error loading data from DB]: " + e.getMessage());
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
-                addWarning("Error leyendo la base de datos.", 200, false);
+                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, false);
             } catch (RuntimeException e) {
                 System.err.println("[Error generating student list]: " + e.getMessage());
                 LOGGER.warning("[Error generating student list]: " + e.getMessage());
-                addWarning("Error generando la lista de alumnos.", 200, false);
+                addWarning("Error generando la lista de alumnos.", Warning.DURATION.SHORT, false);
             }
 
         };
@@ -150,9 +151,9 @@ public abstract class Controller {
 
     @NotNull
     private Set<Student> generateStudentSetFromDB(ArrayList<String> responseIDs, ArrayList<String> responseEmails) {
-        JSONObject studentKeys = UtilParser.parseJSONObject(responseIDs.get(1));
-        JSONObject studentEmails = UtilParser.parseJSONObject(responseEmails.get((1)));
-        return UtilParser.generateStudentListFromJSONObject(studentKeys, studentEmails);
+        JSONObject studentKeys = Util.parseJSONObject(responseIDs.get(1));
+        JSONObject studentEmails = Util.parseJSONObject(responseEmails.get((1)));
+        return Util.generateStudentListFromJSONObject(studentKeys, studentEmails);
     }
 
     private void loadInitialState() {

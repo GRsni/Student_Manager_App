@@ -180,10 +180,6 @@ public class ItemList extends BaseElement {
         }
     }
 
-    public void selectItemField(int x, int y) {
-
-    }
-
     @Override
     public boolean inside(int x, int y) {
         return x > pos.x && x < pos.x + w && y > pos.y + title.h && y < pos.y + h;

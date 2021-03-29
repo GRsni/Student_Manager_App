@@ -3,7 +3,7 @@ package uca.esi.dni.views;
 import processing.core.PApplet;
 import processing.core.PImage;
 import uca.esi.dni.data.Student;
-import uca.esi.dni.file.UtilParser;
+import uca.esi.dni.file.Util;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.ModalCard;
@@ -91,7 +91,6 @@ public class EditView extends View {
                 HEIGHT_UNIT_SIZE, "", "email");
         emailTF.setBackgroundColor(COLORS.WHITE);
         emailTF.setFont(FONT_SMALL);
-        emailTF.setMaxLength(10000);
         emailTF.setClickable(true);
         emailTF.setScrollable(true);
         elements.put("emailTF", emailTF);
@@ -138,10 +137,17 @@ public class EditView extends View {
         confirmEmpty.setVisible(false);
         elementsOverModal.put("confirmEmptyB", confirmEmpty);
 
+        Button exitModal = new Button(parent, WIDTH_UNIT_SIZE * 6, HEIGHT_UNIT_SIZE * 11, WIDTH_UNIT_SIZE * 4,
+                HEIGHT_UNIT_SIZE * 2, 3, "Cancelar", false);
+        exitModal.setFont(FONT_BIG);
+        exitModal.setVisible(false);
+        exitModal.setCentered(true);
+        elementsOverModal.put("exitModalB", exitModal);
+
     }
 
     @Override
-    public void update(Set<Student> dbList, Set<Student> auxList, File inputFile, String dbReference) {
+    public void update(Set<Student> dbList, Set<Student> auxList, File inputFile) {
 
         TextField inputFileTF = (TextField) elements.get("inputFileTF");
         inputFileTF.setContent(inputFile.getName());
@@ -153,12 +159,12 @@ public class EditView extends View {
         dbCounter.modifyCounter(dbList.size());
 
         ItemList auxItemList = (ItemList) elements.get("auxStudentsIL");
-        Set<String> auxStrings = UtilParser.studentSetToStringSet(auxList);
+        Set<String> auxStrings = Util.studentSetToStringSet(auxList);
         auxItemList.getContentList().clear();
         auxItemList.addList(auxStrings);
 
         ItemList dbItemList = (ItemList) elements.get("dbStudentIL");
-        Set<String> dbStrings = UtilParser.studentSetToStringSet(dbList);
+        Set<String> dbStrings = Util.studentSetToStringSet(dbList);
         dbItemList.getContentList().clear();
         dbItemList.addList(dbStrings);
     }

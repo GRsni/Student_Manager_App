@@ -49,7 +49,7 @@ public abstract class View {
 
     protected abstract void createElements();
 
-    public abstract void update(Set<Student> dbList, Set<Student> modList, File inputFile, String dbReference);
+    public abstract void update(Set<Student> dbList, Set<Student> modList, File inputFile);
 
     public void show() {
         parent.image(background, 0, 0);
@@ -75,8 +75,8 @@ public abstract class View {
         }
     }
 
-    public static Warning generateWarning(PApplet parent, String contentString, int fadeout, boolean isGood) {
-        Warning warning = new Warning(parent, WIDTH_UNIT_SIZE * 9, HEIGHT_UNIT_SIZE * 0.5f, WIDTH_UNIT_SIZE * 6, HEIGHT_UNIT_SIZE, contentString, fadeout, isGood);
+    public static Warning generateWarning(PApplet parent, String contentString, Warning.DURATION duration, boolean isGood) {
+        Warning warning = new Warning(parent, WIDTH_UNIT_SIZE * 9, HEIGHT_UNIT_SIZE * 0.5f, WIDTH_UNIT_SIZE * 6, HEIGHT_UNIT_SIZE, contentString, duration, isGood);
         warning.setFont(FONT_BIG);
         warning.setFontSize(10);
         warning.setFontColor(COLORS.WHITE);

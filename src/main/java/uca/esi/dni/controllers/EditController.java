@@ -6,15 +6,16 @@ import processing.data.Table;
 import processing.data.TableRow;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.DniParser;
 import uca.esi.dni.data.Student;
 import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.EmailHandler;
-import uca.esi.dni.file.UtilParser;
+import uca.esi.dni.file.Util;
+import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
+import uca.esi.dni.ui.Warning;
 import uca.esi.dni.views.View;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public class EditController extends Controller {
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getDBReference());
+        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile());
     }
 
     @Override
@@ -96,6 +97,13 @@ public class EditController extends Controller {
                     }
                 }
 
+                for (String key : view.getModalElementKeys()) {
+                    BaseElement element = view.getUIModalElement(key);
+                    if (element.isClicked()) {
+                        element.isClicked(false);
+                    }
+                }
+
                 break;
             case MouseEvent.MOVE:
                 checkHover(x, y);
@@ -120,11 +128,14 @@ public class EditController extends Controller {
 
     @Override
     public void handleKeyEvent(KeyEvent e) {
-        if (e.getAction() == TYPE) {
-
+        if (e.getKey() == ESC) {
+            if (view.isModalActive()) {
+                parent.key = 0; //Hack to stop Processing from closing the app when pressing the ESC key
+                view.setModalActive(false);
+            }
+        } else if (e.getAction() == TYPE) {
             final char k = e.getKey();
             TextField tf = getFocusedTextField();
-
             if (k == BACKSPACE) {
                 tf.removeCharacter();
             } else if (k == ENTER || k == RETURN) {
@@ -147,11 +158,11 @@ public class EditController extends Controller {
     private void addManualDataToAuxList(TextField idTF, TextField emailTF) {
         try {
             model.addTemporaryStudent(new Student(idTF.getContent().toLowerCase(Locale.ROOT), emailTF.getContent().toLowerCase(Locale.ROOT)));
-            addWarning("Alumno introducido correctamente.", 250, true);
+            addWarning("Alumno introducido correctamente.", Warning.DURATION.MEDIUM, true);
         } catch (NullPointerException e) {
             System.err.println("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
             LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
-            addWarning("Error al introducir el alumno.", 200, false);
+            addWarning("Error al introducir el alumno.", Warning.DURATION.SHORT, false);
         }
 
     }
@@ -171,7 +182,7 @@ public class EditController extends Controller {
                 } else {
                     System.err.println("[Error validating email address].");
                     LOGGER.warning("[Error validating email address]: No valid address.");
-                    addWarning("Email no válido.", 200, false);
+                    addWarning("Email no válido.", Warning.DURATION.SHORT, false);
                     return false;
                 }
             } else {
@@ -180,7 +191,7 @@ public class EditController extends Controller {
         } else {
             System.err.println("[Error while reading student data]: Empty ID field");
             LOGGER.warning("[Error while reading student data]:Empty ID field.");
-            addWarning("Identificador no introducido.", 200, false);
+            addWarning("Identificador no introducido.", Warning.DURATION.SHORT, false);
             return false;
         }
     }
@@ -189,7 +200,7 @@ public class EditController extends Controller {
         for (Student student : model.getTemporaryStudents()) {
             if (student.getID().equals(id)) {
                 model.removeTemporaryStudent(student);
-                addWarning("Alumno eliminado de la lista temporal.", 100, true);
+                addWarning("Alumno eliminado de la lista temporal.", Warning.DURATION.MEDIUM, true);
                 break;
             }
         }
@@ -199,7 +210,7 @@ public class EditController extends Controller {
     private void asyncAddStudentsToDBListButtonHook() {
         Runnable runnable = () -> {
 
-            Set<Student> uniqueStudentSet = UtilParser.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
+            Set<Student> uniqueStudentSet = Util.getUniqueStudentSet(model.getTemporaryStudents(), model.getDBStudents());
             if (uniqueStudentSet.size() > 0) {
                 try {
                     ArrayList<String> responseDataUpdate = uploadStudentListToDB(uniqueStudentSet);
@@ -207,8 +218,7 @@ public class EditController extends Controller {
                         model.getTemporaryStudents().clear();
                         savePlainStudentDataToFile(uniqueStudentSet);
                         EmailHandler.sendSecretKeyEmails(uniqueStudentSet);
-                        EmailHandler.sendBackupEmail("data/files/student_data_backup.json");
-                        addWarning("Alumnos añadidos a la base de datos.", 200, true);
+                        addWarning("Alumnos añadidos a la base de datos.", Warning.DURATION.MEDIUM, true);
                         LOGGER.info("[General information]: Added " + uniqueStudentSet.size() + " students to DB.");
                         controllerLogic();
 
@@ -217,7 +227,7 @@ public class EditController extends Controller {
                 } catch (IOException | NullPointerException e) {
                     System.err.println("[Error while uploading data to the DB]: " + e.getMessage() + Arrays.toString(e.getStackTrace()));
                     LOGGER.severe("[Error while uploading data to the DB]: " + e.getMessage());
-                    addWarning("Error subiendo datos.", 200, false);
+                    addWarning("Error subiendo datos.", Warning.DURATION.SHORT, false);
                 }
             }
         };
@@ -228,11 +238,11 @@ public class EditController extends Controller {
 
     private void savePlainStudentDataToFile(Set<Student> students) {
         try {
-            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
+            JSONObject studentBackup = parent.loadJSONObject(DniParser.DATA_BACKUP_FILEPATH);
             for (Student student : students) {
                 studentBackup.setString(student.getID(), student.toString());
             }
-            parent.saveJSONObject(studentBackup, "student_data_backup.json");
+            parent.saveJSONObject(studentBackup, DniParser.DATA_BACKUP_FILEPATH);
         } catch (NullPointerException e) {
             LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
         }
@@ -240,15 +250,15 @@ public class EditController extends Controller {
 
     private ArrayList<String> uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException {
         Map<String, JSONObject> urlContentsMap = getHashKeyEmailMap(uniqueStudentSet);
-        String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
+        String combined = Util.generateMultiPathJSONString(urlContentsMap);
         String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
         return dbHandler.updateData(baseURL, combined);
     }
 
     @NotNull
     private Map<String, JSONObject> getHashKeyEmailMap(Set<Student> uniqueStudentSet) {
-        JSONObject hashKeyList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "hashKey");
-        JSONObject emailList = UtilParser.getStudentAttributeJSONObject(uniqueStudentSet, "email");
+        JSONObject hashKeyList = Util.getStudentAttributeJSONObject(uniqueStudentSet, "hashKey");
+        JSONObject emailList = Util.getStudentAttributeJSONObject(uniqueStudentSet, "email");
         Map<String, JSONObject> urlContentsMap = new HashMap<>();
         urlContentsMap.put("Ids", hashKeyList);
         urlContentsMap.put("Emails", emailList);
@@ -258,18 +268,18 @@ public class EditController extends Controller {
     private void asyncRemoveStudentsFromDBButtonHook() {
         Runnable runnable = () -> {
 
-            Set<Student> coincidentStudentSet = UtilParser.getIntersectionOfStudentSets(model.getTemporaryStudents(), model.getDBStudents());
+            Set<Student> coincidentStudentSet = Util.getIntersectionOfStudentSets(model.getTemporaryStudents(), model.getDBStudents());
             try {
                 if (coincidentStudentSet.size() > 0) {
                     Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersMap(coincidentStudentSet);
-                    String combined = UtilParser.generateMultiPathJSONString(urlContentsMap);
+                    String combined = Util.generateMultiPathJSONString(urlContentsMap);
 
                     String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
                     ArrayList<String> responseDataDelete = dbHandler.updateData(baseURL, combined);
                     if (responseDataDelete.get(0).equals("200")) {
                         model.getTemporaryStudents().clear();
                         removePlainStudentDataFromFile(coincidentStudentSet);
-                        addWarning("Borrados alumnos de la base de datos.", 250, true);
+                        addWarning("Borrados alumnos de la base de datos.", Warning.DURATION.MEDIUM, true);
                         LOGGER.info("[General information]: Removed " + coincidentStudentSet.size() + " students from DB.");
                         controllerLogic();
 
@@ -280,7 +290,7 @@ public class EditController extends Controller {
             } catch (IOException | NullPointerException e) {
                 System.err.println("[Error while deleting data from the DB]: " + e.getMessage());
                 LOGGER.severe("[Error while deleting data from the DB]: " + e.getMessage());
-                addWarning("Error eliminando alumnos.", 200, false);
+                addWarning("Error eliminando alumnos.", Warning.DURATION.SHORT, false);
             }
         };
 
@@ -290,13 +300,13 @@ public class EditController extends Controller {
 
     private void removePlainStudentDataFromFile(Set<Student> students) {
         try {
-            JSONObject studentBackup = UtilParser.loadJSONObject("data/files/student_data_backup.json");
+            JSONObject studentBackup = parent.loadJSONObject(DniParser.DATA_BACKUP_FILEPATH);
             for (Student student : students) {
                 if (studentBackup.keys().contains(student.getID())) {
                     studentBackup.remove(student.getID());
                 }
             }
-            parent.saveJSONObject(studentBackup, "student_data_backup.json");
+            parent.saveJSONObject(studentBackup, DniParser.DATA_BACKUP_FILEPATH);
         } catch (NullPointerException e) {
             LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
         }
@@ -304,7 +314,7 @@ public class EditController extends Controller {
 
     @NotNull
     private Map<String, JSONObject> getIDsEmailsUsersMap(Set<Student> coincidentStudentSet) {
-        JSONObject nullList = UtilParser.getStudentAttributeJSONObject(coincidentStudentSet, null);
+        JSONObject nullList = Util.getStudentAttributeJSONObject(coincidentStudentSet, null);
         Map<String, JSONObject> urlContentsMap = new HashMap<>();
         urlContentsMap.put("Ids", nullList);
         urlContentsMap.put("Emails", nullList);
@@ -321,13 +331,13 @@ public class EditController extends Controller {
                     LOGGER.info("[General information]: Emptied data from DB.");
                     removePlainStudentDataFromFile(model.getDBStudents());
                     model.getDBStudents().clear();
-                    addWarning("Base de datos vaciada.", 250, true);
+                    addWarning("Base de datos vaciada.", Warning.DURATION.MEDIUM, true);
                     controllerLogic();
                 }
             } catch (IOException e) {
                 System.err.println("[Error deleting data from DB]: " + e.getMessage());
                 LOGGER.severe("[Error deleting data from DB]: " + e.getMessage());
-                addWarning("Error vaciando la base de datos.", 200, false);
+                addWarning("Error vaciando la base de datos.", Warning.DURATION.SHORT, false);
             }
         };
 
@@ -342,18 +352,16 @@ public class EditController extends Controller {
         while (!closedContextMenu) {
             Thread.yield();
         }//We need to wait for the input file context menu to be closed before resuming execution
-
         if (model.getInputFile().exists()) {
             try {
                 Table studentIDTable = parent.loadTable(model.getInputFile().getAbsolutePath(), "header");
-                Set<Student> studentList = generateStudentListFromTable(studentIDTable);
-
-                model.addTemporaryStudentList(studentList);
+                Set<Student> newStudentList = generateStudentListFromTable(studentIDTable);
+                Set<Student> unique = Util.getUniqueStudentSet(newStudentList, model.getTemporaryStudents());
+                model.addTemporaryStudentList(unique);
             } catch (Exception e) {
                 System.err.println("[Error loading the student list from CSV file]: " + e.getMessage());
                 LOGGER.warning("[Error loading the student list from CSV file]: " + e.getMessage());
             }
-
         }
     }
 

@@ -2,7 +2,7 @@ package uca.esi.dni.ui;
 
 import processing.core.PVector;
 import processing.core.PApplet;
-import uca.esi.dni.DniParser;
+import uca.esi.dni.main.DniParser;
 
 public class InputButton {
     private final DniParser parent;

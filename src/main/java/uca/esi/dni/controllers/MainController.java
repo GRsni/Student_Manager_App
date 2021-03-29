@@ -4,12 +4,13 @@ import processing.data.JSONObject;
 import processing.data.Table;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.DniParser;
+import uca.esi.dni.main.DniParser;
 import uca.esi.dni.file.DatabaseHandler;
-import uca.esi.dni.file.UtilParser;
+import uca.esi.dni.file.Util;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.ItemList;
+import uca.esi.dni.ui.Warning;
 import uca.esi.dni.views.View;
 
 import java.io.File;
@@ -31,7 +32,8 @@ public class MainController extends Controller {
     }
 
     private void initModelState() {
-        model.setDBReference(DatabaseHandler.getDBReference("data/files/settings.json"));
+        model.setSettingsObject(Util.loadJSONObject(DniParser.SETTINGS_FILEPATH));
+        model.setDBReference(model.getSettingsObject().getString("databaseURL"));
         if (model.getDBStudents().isEmpty()) {
             asyncLoadStudentDataFromDB();
         }
@@ -39,7 +41,7 @@ public class MainController extends Controller {
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getDBReference());
+        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile());
     }
 
     @Override
@@ -102,21 +104,21 @@ public class MainController extends Controller {
                 String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
                 ArrayList<String> response = dbHandler.getDataFromDB(usersURL);
                 if (response.get(0).equals("200")) {
-                    JSONObject studentData = UtilParser.parseJSONObject(response.get(1));
-                    Map<String, Map<String, Table>> tableMap = UtilParser.createStudentsDataTables(studentData);
+                    JSONObject studentData = Util.parseJSONObject(response.get(1));
+                    Map<String, Map<String, Table>> tableMap = Util.createStudentsDataTables(studentData);
                     if (model.getOutputFolder() != null) {
                         saveLabTables(tableMap, model.getOutputFolder());
-                        addWarning("Generados archivos de alumnos.", 250, true);
+                        addWarning("Generados archivos de alumnos.", Warning.DURATION.SHORT, true);
                     }
                 }
             } catch (IOException e) {
                 System.err.println("[IOException when reading database]: \" + e.getMessage()");
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
-                addWarning("Error leyendo la base de datos.", 250, false);
+                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, false);
             } catch (RuntimeException e) {
                 System.err.println("[Error while generating the CSV files]: " + e.getMessage());
                 LOGGER.severe("[NullPointerException when generating the CSV files]: " + e.getMessage());
-                addWarning("Error generando los archivos.", 250, false);
+                addWarning("Error generando los archivos.", Warning.DURATION.SHORT, false);
             }
         }
     }

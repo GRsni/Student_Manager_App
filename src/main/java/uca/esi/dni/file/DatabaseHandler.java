@@ -4,7 +4,6 @@ package uca.esi.dni.file;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import okhttp3.*;
-import processing.data.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,13 +14,7 @@ public class DatabaseHandler {
     private static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
 
-
     final OkHttpClient client = new OkHttpClient();
-
-    public static String getDBReference(String filename) {
-        JSONObject object = UtilParser.loadJSONObject(filename);
-        return object.getString("databaseURL");
-    }
 
     public static String getDatabaseDirectoryURL(String url) throws IOException, NullPointerException {
         return getDatabaseDirectoryURL(url, "");
@@ -88,7 +81,7 @@ public class DatabaseHandler {
         ArrayList<String> responseStrings = new ArrayList<>();
         try (Response response = client.newCall(request).execute()) {
             responseStrings.add(Integer.toString(response.code()));
-            responseStrings.add(response.body().string());
+            responseStrings.add(Objects.requireNonNull(response.body()).string());
         }
         return responseStrings;
     }

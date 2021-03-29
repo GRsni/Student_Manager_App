@@ -7,7 +7,9 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import processing.data.JSONObject;
 import uca.esi.dni.data.Student;
+import uca.esi.dni.main.DniParser;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -58,10 +60,23 @@ public class EmailHandler {
         LOGGER.info("[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size());
     }
 
-    public static void sendBackupEmail(String attachment) {
+    public static void sendBackupEmail(String filepath) {
+        try {
+            sendBackupEmail(new File(filepath));
+        } catch (NullPointerException e) {
+            LOGGER.severe("[Error while sending student data backup email]: " + e.getMessage());
+        }
+    }
+
+    public static void sendBackupEmail(File attachment) {
         Session session = getSessionObject();
         String header = String.format(backupHeaderText, new Date().toString());
-        sendHTMLEmail(backupEmail, header, backupContentText, attachment, session);
+        try {
+            sendHTMLEmail(backupEmail, header, backupContentText, attachment, session);
+        } catch (MessagingException e) {
+            System.err.println("[Error sending email]: " + e.getMessage());
+            LOGGER.severe("[Error sending email]: " + e.getMessage());
+        }
         System.out.println("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
         LOGGER.info("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
     }
@@ -69,7 +84,12 @@ public class EmailHandler {
     private static void sendEmailCollection(Map<String, String> emailContentMap) {
         Session session = getSessionObject();
         for (String email : emailContentMap.keySet()) {
-            sendHTMLEmail(email, EmailHandler.subjectText, emailContentMap.get(email), session);
+            try {
+                sendHTMLEmail(email, EmailHandler.subjectText, emailContentMap.get(email), session);
+            } catch (MessagingException e) {
+                System.err.println("[Error sending email]: " + e.getMessage());
+                LOGGER.severe("[Error sending email]: " + e.getMessage());
+            }
         }
     }
 
@@ -93,45 +113,44 @@ public class EmailHandler {
         return props;
     }
 
-    private static void sendHTMLEmail(String dest, String header, String contentText, Session session) {
-        sendHTMLEmail(dest, header, contentText, "", session);
+    private static void sendHTMLEmail(String dest, String header, String contentText, Session session) throws MessagingException {
+        sendHTMLEmail(dest, header, contentText, null, session);
     }
 
-    private static void sendHTMLEmail(String dest, String header, String contentText, String attachment, Session session) {
-        try {
-            MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(sender));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
-            message.setSubject(header);
-            message.setContent(contentText, "text/html; charset=UTF-8");
-            if (attachment != null && !attachment.isEmpty()) {
-                setAttachment(message, attachment);
-            }
-            Transport.send(message);
-        } catch (MessagingException e) {
-            System.err.println("[Error sending email]: " + e.getMessage());
-            LOGGER.severe("[Error sending email]: " + e.getMessage());
-        }
+    private static void sendHTMLEmail(String dest, String header, String contentText, File attachment, Session session) throws MessagingException {
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(sender));
+        message.addRecipient(Message.RecipientType.TO, new InternetAddress(dest));
+        message.setSubject(header);
+        setMultiPartContent(message, contentText, attachment);
+        Transport.send(message);
     }
 
-
-    public static void setAttachment(Message message, String filename) throws MessagingException {
-        // create a multipart message
+    private static void setMultiPartContent(Message message, String textContent, File attachment) throws MessagingException {
         Multipart multipart = new MimeMultipart();
+        BodyPart messageTextBodyPart = new MimeBodyPart();
+        messageTextBodyPart.setContent(textContent, "text/html; charset=UTF-8");
+        multipart.addBodyPart(messageTextBodyPart);
+        if (attachment != null && attachment.exists()) {
+            BodyPart attachmentBodyPart = getAttachmentBodyPart(attachment);
+            multipart.addBodyPart(attachmentBodyPart);
+        }
+        message.setContent(multipart);
+    }
+
+    public static BodyPart getAttachmentBodyPart(File filename) throws MessagingException {
         BodyPart messageBodyPart = new MimeBodyPart();
 
         // specify your file
         DataSource source = new FileDataSource(filename);
         messageBodyPart.setDataHandler(new DataHandler(source));
-        messageBodyPart.setFileName(filename);
+        messageBodyPart.setFileName(filename.getName());
 
-        //Add the file part
-        multipart.addBodyPart(messageBodyPart);
-        message.setContent(multipart);
+        return messageBodyPart;
     }
 
     private void loadSettings() {
-        JSONObject settingsObject = UtilParser.loadJSONObject("data/files/settings.json");
+        JSONObject settingsObject = Util.loadJSONObject(DniParser.SETTINGS_FILEPATH);
         sender = settingsObject.getString("senderEmail");
         username = settingsObject.getString("senderUsername");
         password = settingsObject.getString("senderPassword");

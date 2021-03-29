@@ -187,7 +187,7 @@ public class TextField extends BaseElement {
                 text = text.substring(0, maxNumCharacters());
                 text += "...";
             } else if (isScrollable) {
-                text = text.substring(text.length() - maxNumCharacters(), text.length() - 1);
+                text = text.substring(text.length() - maxNumCharacters());
             }
         }
         parent.text(text, pos.x + padding, pos.y, w, h);

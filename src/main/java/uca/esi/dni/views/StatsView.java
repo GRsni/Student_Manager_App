@@ -24,7 +24,7 @@ public class StatsView extends View {
     }
 
     @Override
-    public void update(Set<Student> dbList, Set<Student> modList, File inputFile, String dbReference) {
+    public void update(Set<Student> dbList, Set<Student> modList, File inputFile) {
 
     }
 }

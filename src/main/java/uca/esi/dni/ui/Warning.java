@@ -7,9 +7,15 @@ import uca.esi.dni.views.View;
 
 public class Warning extends BaseElement {
 
+    public enum DURATION {
+        SHORT,
+        MEDIUM,
+        LONG
+    }
+
     private final TextField content;
     private int fadeout;
-    private int max_life = 0;
+    private final int max_life;
 
     private final boolean isGood;
 
@@ -19,7 +25,7 @@ public class Warning extends BaseElement {
     private static final int lineColorGood = View.COLORS.PRIMARY_DARK;
     private static final int lineColorBad = View.COLORS.ACCENT_DARK;
 
-    public Warning(PApplet parent, float x, float y, int w, int h, String contentString, int fadeout, boolean good) {
+    public Warning(PApplet parent, float x, float y, int w, int h, String contentString, DURATION duration, boolean good) {
         super(parent, new PVector(x, y), w, h);
         this.content = new TextField(parent, x, y, w, h, contentString, "");
         this.isGood = good;
@@ -29,8 +35,21 @@ public class Warning extends BaseElement {
             this.content.setBackgroundColor(backgroundColorBad);
         }
         this.content.setCentered(true);
-        this.fadeout = fadeout;
+        this.fadeout = getWarningDurationTime(duration);
         this.max_life = fadeout;
+    }
+
+    public int getWarningDurationTime(DURATION duration) {
+        switch (duration) {
+            case SHORT:
+                return 150;
+            case MEDIUM:
+                return 200;
+            case LONG:
+                return 250;
+            default:
+                return 100;
+        }
     }
 
     public void setFont(PFont font) {
@@ -72,7 +91,7 @@ public class Warning extends BaseElement {
         } else {
             parent.stroke(lineColorBad);
         }
-        parent.strokeWeight(h * 2/10);
+        parent.strokeWeight(h * 0.2f);
         parent.strokeCap(PApplet.SQUARE);
         parent.line(pos.x, pos.y + h, pos.x + calcLineBarLength(), pos.y + h);
         parent.pop();

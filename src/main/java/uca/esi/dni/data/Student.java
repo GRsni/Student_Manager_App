@@ -1,8 +1,7 @@
 package uca.esi.dni.data;
 
 import org.jetbrains.annotations.NotNull;
-import uca.esi.dni.file.UtilParser;
-import uca.esi.dni.logger.AppLogger;
+import uca.esi.dni.file.Util;
 
 import java.security.SecureRandom;
 import java.util.Random;
@@ -67,7 +66,7 @@ public class Student {
 
     private String keyToHash(@NotNull String key) throws NullPointerException {
         try {
-            return UtilParser.getSHA256HashedString(key);
+            return Util.getSHA256HashedString(key);
         } catch (NullPointerException e) {
             System.err.println("[Error while generating hashedKey]: " + e.getMessage());
             LOGGER.severe("[Error while generating hashedKey]: " + e.getMessage());

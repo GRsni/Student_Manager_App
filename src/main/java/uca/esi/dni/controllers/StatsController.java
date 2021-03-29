@@ -2,7 +2,7 @@ package uca.esi.dni.controllers;
 
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.DniParser;
+import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.views.View;
 

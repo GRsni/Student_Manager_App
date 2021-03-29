@@ -6,19 +6,16 @@ import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
-import uca.esi.dni.DniParser;
+import uca.esi.dni.main.DniParser;
 import uca.esi.dni.data.Student;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UtilParser {
+public class Util {
     private static final Pattern idPattern = Pattern.compile("u[a-zA-Z0-9]{8}");
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
@@ -52,7 +49,7 @@ public class UtilParser {
         if (filepath != null) {
             if (checkFileExtension(filepath, "json")) {
                 try {
-                    InputStream inputStream = UtilParser.class.getClassLoader().getResourceAsStream(filepath);
+                    InputStream inputStream = Util.class.getClassLoader().getResourceAsStream(filepath);
                     String fileContent = readFromInputStream(inputStream);
                     return parseJSONObject(fileContent);
                 } catch (IOException | NullPointerException e) {
@@ -73,8 +70,7 @@ public class UtilParser {
         }
     }
 
-    private static String readFromInputStream(InputStream inputStream)
-            throws IOException {
+    private static String readFromInputStream(InputStream inputStream) throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;

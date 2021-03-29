@@ -1,10 +1,9 @@
 package uca.esi.dni.models;
 
+import processing.data.JSONObject;
 import uca.esi.dni.data.Student;
-import uca.esi.dni.ui.Warning;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +12,7 @@ public class AppModel extends Model {
     private final Set<Student> temporaryStudents = new HashSet<>();
     private File inputFile = new File("");
     private File outputFolder = new File("");
+    private JSONObject settingsObject;
     private String DBReference;
 
     public AppModel() {
@@ -40,6 +40,14 @@ public class AppModel extends Model {
 
     public void setOutputFolder(File outputFolder) {
         this.outputFolder = outputFolder;
+    }
+
+    public JSONObject getSettingsObject() {
+        return settingsObject;
+    }
+
+    public void setSettingsObject(JSONObject settingsObject) {
+        this.settingsObject = settingsObject;
     }
 
     public Set<Student> getDBStudents() {

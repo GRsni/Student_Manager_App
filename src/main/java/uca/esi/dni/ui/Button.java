@@ -152,6 +152,14 @@ public class Button extends BaseElement {
         content.setBackgroundColor(color);
     }
 
+    public boolean getIsCentered() {
+        return content.isCentered();
+    }
+
+    public void setCentered(boolean centered) {
+        content.setCentered(centered);
+    }
+
     public void display() {
         renderButton();
         renderIcon();

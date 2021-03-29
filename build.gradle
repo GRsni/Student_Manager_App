@@ -1,4 +1,3 @@
-
 plugins {
     id 'java'
 }
@@ -55,7 +54,7 @@ dependencies {
 }
 
 task uberJar(type: Jar) {
-    archiveClassifier = 'uber'
+    //archiveClassifier = 'uber'
 
     from sourceSets.main.output
 
@@ -63,7 +62,7 @@ task uberJar(type: Jar) {
     from {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
-    manifest.attributes("Main-Class":"uca.esi.dni.DniParser")
+    manifest.attributes("Main-Class":"uca.esi.dni.main.DniParser")
 }
 
 test {
