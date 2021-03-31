@@ -16,10 +16,10 @@ gradle-app.setting
 /out
 
 #Important files
-/src/main/resources/data/files
+/src/main/resources/data/files/settings.json
+/src/main/resources/data/files/manualdetorsion-firebase.json
 /data/files
 Log.txt
 *.lck
 *.1
 src/main/resources/data/files/student_data_backup.json
-src/main/resources/data/files/settings.json
