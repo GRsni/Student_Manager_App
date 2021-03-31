@@ -1,22 +1,19 @@
 package uca.esi.dni.models;
 
 import processing.data.JSONObject;
-import uca.esi.dni.data.Student;
+import uca.esi.dni.types.Student;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AppModel extends Model {
-    private final Set<Student> DBStudents = new HashSet<>();
+public class AppModel implements Model {
+    private final Set<Student> dbStudents = new HashSet<>();
     private final Set<Student> temporaryStudents = new HashSet<>();
     private File inputFile = new File("");
     private File outputFolder = new File("");
     private JSONObject settingsObject;
-    private String DBReference;
-
-    public AppModel() {
-    }
+    private String dbReference;
 
     public File getInputFile() {
         return inputFile;
@@ -26,12 +23,12 @@ public class AppModel extends Model {
         this.inputFile = inputFile;
     }
 
-    public String getDBReference() {
-        return DBReference;
+    public String getdbReference() {
+        return dbReference;
     }
 
-    public void setDBReference(String DBReference) {
-        this.DBReference = DBReference;
+    public void setdbReference(String dbReference) {
+        this.dbReference = dbReference;
     }
 
     public File getOutputFolder() {
@@ -50,24 +47,24 @@ public class AppModel extends Model {
         this.settingsObject = settingsObject;
     }
 
-    public Set<Student> getDBStudents() {
-        return DBStudents;
+    public Set<Student> getDbStudents() {
+        return dbStudents;
     }
 
     public void addDBStudentList(Set<Student> list) {
-        DBStudents.addAll(list);
+        dbStudents.addAll(list);
     }
 
     public void removeDBStudentList(Set<Student> list) {
-        DBStudents.removeAll(list);
+        dbStudents.removeAll(list);
     }
 
     public void addDBStudent(Student s) {
-        DBStudents.add(s);
+        dbStudents.add(s);
     }
 
     public void removeDBStudent(Student s) {
-        DBStudents.remove(s);
+        dbStudents.remove(s);
     }
 
     public Set<Student> getTemporaryStudents() {

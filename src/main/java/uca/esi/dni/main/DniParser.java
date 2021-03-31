@@ -20,29 +20,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DniParser extends PApplet {
-    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    public final static String DATA_BACKUP_FILEPATH = "data/files/student_data_backup.json";
-    public final static String SETTINGS_FILEPATH = "data/files/settings.json";
+    public static final String DATA_BACKUP_FILEPATH = "data/files/student_data_backup.json";
+    public static final String SETTINGS_FILEPATH = "data/files/settings.json";
 
-    public static AppModel appModel;
-    public static View currentView;
-    public static Controller currentController;
+    private AppModel appModel;
+    private View currentView;
+    private Controller currentController;
 
-    private static PImage icon;
+    private PImage icon;
 
     public static void main(String[] args) {
         PApplet.main(new String[]{DniParser.class.getName()});
     }
 
+    @Override
     public void settings() {
         size(displayWidth / 2, displayHeight / 2);
         icon = loadImage("data/icons/server-storage_filled.png");
     }
 
+    @Override
     public void setup() {
         surface.setTitle("Manual de laboratorio: Gestor de datos");
-        surface.setResizable(false);
+        surface.setResizable(true);
         surface.setIcon(icon);
         registerMethod("mouseEvent", this);
         registerMethod("keyEvent", this);
@@ -56,8 +58,15 @@ public class DniParser extends PApplet {
 
     private void initMVCObjects() {
         appModel = new AppModel();
+        initViewConstants();
         currentView = new MainView(this);
         currentController = new MainController(this, appModel, currentView);
+    }
+
+    private void initViewConstants() {
+        View.setWidthUnitSize(width / 16);
+        View.setHeightUnitSize(height / 16);
+        View.loadFonts(this);
     }
 
     private void setupFileSystem() {
@@ -67,6 +76,31 @@ public class DniParser extends PApplet {
         }
     }
 
+    public AppModel getAppModel() {
+        return appModel;
+    }
+
+    public void setAppModel(AppModel appModel) {
+        this.appModel = appModel;
+    }
+
+    public View getCurrentView() {
+        return currentView;
+    }
+
+    public void setCurrentView(View currentView) {
+        this.currentView = currentView;
+    }
+
+    public Controller getCurrentController() {
+        return currentController;
+    }
+
+    public void setCurrentController(Controller currentController) {
+        this.currentController = currentController;
+    }
+
+    @Override
     public void draw() {
         background(255);
         currentView.show();
@@ -82,16 +116,14 @@ public class DniParser extends PApplet {
 
     public void selectInputFile(File selection) {
         if (selection == null) {
-            System.err.println("[Error while selecting input file]: No file selected.");
+
             LOGGER.warning("[Error while selecting input file]: No file selected.");
             currentController.addWarning("Archivo no seleccionado.", Warning.DURATION.SHORT, false);
         } else {
             String filePath = selection.getAbsolutePath();
-            LOGGER.info("[General information]: File selected: " + filePath);
             if (Util.checkFileExtension(filePath, "csv")) {
                 currentController.onContextMenuClosed(selection);
             } else {
-                System.err.println("[Error in selected file]: File selected is not a CSV file.");
                 LOGGER.warning("[Error in selected file]: File selected is not a CSV file.");
             }
         }
@@ -100,26 +132,23 @@ public class DniParser extends PApplet {
 
     public void selectOutputFolder(File folder) {
         if (folder == null) {
-            System.err.println("[Error while selecting output folder]: No folder selected.");
             LOGGER.warning("[Error while selecting output folder]: No folder selected.");
             currentController.addWarning("Carpeta no seleccionada.", Warning.DURATION.SHORT, false);
             currentController.onContextMenuClosed(new File(""));
         } else {
-            String folderPath = folder.getAbsolutePath();
-            LOGGER.info("[General information]: File selected: " + folderPath);
             if (folder.isDirectory()) {
                 currentController.onContextMenuClosed(folder);
             } else {
-                System.err.println("[Error in selected directory]: Path selected is not a directory.");
                 LOGGER.warning("[Error in selected directory]: Path selected is not a directory.");
             }
         }
         currentController.setClosedContextMenu(true);
     }
 
+    @Override
     public void exit() {
         currentController.addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, true);
-        if (appModel.getDBStudents().size() > 0) {
+        if (!appModel.getDbStudents().isEmpty()) {
             EmailHandler.sendBackupEmail(DATA_BACKUP_FILEPATH);
         }
         LOGGER.info("[General information]: Closing app");

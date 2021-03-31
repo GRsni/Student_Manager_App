@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.util.logging.*;
 
 public class AppLogger {
-    static private FileHandler logFile;
 
-    static public void setup() {
+    private AppLogger() {
+    }
+
+    private static FileHandler logFile;
+
+    public static void setup() {
         Logger logger = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
         Logger rootLogger = Logger.getLogger("");

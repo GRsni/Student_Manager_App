@@ -16,7 +16,7 @@ public class TextField extends BaseElement {
 
     private boolean hasMaxLength = false;
     private int maxLength;
-    private final int padding = 4;
+    private static final int PADDING = 4;
     private boolean isClickable = false;
     private boolean isFocused = false;
     private boolean isHeader = false;
@@ -25,8 +25,8 @@ public class TextField extends BaseElement {
     private boolean isCuttable = false;
 
 
-    public TextField(PApplet parent, float x, float y, int w, int h, String content, String hint) {
-        super(parent, new PVector(x, y), w, h);
+    public TextField(PApplet parent, Rectangle rectangle, String content, String hint) {
+        super(parent, rectangle);
         this.content = content;
         this.hint = hint;
     }
@@ -190,7 +190,7 @@ public class TextField extends BaseElement {
                 text = text.substring(text.length() - maxNumCharacters());
             }
         }
-        parent.text(text, pos.x + padding, pos.y, w, h);
+        parent.text(text, pos.x + PADDING, pos.y, w, h);
         parent.pop();
     }
 
@@ -200,17 +200,14 @@ public class TextField extends BaseElement {
 
     private void renderCursor() {
         parent.push();
-        if (isFocused) {
-            if ((parent.frameCount >> 5 & 1) == 0) {
-
-                parent.stroke(View.COLORS.BLACK);
-                parent.strokeWeight(3);
-                parent.strokeCap(PConstants.SQUARE);
-                parent.textFont(font);
-                float xCursorPos = getCursorXPos();
-                float xOffset = pos.x + padding + xCursorPos;
-                parent.line(xOffset, pos.y + padding, xOffset, pos.y + h - padding);
-            }
+        if (isFocused && (parent.frameCount >> 5 & 1) == 0) {
+            parent.stroke(View.COLORS.BLACK);
+            parent.strokeWeight(3);
+            parent.strokeCap(PConstants.SQUARE);
+            parent.textFont(font);
+            float xCursorPos = getCursorXPos();
+            float xOffset = pos.x + PADDING + xCursorPos;
+            parent.line(xOffset, pos.y + PADDING, xOffset, pos.y + h - PADDING);
         }
         parent.pop();
     }

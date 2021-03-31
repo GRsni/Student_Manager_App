@@ -1,10 +1,11 @@
 package uca.esi.dni.views;
 
 import processing.core.PApplet;
-import uca.esi.dni.data.Student;
 import uca.esi.dni.file.Util;
+import uca.esi.dni.types.Student;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
+import uca.esi.dni.ui.Rectangle;
 import uca.esi.dni.ui.TextField;
 
 import java.io.File;
@@ -30,41 +31,46 @@ public class MainView extends View {
     @Override
     protected void createElements() {
 
-        Button editButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 6,
-                HEIGHT_UNIT_SIZE * 3, 6, "Editar Lista", true);
+        Button editButton = new Button(parent,
+                new Rectangle(widthUnitSize, heightUnitSize * 2f, widthUnitSize * 6, heightUnitSize * 3),
+                6, "Editar Lista", true);
         editButton.setIcon(parent.loadImage("data/icons/edit-list.png"));
-        editButton.setFont(FONT_BIG);
+        editButton.setFont(fontBig);
         editButton.setFontSize(10);
         elements.put("editB", editButton);
 
-        Button generateFilesButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 6.5f, WIDTH_UNIT_SIZE * 6,
-                HEIGHT_UNIT_SIZE * 3, 6, "Generar archivos Excel", true);
+        Button generateFilesButton = new Button(parent,
+                new Rectangle(widthUnitSize, heightUnitSize * 6.5f, widthUnitSize * 6, heightUnitSize * 3),
+                6, "Generar archivos Excel", true);
         generateFilesButton.setIcon(parent.loadImage("data/icons/excel.png"));
-        generateFilesButton.setFont(FONT_BIG);
+        generateFilesButton.setFont(fontBig);
         generateFilesButton.setFontSize(30);
         elements.put("generateFilesB", generateFilesButton);
 
-        Button generateStatsButton = new Button(parent, WIDTH_UNIT_SIZE, HEIGHT_UNIT_SIZE * 11f, WIDTH_UNIT_SIZE * 6,
-                HEIGHT_UNIT_SIZE * 3, 6, "Generar estadísticas", true);
+        Button generateStatsButton = new Button(parent,
+                new Rectangle(widthUnitSize, heightUnitSize * 11f, widthUnitSize * 6, heightUnitSize * 3),
+                6, "Generar estadísticas", true);
         generateStatsButton.setIcon(parent.loadImage("data/icons/statistics.png"));
-        generateStatsButton.setFont(FONT_BIG);
+        generateStatsButton.setFont(fontBig);
         generateStatsButton.setFontSize(30);
         elements.put("generateStatsB", generateStatsButton);
 
-        TextField dbStudentsCounter = new TextField(parent, WIDTH_UNIT_SIZE * 13, HEIGHT_UNIT_SIZE * 14, WIDTH_UNIT_SIZE * 2,
-                HEIGHT_UNIT_SIZE, "Alumnos en BD: 0", "");
-        dbStudentsCounter.setFont(FONT_SMALL);
+        TextField dbStudentsCounter = new TextField(parent,
+                new Rectangle(widthUnitSize * 13f, heightUnitSize * 14f, widthUnitSize * 2, heightUnitSize),
+                "Alumnos en BD: 0", "");
+        dbStudentsCounter.setFont(fontSmall);
         dbStudentsCounter.setFontSize(10);
         elements.put("dbStudentsTF", dbStudentsCounter);
 
 
-        ItemList DBStudentsItemList = new ItemList(parent, WIDTH_UNIT_SIZE * 12, HEIGHT_UNIT_SIZE * 2, WIDTH_UNIT_SIZE * 3,
-                HEIGHT_UNIT_SIZE * 12, "Alumnos en BD");
-        DBStudentsItemList.setFont(FONT_SMALL);
-        DBStudentsItemList.setFontSize(10);
-        DBStudentsItemList.setTitleFontSize(20);
-        DBStudentsItemList.setTitleFont(FONT_BIG);
-        elements.put("dbStudentsIL", DBStudentsItemList);
+        ItemList dbStudentsItemList = new ItemList(parent,
+                new Rectangle(widthUnitSize * 12f, heightUnitSize * 2f, widthUnitSize * 3, heightUnitSize * 12),
+                "Alumnos en BD");
+        dbStudentsItemList.setFont(fontSmall);
+        dbStudentsItemList.setFontSize(10);
+        dbStudentsItemList.setTitleFontSize(20);
+        dbStudentsItemList.setTitleFont(fontBig);
+        elements.put("dbStudentsIL", dbStudentsItemList);
     }
 
     @Override

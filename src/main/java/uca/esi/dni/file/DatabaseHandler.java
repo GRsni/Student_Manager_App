@@ -8,6 +8,7 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class DatabaseHandler {
@@ -44,14 +45,14 @@ public class DatabaseHandler {
         return token.getTokenValue();
     }
 
-    public ArrayList<String> getDataFromDB(String url) throws IOException, NullPointerException {
+    public List<String> getDataFromDB(String url) throws IOException, NullPointerException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
         return callAndParseResponse(request);
     }
 
-    public ArrayList<String> putDataToDB(String url, String jsonString) throws IOException, NullPointerException {
+    public List<String> putDataToDB(String url, String jsonString) throws IOException, NullPointerException {
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
@@ -60,7 +61,7 @@ public class DatabaseHandler {
         return callAndParseResponse(request);
     }
 
-    public ArrayList<String> updateData(String url, String jsonString) throws IOException, NullPointerException {
+    public List<String> updateData(String url, String jsonString) throws IOException, NullPointerException {
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
@@ -69,7 +70,7 @@ public class DatabaseHandler {
         return callAndParseResponse(request);
     }
 
-    public ArrayList<String> emptyDB(String url) throws IOException, NullPointerException {
+    public List<String> emptyDB(String url) throws IOException, NullPointerException {
         Request request = new Request.Builder()
                 .url(url)
                 .delete()

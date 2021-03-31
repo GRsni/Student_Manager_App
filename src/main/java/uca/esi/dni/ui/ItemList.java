@@ -4,22 +4,19 @@ import org.apache.commons.lang3.SystemUtils;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PFont;
-import processing.core.PVector;
 import processing.event.MouseEvent;
 import uca.esi.dni.views.View;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-import static uca.esi.dni.views.View.HEIGHT_UNIT_SIZE;
 
 public class ItemList extends BaseElement {
     private final Set<String> items = new HashSet<>();
 
     private final int visibleItems;
-    private final int itemHeight = HEIGHT_UNIT_SIZE / 2;
+    private static final int ITEM_HEIGHT = View.getHeightUnitSize() / 2;
 
     private int backgroundColor;
     private int textColor;
@@ -28,18 +25,17 @@ public class ItemList extends BaseElement {
     private int scrollIndex = 0;
     private int maxScroll;
 
-    public ItemList(PApplet parent, float x, float y, int w, int h, String title) {
-        this(parent, x, y, w, h, title, View.COLORS.ACCENT, View.COLORS.PRIMARY, View.COLORS.WHITE);
+    public ItemList(PApplet parent, Rectangle rectangle, String title) {
+        this(parent, rectangle, title, View.COLORS.ACCENT, View.COLORS.PRIMARY, View.COLORS.WHITE);
 
     }
 
-    public ItemList(PApplet parent, float x, float y, int w, int h, String title, int backgroundColor, int titleBackgroundColor, int textColor) {
-        super(parent, new PVector(x, y + HEIGHT_UNIT_SIZE), w, h - HEIGHT_UNIT_SIZE);
+    public ItemList(PApplet parent, Rectangle rectangle, String title, int backgroundColor, int titleBackgroundColor, int textColor) {
+        super(parent, new Rectangle(rectangle.x, rectangle.y + View.getHeightUnitSize(), rectangle.w, rectangle.h - View.getHeightUnitSize()));
         this.visibleItems = calculateNumberOfVisibleItems();
-        this.maxScroll =
-                this.backgroundColor = backgroundColor;
+        this.maxScroll = this.backgroundColor = backgroundColor;
         this.textColor = textColor;
-        this.title = new TextField(parent, x, y, w, HEIGHT_UNIT_SIZE, title, "");
+        this.title = new TextField(parent, new Rectangle(rectangle.x, rectangle.y, w, View.getWidthUnitSize()), title, "");
         this.title.setContentColor(textColor);
         this.title.setBackgroundColor(titleBackgroundColor);
         this.title.setIsHeader(true);
@@ -66,24 +62,8 @@ public class ItemList extends BaseElement {
         this.title.setContentColor(textColor);
     }
 
-    public PFont getFont() {
-        return font;
-    }
-
-    public void setFont(PFont font) {
-        this.font = font;
-    }
-
     public void setTitleFont(PFont font) {
         this.title.setFont(font);
-    }
-
-    public int getFontSize() {
-        return fontSize;
-    }
-
-    public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
     }
 
     public void setTitleFontSize(int fontSize) {
@@ -109,7 +89,7 @@ public class ItemList extends BaseElement {
         updateMaxScroll();
     }
 
-    public void removeList(ArrayList<String> list) {
+    public void removeList(Set<String> list) {
         items.removeAll(list);
         updateMaxScroll();
     }
@@ -136,33 +116,22 @@ public class ItemList extends BaseElement {
         parent.textAlign(PConstants.LEFT, PConstants.CENTER);
         ArrayList<String> itemList = new ArrayList<>(items);
 
-        for (int i = scrollIndex; i < itemList.size() && itemsDisplayed <= visibleItems; i++) {
-            float yOffset = itemHeight * itemsDisplayed;
+        for (int i = scrollIndex; i < itemList.size() && itemsDisplayed <= visibleItems; i++, itemsDisplayed++) {
+            int yOffset = ITEM_HEIGHT * itemsDisplayed;
             String item = itemList.get(i);
-            TextField textField = new TextField(parent, pos.x, pos.y + yOffset, w, h / visibleItems, item, "");
+            TextField textField = new TextField(parent, new Rectangle(pos.x, pos.y + title.h + yOffset, w, h / visibleItems), item, "");
             textField.setContentColor(View.COLORS.BLACK);
             textField.setFontSize(fontSize);
             textField.setBackgroundColor(View.COLORS.ACCENT);
             textField.setFont(font);
             textField.display();
-            itemsDisplayed++;
         }
 
         parent.pop();
     }
 
-    private String getItem(int itemsDisplayed, Iterator<String> it) {
-        String item;
-        if (itemsDisplayed < visibleItems) {
-            item = it.next();
-        } else {
-            item = "...";
-        }
-        return item;
-    }
-
     private int calculateNumberOfVisibleItems() {
-        return h / itemHeight - 1;
+        return h / ITEM_HEIGHT - 1;
     }
 
     private void updateMaxScroll() {
@@ -172,6 +141,7 @@ public class ItemList extends BaseElement {
         }
     }
 
+    @Override
     public void handleInput(MouseEvent e) {
         if (SystemUtils.IS_OS_MAC_OSX) {
             scrollIndex = Math.min(maxScroll, Math.max(0, scrollIndex - e.getCount()));

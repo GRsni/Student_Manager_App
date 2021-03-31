@@ -1,11 +1,10 @@
 package uca.esi.dni.ui;
 
 import processing.core.PApplet;
-import processing.core.PFont;
-import processing.core.PVector;
+import processing.core.PConstants;
 import uca.esi.dni.views.View;
 
-public class Warning extends BaseElement {
+public class Warning extends TextField {
 
     public enum DURATION {
         SHORT,
@@ -13,30 +12,29 @@ public class Warning extends BaseElement {
         LONG
     }
 
-    private final TextField content;
     private int fadeout;
-    private final int max_life;
+    private final int maxLife;
 
     private final boolean isGood;
 
-    private static final int backgroundColorGood = View.COLORS.PRIMARY;
-    private static final int backgroundColorBad = View.COLORS.SECONDARY_DARK;
+    private static final int BACKGROUND_COLOR_GOOD = View.COLORS.PRIMARY;
+    private static final int BACKGROUND_COLOR_BAD = View.COLORS.SECONDARY_DARK;
 
-    private static final int lineColorGood = View.COLORS.PRIMARY_DARK;
-    private static final int lineColorBad = View.COLORS.ACCENT_DARK;
+    private static final int LINE_COLOR_GOOD = View.COLORS.PRIMARY_DARK;
+    private static final int LINE_COLOR_BAD = View.COLORS.ACCENT_DARK;
 
-    public Warning(PApplet parent, float x, float y, int w, int h, String contentString, DURATION duration, boolean good) {
-        super(parent, new PVector(x, y), w, h);
-        this.content = new TextField(parent, x, y, w, h, contentString, "");
+    public Warning(PApplet parent, Rectangle rectangle, String contentString, DURATION duration, boolean good) {
+        super(parent, rectangle, contentString, "");
+
+        this.fadeout = getWarningDurationTime(duration);
+        this.maxLife = fadeout;
         this.isGood = good;
         if (good) {
-            this.content.setBackgroundColor(backgroundColorGood);
+            setBackgroundColor(BACKGROUND_COLOR_GOOD);
         } else {
-            this.content.setBackgroundColor(backgroundColorBad);
+            setBackgroundColor(BACKGROUND_COLOR_BAD);
         }
-        this.content.setCentered(true);
-        this.fadeout = getWarningDurationTime(duration);
-        this.max_life = fadeout;
+        setCentered(true);
     }
 
     public int getWarningDurationTime(DURATION duration) {
@@ -52,32 +50,20 @@ public class Warning extends BaseElement {
         }
     }
 
-    public void setFont(PFont font) {
-        this.content.setFont(font);
-    }
-
-    public void setFontSize(int fontSize) {
-        this.content.setFontSize(fontSize);
-    }
-
-    public void setFontColor(int fontColor) {
-        this.content.setContentColor(fontColor);
-    }
-
     @Override
     public void display() {
         renderBox();
         renderLifeBar();
-        content.display();
+        super.display();
     }
 
     private void renderBox() {
         parent.push();
         parent.noStroke();
         if (isGood) {
-            parent.fill(backgroundColorGood);
+            parent.fill(BACKGROUND_COLOR_GOOD);
         } else {
-            parent.fill(backgroundColorBad);
+            parent.fill(BACKGROUND_COLOR_BAD);
         }
         parent.rect(pos.x, pos.y, w, h);
         parent.pop();
@@ -87,12 +73,12 @@ public class Warning extends BaseElement {
         parent.push();
         parent.strokeWeight(2);
         if (isGood) {
-            parent.stroke(lineColorGood);
+            parent.stroke(LINE_COLOR_GOOD);
         } else {
-            parent.stroke(lineColorBad);
+            parent.stroke(LINE_COLOR_BAD);
         }
         parent.strokeWeight(h * 0.2f);
-        parent.strokeCap(PApplet.SQUARE);
+        parent.strokeCap(PConstants.SQUARE);
         parent.line(pos.x, pos.y + h, pos.x + calcLineBarLength(), pos.y + h);
         parent.pop();
     }
@@ -102,7 +88,7 @@ public class Warning extends BaseElement {
     }
 
     private float calcLineBarLength() {
-        return PApplet.map(fadeout, max_life, 0, w, 0);
+        return PApplet.map(fadeout, maxLife, 0, w, 0);
     }
 
     public boolean toDestroy() {

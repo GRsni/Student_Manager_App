@@ -14,16 +14,6 @@ repositories {
     jcenter()
 }
 
-sourceSets{
-    all {
-        main {
-            resources {
-                srcDirs '../../data'
-            }
-        }
-    }
-}
-
 dependencies {
     // processing core library
     implementation files("libs/core.jar")

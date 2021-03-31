@@ -6,8 +6,8 @@ import jakarta.activation.FileDataSource;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import processing.data.JSONObject;
-import uca.esi.dni.data.Student;
 import uca.esi.dni.main.DniParser;
+import uca.esi.dni.types.Student;
 
 import java.io.File;
 import java.util.*;
@@ -20,10 +20,10 @@ public class EmailHandler {
     private static String username;
     private static String password;
     private static String backupEmail;
-    private static final String host = "smtp.gmail.com";
+    private static final String HOST = "smtp.gmail.com";
 
-    private static final String subjectText = "Clave segura para aplicación de Manual de Laboratorio Escuela Superior de Ingeniería";
-    private static final String contentText = "<h1>Clave de acceso al manual de laboratorio de la Escuela Superior de Ingeniería</h1>" +
+    private static final String GENERAL_HEADER_TEXT = "Clave segura para aplicación de Manual de Laboratorio Escuela Superior de Ingeniería";
+    private static final String GENERAL_CONTENT_TEXT = "<h1>Clave de acceso al manual de laboratorio de la Escuela Superior de Ingeniería</h1>" +
             "<p>Has recibido este correo porque se te ha incluido en la lista de alumnos con acceso a la aplicación " +
             "Android de manual de laboratorio de Resistencia de Materiales de la Escuela Superior de Ingeniería.</p>" +
             "<p><b>Tu clave de acceso es: %s .</b></p>" +
@@ -31,11 +31,10 @@ public class EmailHandler {
             "<p>Este mensaje ha sido generado de forma automática. Si has recibido este mensaje por error, puedes ignorarlo. Si tu identificador único de la UCA " +
             "no coincide con el mostrado en el mensaje, envía un correo electrónico a la dirección: %s .</p>";
 
-    private static final String backupHeaderText = "Archivo de copia de seguridad de datos de alumnos [%s]";
-    private static final String backupContentText = "<p>Se adjunta la lista de contraseñas en texto plano de los alumnos añadidos a la base de datos.</p>";
+    private static final String BACKUP_HEADER_TEXT = "Archivo de copia de seguridad de datos de alumnos [%s]";
+    private static final String BACKUP_CONTENT_TEXT = "<p>Se adjunta la lista de contraseñas en texto plano de los alumnos añadidos a la base de datos.</p>";
 
-    public EmailHandler() {
-        loadSettings();
+    private EmailHandler() {
     }
 
     public static boolean isValidEmailAddress(String email) {
@@ -52,11 +51,10 @@ public class EmailHandler {
     public static void sendSecretKeyEmails(Set<Student> students) {
         Map<String, String> emailContentMap = new HashMap<>();
         for (Student student : students) {
-            String formattedMessage = String.format(contentText, student.getKey(), student.getID(), sender);
+            String formattedMessage = String.format(GENERAL_CONTENT_TEXT, student.getKey(), student.getId(), sender);
             emailContentMap.put(student.getEmail(), formattedMessage);
         }
         sendEmailCollection(emailContentMap);
-        System.out.println("[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size());
         LOGGER.info("[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size());
     }
 
@@ -70,24 +68,21 @@ public class EmailHandler {
 
     public static void sendBackupEmail(File attachment) {
         Session session = getSessionObject();
-        String header = String.format(backupHeaderText, new Date().toString());
+        String header = String.format(BACKUP_HEADER_TEXT, new Date().toString());
         try {
-            sendHTMLEmail(backupEmail, header, backupContentText, attachment, session);
+            sendHTMLEmail(backupEmail, header, BACKUP_CONTENT_TEXT, attachment, session);
         } catch (MessagingException e) {
-            System.err.println("[Error sending email]: " + e.getMessage());
             LOGGER.severe("[Error sending email]: " + e.getMessage());
         }
-        System.out.println("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
         LOGGER.info("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
     }
 
     private static void sendEmailCollection(Map<String, String> emailContentMap) {
         Session session = getSessionObject();
-        for (String email : emailContentMap.keySet()) {
+        for (Map.Entry<String, String> entry : emailContentMap.entrySet()) {
             try {
-                sendHTMLEmail(email, EmailHandler.subjectText, emailContentMap.get(email), session);
+                sendHTMLEmail(entry.getKey(), EmailHandler.GENERAL_HEADER_TEXT, entry.getValue(), session);
             } catch (MessagingException e) {
-                System.err.println("[Error sending email]: " + e.getMessage());
                 LOGGER.severe("[Error sending email]: " + e.getMessage());
             }
         }
@@ -98,6 +93,7 @@ public class EmailHandler {
         //create the Session object
         return Session.getInstance(props,
                 new Authenticator() {
+                    @Override
                     protected PasswordAuthentication getPasswordAuthentication() {
                         return new PasswordAuthentication(username, password);
                     }
@@ -108,7 +104,7 @@ public class EmailHandler {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.host", HOST);
         props.put("mail.smtp.port", "587");
         return props;
     }
@@ -149,7 +145,7 @@ public class EmailHandler {
         return messageBodyPart;
     }
 
-    private void loadSettings() {
+    public static void loadSettings() {
         JSONObject settingsObject = Util.loadJSONObject(DniParser.SETTINGS_FILEPATH);
         sender = settingsObject.getString("senderEmail");
         username = settingsObject.getString("senderUsername");

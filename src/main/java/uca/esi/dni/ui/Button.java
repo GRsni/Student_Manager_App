@@ -14,28 +14,19 @@ public class Button extends BaseElement {
     private PImage icon;
     private boolean isIconLoaded = false;
 
-    private int color;
-    private int clickColor;
-    private int hoverColor;
+    private int color=View.COLORS.PRIMARY;
+    private int clickColor=View.COLORS.PRIMARY_DARK;
+    private int hoverColor=View.COLORS.ACCENT_DARK;
 
     private final TextField content;
     private int iconSize = 0;
 
-    public Button(PApplet parent, float x, float y, int w, int h, int corner, String content, boolean active) {
-        this(parent, x, y, w, h, corner, content, active, View.COLORS.PRIMARY, View.COLORS.PRIMARY_DARK,
-                View.COLORS.ACCENT_DARK, View.COLORS.WHITE);
-    }
-
-    public Button(PApplet parent, float x, float y, int w, int h, int corner, String content, boolean active,
-                  int color, int hoverColor, int clickColor, int textColor) {
-        super(parent, new PVector(x, y), w, h);
-        this.content = new TextField(parent, x + w * .1f, y + h * .1f, w / 10 * 8, h / 10 * 8, content, "");
+    public Button(PApplet parent, Rectangle rectangle, int corner, String content, boolean active) {
+        super(parent, rectangle);
+        this.content = new TextField(parent, new Rectangle(rectangle.x + w * .1f, rectangle.y + h * .1f, w / 10 * 8, h / 10 * 8), content, "");
         this.cornerR = corner;
         this.active = active;
-        this.color = color;
-        this.hoverColor = hoverColor;
-        this.clickColor = clickColor;
-        this.content.setContentColor(textColor);
+        this.content.setContentColor(View.COLORS.WHITE);
     }
 
     public TextField getContent() {

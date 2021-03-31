@@ -2,13 +2,12 @@ package uca.esi.dni.ui;
 
 import processing.core.PApplet;
 import processing.core.PImage;
-import processing.core.PVector;
 
 public class ModalCard extends BaseElement {
     private final PImage card;
 
-    public ModalCard(PApplet parent, int x, int y, int w, int h, PImage card) {
-        super(parent, new PVector(x, y), w, h);
+    public ModalCard(PApplet parent, Rectangle rectangle, PImage card) {
+        super(parent, rectangle);
         this.card = card;
         card.resize(w, h);
     }

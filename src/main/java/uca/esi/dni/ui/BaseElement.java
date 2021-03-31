@@ -9,7 +9,8 @@ public abstract class BaseElement {
 
     protected final PApplet parent;
     protected PVector pos;
-    protected int w, h;
+    protected int w;
+    protected int h;
 
     protected boolean clicked = false;
     protected boolean hover = false;
@@ -18,13 +19,11 @@ public abstract class BaseElement {
     protected PFont font;
     protected int fontSize = 10;
 
-    private final boolean hasShadow = false;
-
-    public BaseElement(PApplet parent, PVector pos, int w, int h) {
+    protected BaseElement(PApplet parent, Rectangle rectangle) {
         this.parent = parent;
-        this.pos = pos;
-        this.w = w;
-        this.h = h;
+        this.pos = new PVector(rectangle.x, rectangle.y);
+        this.w = rectangle.w;
+        this.h = rectangle.h;
     }
 
     public PFont getFont() {

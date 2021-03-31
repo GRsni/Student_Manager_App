@@ -4,12 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.main.DniParser;
-import uca.esi.dni.data.Student;
 import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.EmailHandler;
 import uca.esi.dni.file.Util;
+import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
+import uca.esi.dni.types.Student;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.Warning;
 import uca.esi.dni.views.EditView;
@@ -19,33 +19,32 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 public abstract class Controller {
-    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public enum VIEW_STATES {
-        main,
-        edit,
-        stats
+        MAIN,
+        EDIT,
+        STATS
     }
 
     protected static final DatabaseHandler dbHandler = new DatabaseHandler();
-    protected static EmailHandler emailHandler;
     protected final AppModel model;
     protected final View view;
     protected final DniParser parent;
 
-    public volatile boolean closedContextMenu = false;
+    protected volatile boolean closedContextMenu = false;
 
 
-    public Controller(DniParser parent, AppModel model, View view) {
+    protected Controller(DniParser parent, AppModel model, View view) {
         this.parent = parent;
         this.model = model;
         this.view = view;
-        emailHandler = new EmailHandler();
+        EmailHandler.loadSettings();
     }
 
     public boolean isClosedContextMenu() {
@@ -69,20 +68,24 @@ public abstract class Controller {
     }
 
     public void changeState(VIEW_STATES state) {
+        View newView;
+        Controller newController;
         switch (state) {
-            case edit:
-                DniParser.currentView = new EditView(parent);
-                DniParser.currentController = new EditController(parent, DniParser.appModel, DniParser.currentView);
+            case EDIT:
+                newView = new EditView(parent);
+                newController = new EditController(parent, parent.getAppModel(), newView);
                 break;
-            case stats:
-                DniParser.currentView = new StatsView(parent);
-                DniParser.currentController = new StatsController(parent, DniParser.appModel, DniParser.currentView);
+            case STATS:
+                newView = new StatsView(parent);
+                newController = new StatsController(parent, parent.getAppModel(), newView);
                 break;
-            case main:
-                DniParser.currentView = new MainView(parent);
-                DniParser.currentController = new MainController(parent, DniParser.appModel, DniParser.currentView);
+            default:
+                newView = new MainView(parent);
+                newController = new MainController(parent, parent.getAppModel(), newView);
                 break;
         }
+        parent.setCurrentView(newView);
+        parent.setCurrentController(newController);
         loadInitialState();
     }
 
@@ -118,27 +121,24 @@ public abstract class Controller {
 
         Runnable runnable = () -> {
             try {
-                String idsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                ArrayList<String> responseIDs = dbHandler.getDataFromDB(idsURL);
+                String idsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference(), "Ids");
+                List<String> responseIDs = dbHandler.getDataFromDB(idsURL);
 
-                String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Emails");
-                ArrayList<String> responseEmails = dbHandler.getDataFromDB(emailsURL);
+                String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference(), "Emails");
+                List<String> responseEmails = dbHandler.getDataFromDB(emailsURL);
 
                 if (responseIDs.get(0).equals("200") && responseEmails.get(0).equals("200")) {
                     Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
-                    model.getDBStudents().clear();
+                    model.getDbStudents().clear();
                     model.addDBStudentList(studentsInDB);
                     addWarning("Cargados datos de la base de datos.", Warning.DURATION.SHORT, true);
                     controllerLogic();
-                    System.out.println("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
                     LOGGER.info("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
                 }
             } catch (IOException | NullPointerException e) {
-                System.err.println("[Error loading data from DB]: " + e.getMessage());
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
                 addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, false);
             } catch (RuntimeException e) {
-                System.err.println("[Error generating student list]: " + e.getMessage());
                 LOGGER.warning("[Error generating student list]: " + e.getMessage());
                 addWarning("Error generando la lista de alumnos.", Warning.DURATION.SHORT, false);
             }
@@ -150,14 +150,14 @@ public abstract class Controller {
     }
 
     @NotNull
-    private Set<Student> generateStudentSetFromDB(ArrayList<String> responseIDs, ArrayList<String> responseEmails) {
+    private Set<Student> generateStudentSetFromDB(List<String> responseIDs, List<String> responseEmails) {
         JSONObject studentKeys = Util.parseJSONObject(responseIDs.get(1));
         JSONObject studentEmails = Util.parseJSONObject(responseEmails.get((1)));
         return Util.generateStudentListFromJSONObject(studentKeys, studentEmails);
     }
 
     private void loadInitialState() {
-        DniParser.currentController.controllerLogic();
+        parent.getCurrentController().controllerLogic();
     }
 
 }

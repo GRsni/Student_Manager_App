@@ -1,20 +1,16 @@
-package uca.esi.dni.data;
+package uca.esi.dni.types;
 
 import org.jetbrains.annotations.NotNull;
 import uca.esi.dni.file.Util;
 
 import java.security.SecureRandom;
 import java.util.Random;
-import java.util.logging.Logger;
 
 public class Student {
-    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
     private static final String VALID_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ12345678";
     private static final int KEY_LENGTH = 7;
 
-
-    private String ID;
+    private String id;
     private String hashKey;
     private String key;
     private String email;
@@ -23,25 +19,26 @@ public class Student {
 
     }
 
-    public Student(String ID, String email) throws NullPointerException {
-        this.ID = ID;
+    public Student(String id, String email) throws NullPointerException {
+        this.id = id;
         this.email = email;
         this.key = generateRandomKey();
         this.hashKey = keyToHash(key);
     }
 
-    public Student(String ID, String email, String hashKey) {
-        this.ID = ID;
+    public Student(String id, String email, String hashKey) {
+        this.id = id;
         this.email = email;
+        this.key = "";
         this.hashKey = hashKey;
     }
 
-    public String getID() {
-        return ID;
+    public String getId() {
+        return id;
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getKey() {
@@ -65,30 +62,24 @@ public class Student {
     }
 
     private String keyToHash(@NotNull String key) throws NullPointerException {
-        try {
-            return Util.getSHA256HashedString(key);
-        } catch (NullPointerException e) {
-            System.err.println("[Error while generating hashedKey]: " + e.getMessage());
-            LOGGER.severe("[Error while generating hashedKey]: " + e.getMessage());
-            throw e;
-        }
+        return Util.getSHA256HashedString(key);
     }
 
     private String generateRandomKey() {
-        StringBuilder key = new StringBuilder();
+        StringBuilder plainKey = new StringBuilder();
         Random gen = new SecureRandom();
 
         for (int i = 0; i < KEY_LENGTH; i++) {
             int index = gen.nextInt(VALID_LETTERS.length());
-            key.append(VALID_LETTERS.charAt(index));
+            plainKey.append(VALID_LETTERS.charAt(index));
         }
-        return key.toString();
+        return plainKey.toString();
     }
 
     public String getAttributeFromStudent(String attribute) {
         switch (attribute) {
             case "ID":
-                return ID;
+                return id;
             case "email":
                 return email;
             case "hashKey":
@@ -101,7 +92,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "ID='" + ID + '\'' +
+                "ID='" + id + '\'' +
                 ", plainKey='" + key + '\'' +
                 ", hashKey='" + hashKey + '\'' +
                 ", email='" + email + '\'' +

@@ -1,7 +1,7 @@
 package uca.esi.dni.views;
 
 import processing.core.PApplet;
-import uca.esi.dni.data.Student;
+import uca.esi.dni.types.Student;
 
 import java.io.File;
 import java.util.Set;

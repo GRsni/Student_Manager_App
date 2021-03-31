@@ -3,22 +3,20 @@ package uca.esi.dni.views;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
-import uca.esi.dni.data.Student;
+import uca.esi.dni.types.Student;
 import uca.esi.dni.ui.BaseElement;
+import uca.esi.dni.ui.Rectangle;
 import uca.esi.dni.ui.Warning;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public abstract class View {
 
     protected PApplet parent;
-    public static int WIDTH_UNIT_SIZE;
-    public static int HEIGHT_UNIT_SIZE;
+    protected static int widthUnitSize;
+    protected static int heightUnitSize;
 
     protected final Map<String, BaseElement> elements = new HashMap<>();
     protected final Map<String, BaseElement> elementsOverModal = new HashMap<>();
@@ -28,21 +26,38 @@ public abstract class View {
     protected boolean modalActive = false;
 
     private static boolean loadedFonts = false;
-    protected static PFont FONT_BIG;
-    protected static PFont FONT_SMALL;
+    protected static PFont fontBig;
+    protected static PFont fontSmall;
 
     protected View(PApplet parent) {
         this.parent = parent;
-        WIDTH_UNIT_SIZE = parent.width / 16;
-        HEIGHT_UNIT_SIZE = parent.height / 16;
-        if (!loadedFonts) {
-            FONT_BIG = parent.loadFont("data/fonts/Calibri-30.vlw");
-            FONT_SMALL = parent.loadFont("data/fonts/Calibri-14.vlw");
-            loadedFonts = true;
-        }
     }
 
     protected View() {
+    }
+
+    public static int getWidthUnitSize() {
+        return widthUnitSize;
+    }
+
+    public static void setWidthUnitSize(int widthUnitSize) {
+        View.widthUnitSize = widthUnitSize;
+    }
+
+    public static int getHeightUnitSize() {
+        return heightUnitSize;
+    }
+
+    public static void setHeightUnitSize(int heightUnitSize) {
+        View.heightUnitSize = heightUnitSize;
+    }
+
+    public static void loadFonts(PApplet parent) {
+        if (!loadedFonts) {
+            fontBig = parent.loadFont("data/fonts/Calibri-30.vlw");
+            fontSmall = parent.loadFont("data/fonts/Calibri-14.vlw");
+            loadedFonts = true;
+        }
     }
 
     protected abstract void onCreate();
@@ -53,33 +68,31 @@ public abstract class View {
 
     public void show() {
         parent.image(background, 0, 0);
-        for (String s : elements.keySet()) {
-            if (elements.get(s).isVisible()) {
-                elements.get(s).display();
+        for (BaseElement element : elements.values()) {
+            if (element.isVisible()) {
+                element.display();
             }
         }
-        for (String s : elementsOverModal.keySet()) {
-            if (elementsOverModal.get(s).isVisible()) {
-                elementsOverModal.get(s).display();
+        for (BaseElement element : elementsOverModal.values()) {
+            if (element.isVisible()) {
+                element.display();
             }
         }
-        if (!isModalActive()) {
-            if (warnings.size() > 0) {
-                warnings.get(0).display();
-                warnings.get(0).update();
-                if (warnings.get(0).toDestroy()) {
-                    warnings.remove(0);
-                }
-
+        if (!isModalActive() && !warnings.isEmpty()) {
+            warnings.get(0).display();
+            warnings.get(0).update();
+            if (warnings.get(0).toDestroy()) {
+                warnings.remove(0);
             }
         }
     }
 
     public static Warning generateWarning(PApplet parent, String contentString, Warning.DURATION duration, boolean isGood) {
-        Warning warning = new Warning(parent, WIDTH_UNIT_SIZE * 9, HEIGHT_UNIT_SIZE * 0.5f, WIDTH_UNIT_SIZE * 6, HEIGHT_UNIT_SIZE, contentString, duration, isGood);
-        warning.setFont(FONT_BIG);
+        Warning warning = new Warning(parent, new Rectangle(widthUnitSize * 9f, heightUnitSize * 0.5f, widthUnitSize * 6, heightUnitSize),
+                contentString, duration, isGood);
+        warning.setFont(fontBig);
         warning.setFontSize(10);
-        warning.setFontColor(COLORS.WHITE);
+        warning.setContentColor(COLORS.WHITE);
         return warning;
     }
 
@@ -99,7 +112,7 @@ public abstract class View {
         return elementsOverModal.get(key);
     }
 
-    public ArrayList<Warning> getWarnings() {
+    public List<Warning> getWarnings() {
         return warnings;
     }
 
@@ -112,13 +125,16 @@ public abstract class View {
     }
 
     public static class COLORS {
-        public final static int PRIMARY = 0xff008577;
-        public final static int PRIMARY_DARK = 0xff00665c;
-        public final static int SECONDARY = 0xfff5b000;
-        public final static int SECONDARY_DARK = 0xffdba724;
-        public final static int ACCENT_DARK = 0xffaaaaaa;
-        public final static int ACCENT = 0xffcccccc;
-        public final static int WHITE = 0xffffffff;
-        public final static int BLACK = 0xff000000;
+        public static final int PRIMARY = 0xff008577;
+        public static final int PRIMARY_DARK = 0xff00665c;
+        public static final int SECONDARY = 0xfff5b000;
+        public static final int SECONDARY_DARK = 0xffdba724;
+        public static final int ACCENT_DARK = 0xffaaaaaa;
+        public static final int ACCENT = 0xffcccccc;
+        public static final int WHITE = 0xffffffff;
+        public static final int BLACK = 0xff000000;
+
+        private COLORS() {
+        }
     }
 }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import processing.core.PApplet;
 import processing.data.JSONObject;
-import uca.esi.dni.data.Student;
+import uca.esi.dni.types.Student;
 
 import java.util.*;
 

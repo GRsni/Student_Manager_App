@@ -4,9 +4,9 @@ import processing.data.JSONObject;
 import processing.data.Table;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.main.DniParser;
 import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.Util;
+import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.ItemList;
@@ -15,15 +15,15 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import static processing.event.MouseEvent.*;
-import static uca.esi.dni.controllers.Controller.VIEW_STATES.edit;
+import static uca.esi.dni.controllers.Controller.VIEW_STATES.EDIT;
 
 public class MainController extends Controller {
-    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     public MainController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
@@ -33,15 +33,15 @@ public class MainController extends Controller {
 
     private void initModelState() {
         model.setSettingsObject(Util.loadJSONObject(DniParser.SETTINGS_FILEPATH));
-        model.setDBReference(model.getSettingsObject().getString("databaseURL"));
-        if (model.getDBStudents().isEmpty()) {
+        model.setdbReference(model.getSettingsObject().getString("databaseURL"));
+        if (model.getDbStudents().isEmpty()) {
             asyncLoadStudentDataFromDB();
         }
     }
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDBStudents(), model.getTemporaryStudents(), model.getInputFile());
+        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile());
     }
 
     @Override
@@ -50,13 +50,11 @@ public class MainController extends Controller {
             case CLICK:
                 if (view.getUIElement("editB").inside(e.getX(), e.getY())) {
                     //change view to editView
-                    changeState(edit);
+                    changeState(EDIT);
                 } else if (view.getUIElement("generateFilesB").inside(e.getX(), e.getY())) {
                     generateExcelFiles();
                 } else if (view.getUIElement("generateStatsB").inside(e.getX(), e.getY())) {
-                    //change view to statsView
                     //TODO: Implement stats view
-                    //changeState(stats);
                 } else if (view.getUIElement("dbStudentsIL").inside(e.getX(), e.getY())) {
                     view.getUIElement("dbStudentsIL").handleInput(e);
                 }
@@ -82,13 +80,15 @@ public class MainController extends Controller {
                     list.handleInput(e);
                 }
                 break;
+            default:
+                break;
         }
         controllerLogic();
     }
 
     @Override
     public void handleKeyEvent(KeyEvent e) {
-
+        // There are no UI elements that need to handle key inputs in the main View
     }
 
     public void generateExcelFiles() {
@@ -99,10 +99,10 @@ public class MainController extends Controller {
             Thread.yield(); //We need to wait for the output folder context menu to be closed before resuming execution
         }
 
-        if (model.getDBReference() != null && model.getOutputFolder().exists()) {
+        if (model.getdbReference() != null && model.getOutputFolder().exists()) {
             try {
-                String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
-                ArrayList<String> response = dbHandler.getDataFromDB(usersURL);
+                String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference(), "Users");
+                List<String> response = dbHandler.getDataFromDB(usersURL);
                 if (response.get(0).equals("200")) {
                     JSONObject studentData = Util.parseJSONObject(response.get(1));
                     Map<String, Map<String, Table>> tableMap = Util.createStudentsDataTables(studentData);
@@ -112,11 +112,9 @@ public class MainController extends Controller {
                     }
                 }
             } catch (IOException e) {
-                System.err.println("[IOException when reading database]: \" + e.getMessage()");
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
                 addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, false);
             } catch (RuntimeException e) {
-                System.err.println("[Error while generating the CSV files]: " + e.getMessage());
                 LOGGER.severe("[NullPointerException when generating the CSV files]: " + e.getMessage());
                 addWarning("Error generando los archivos.", Warning.DURATION.SHORT, false);
             }
@@ -125,21 +123,19 @@ public class MainController extends Controller {
 
     private void saveLabTables(Map<String, Map<String, Table>> studentLabsMap, File route) {
         String pathToFolder = route.getAbsolutePath() + File.separator + "datos" + File.separator;
-        for (String student : studentLabsMap.keySet()) {
-            String pathToFolderStudent = pathToFolder + student + File.separator;
-            Map<String, Table> typeTableMap = studentLabsMap.get(student);
-            for (String type : typeTableMap.keySet()) {
-                String pathToFolderStudentType = pathToFolderStudent + type + ".csv";
-                Table labTable = typeTableMap.get(type);
+        for (Map.Entry<String, Map<String, Table>> studentLabEntry : studentLabsMap.entrySet()) {
+            String pathToFolderStudent = pathToFolder + studentLabEntry.getKey() + File.separator;
+            Map<String, Table> typeTableMap = studentLabEntry.getValue();
+            for (Map.Entry<String, Table> typeTableEntry : typeTableMap.entrySet()) {
+                String pathToFolderStudentType = pathToFolderStudent + typeTableEntry.getKey() + ".csv";
+                Table labTable = typeTableEntry.getValue();
                 try {
                     parent.saveTable(labTable, pathToFolderStudentType, "csv");
                 } catch (Exception e) {
-                    System.err.println("[Error while saving the student data tables]: " + e.getMessage());
                     LOGGER.warning("[Error while saving the student data tables]: " + e.getMessage());
                 }
             }
         }
-        System.out.println("[General information]: Generated all CSV files.");
         LOGGER.info("[General information]: Generated all CSV files.");
     }
 

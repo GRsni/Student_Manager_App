@@ -1,15 +1,19 @@
 package uca.esi.dni.file;
 
-import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import org.jetbrains.annotations.NotNull;
+import processing.core.PApplet;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
-import uca.esi.dni.main.DniParser;
-import uca.esi.dni.data.Student;
+import uca.esi.dni.types.JSONParsingException;
+import uca.esi.dni.types.Student;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -17,7 +21,10 @@ import java.util.regex.Pattern;
 
 public class Util {
     private static final Pattern idPattern = Pattern.compile("u[a-zA-Z0-9]{8}");
-    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
+    private Util() {
+    }
 
     public static String extractId(String line) {
 
@@ -32,7 +39,7 @@ public class Util {
     }
 
     public static boolean checkFileExtension(String file, String ext) {
-        String fileExtension = DniParser.checkExtension(file);
+        String fileExtension = PApplet.checkExtension(file);
         if (fileExtension == null) {
             return false;
         } else {
@@ -42,21 +49,18 @@ public class Util {
 
     @NotNull
     public static String getSHA256HashedString(String plain) {
-        return Hashing.sha256().hashString(plain, Charsets.UTF_8).toString();
+        return Hashing.sha256().hashString(plain, StandardCharsets.UTF_8).toString();
     }
 
     public static JSONObject loadJSONObject(String filepath) {
-        if (filepath != null) {
-            if (checkFileExtension(filepath, "json")) {
-                try {
-                    InputStream inputStream = Util.class.getClassLoader().getResourceAsStream(filepath);
-                    String fileContent = readFromInputStream(inputStream);
-                    return parseJSONObject(fileContent);
-                } catch (IOException | NullPointerException e) {
-                    System.err.println("[Error while reading JSON file]: " + e.getMessage());
-                    LOGGER.severe("[Error while reading JSON file]: " + e.getMessage());
-                    return new JSONObject();
-                }
+        if (filepath != null && checkFileExtension(filepath, "json")) {
+            try {
+                InputStream inputStream = Util.class.getClassLoader().getResourceAsStream(filepath);
+                String fileContent = readFromInputStream(inputStream);
+                return parseJSONObject(fileContent);
+            } catch (IOException | NullPointerException e) {
+                LOGGER.severe("[Error while reading JSON file]: " + e.getMessage());
+                return new JSONObject();
             }
         }
         return new JSONObject();
@@ -151,7 +155,6 @@ public class Util {
                     row.setString(k, stringToUse);
                 }
             } catch (Exception e2) {
-                System.err.println("[Exception while reading JSONObject]: " + e2.getMessage());
                 LOGGER.warning("[Exception while reading JSONObject]: " + e2.getMessage());
             }
         }
@@ -160,10 +163,10 @@ public class Util {
 
     public static String generateMultiPathJSONString(@NotNull Map<String, JSONObject> urlContentsMap) throws NullPointerException {
         JSONObject multipath = new JSONObject();
-        for (String url : urlContentsMap.keySet()) {
-            ArrayList<String> secondLevelKeys = getJSONObjectKeys(urlContentsMap.get(url));
+        for (Map.Entry<String, JSONObject> entry : urlContentsMap.entrySet()) {
+            ArrayList<String> secondLevelKeys = getJSONObjectKeys(urlContentsMap.get(entry.getKey()));
             for (String key : secondLevelKeys) {
-                multipath.put(url + "/" + key, urlContentsMap.get(url).get(key));
+                multipath.put(entry.getKey() + "/" + key, entry.getValue());
             }
         }
         return multipath.toString();
@@ -173,21 +176,25 @@ public class Util {
         JSONObject jsonObject = new JSONObject();
         for (Student student : students) {
             if (attribute != null) {
-                jsonObject.setString(student.getID(), student.getAttributeFromStudent(attribute));
+                jsonObject.setString(student.getId(), student.getAttributeFromStudent(attribute));
             } else {
-                jsonObject.put(student.getID(), JSONObject.NULL);
+                jsonObject.put(student.getId(), JSONObject.NULL);
             }
         }
         return jsonObject;
     }
 
     public static Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws
-            RuntimeException {
+            JSONParsingException {
         Set<Student> students = new HashSet<>();
         ArrayList<String> ids = getJSONObjectKeys(emails);
         for (String id : ids) {
-            Student student = new Student(id, emails.getString(id), hashKeys.getString(id));
-            students.add(student);
+            try {
+                Student student = new Student(id, emails.getString(id), hashKeys.getString(id));
+                students.add(student);
+            } catch (RuntimeException e) {
+                throw new JSONParsingException(e.getMessage());
+            }
         }
         return students;
     }
@@ -195,7 +202,7 @@ public class Util {
     public static Set<String> studentSetToStringSet(@NotNull Set<Student> students) throws NullPointerException {
         Set<String> stringSet = new HashSet<>();
         for (Student s : students) {
-            stringSet.add(s.getID());
+            stringSet.add(s.getId());
         }
         return stringSet;
     }
@@ -208,7 +215,7 @@ public class Util {
             for (Student s : set1) {
                 boolean found = false;
                 for (Student s2 : set2) {
-                    if (s.getID().equals(s2.getID())) {
+                    if (s.getId().equals(s2.getId())) {
                         found = true;
                         break;
                     }
@@ -228,7 +235,7 @@ public class Util {
             Set<Student> coincident = new HashSet<>();
             for (Student s : set1) {
                 for (Student s2 : set2) {
-                    if (s.getID().equals(s2.getID())) {
+                    if (s.getId().equals(s2.getId())) {
                         coincident.add(s2);
                         break;
                     }
