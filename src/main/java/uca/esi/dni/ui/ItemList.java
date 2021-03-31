@@ -35,7 +35,7 @@ public class ItemList extends BaseElement {
         this.visibleItems = calculateNumberOfVisibleItems();
         this.maxScroll = this.backgroundColor = backgroundColor;
         this.textColor = textColor;
-        this.title = new TextField(parent, new Rectangle(rectangle.x, rectangle.y, w, View.getWidthUnitSize()), title, "");
+        this.title = new TextField(parent, new Rectangle(rectangle.x, rectangle.y, w, View.getHeightUnitSize()), title, "");
         this.title.setContentColor(textColor);
         this.title.setBackgroundColor(titleBackgroundColor);
         this.title.setIsHeader(true);
@@ -118,16 +118,21 @@ public class ItemList extends BaseElement {
 
         for (int i = scrollIndex; i < itemList.size() && itemsDisplayed <= visibleItems; i++, itemsDisplayed++) {
             int yOffset = ITEM_HEIGHT * itemsDisplayed;
-            String item = itemList.get(i);
-            TextField textField = new TextField(parent, new Rectangle(pos.x, pos.y + title.h + yOffset, w, h / visibleItems), item, "");
-            textField.setContentColor(View.COLORS.BLACK);
-            textField.setFontSize(fontSize);
-            textField.setBackgroundColor(View.COLORS.ACCENT);
-            textField.setFont(font);
+            String content = itemList.get(i);
+            Rectangle rectangle = new Rectangle(pos.x, pos.y + yOffset, w, h / visibleItems);
+            TextField textField = getItemTextField(rectangle, content);
             textField.display();
         }
-
         parent.pop();
+    }
+
+    private TextField getItemTextField(Rectangle rectangle, String content) {
+        TextField textField = new TextField(parent, rectangle, content, "");
+        textField.setContentColor(View.COLORS.BLACK);
+        textField.setFontSize(fontSize);
+        textField.setBackgroundColor(View.COLORS.ACCENT);
+        textField.setFont(font);
+        return textField;
     }
 
     private int calculateNumberOfVisibleItems() {

@@ -252,7 +252,7 @@ public class UtilTest {
     @Test
     @DisplayName("getStudentAttributeJSONObject should return a correct JSONObject if the attribute is empty")
     public void givenACorrectStudentSetAndAnEmptyAttributeReturnACorrectJSONObject() {
-        Student testStudent = new Student("u99999999", "test@test.com");
+        Student testStudent = new Student("u99999999", "manual.laboratorio.rme.uca@gmail.com");
         Set<Student> testSet = new HashSet<>();
         testSet.add(testStudent);
         assertEquals(1, Util.getStudentAttributeJSONObject(testSet, "").size());
@@ -261,7 +261,7 @@ public class UtilTest {
     @Test
     @DisplayName("getStudentAttributeJSONObject should return a correct JSONObject if the attribute is null")
     public void givenACorrectStudentSetAndANullAttributeReturnACorrectJSONObject() {
-        Student testStudent = new Student("u99999999", "test@test.com");
+        Student testStudent = new Student("u99999999", "manual.laboratorio.rme.uca@gmail.com");
         Set<Student> testSet = new HashSet<>();
         testSet.add(testStudent);
         assertEquals(1, Util.getStudentAttributeJSONObject(testSet, null).size());
