@@ -238,18 +238,6 @@ public class EditController extends Controller {
         thread.start();
     }
 
-    private void savePlainStudentDataToFile(Set<Student> students) {
-        try {
-            JSONObject studentBackup = parent.loadJSONObject(DniParser.DATA_BACKUP_FILEPATH);
-            for (Student student : students) {
-                studentBackup.setString(student.getId(), student.toString());
-            }
-            parent.saveJSONObject(studentBackup, DniParser.DATA_BACKUP_FILEPATH);
-        } catch (NullPointerException e) {
-            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
-        }
-    }
-
     private List<String> uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException {
         Map<String, JSONObject> urlContentsMap = getHashKeyEmailMap(uniqueStudentSet);
         String combined = Util.generateMultiPathJSONString(urlContentsMap);
@@ -266,6 +254,19 @@ public class EditController extends Controller {
         urlContentsMap.put("Emails", emailList);
         return urlContentsMap;
     }
+
+    private void savePlainStudentDataToFile(Set<Student> students) {
+        try {
+            JSONObject studentBackup = parent.loadJSONObject(DniParser.DATA_BACKUP_FILEPATH);
+            for (Student student : students) {
+                studentBackup.setString(student.getId(), student.toString());
+            }
+            parent.saveJSONObject(studentBackup, DniParser.DATA_BACKUP_FILEPATH);
+        } catch (NullPointerException e) {
+            LOGGER.severe("[Error while saving plain student data]: " + e.getMessage());
+        }
+    }
+
 
     private void asyncRemoveStudentsFromDBButtonHook() {
         Runnable runnable = () -> {

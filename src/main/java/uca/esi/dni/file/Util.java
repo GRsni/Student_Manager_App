@@ -166,7 +166,7 @@ public class Util {
         for (Map.Entry<String, JSONObject> entry : urlContentsMap.entrySet()) {
             ArrayList<String> secondLevelKeys = getJSONObjectKeys(urlContentsMap.get(entry.getKey()));
             for (String key : secondLevelKeys) {
-                multipath.put(entry.getKey() + "/" + key, entry.getValue());
+                multipath.put(entry.getKey() + "/" + key, entry.getValue().getString(key));
             }
         }
         return multipath.toString();
