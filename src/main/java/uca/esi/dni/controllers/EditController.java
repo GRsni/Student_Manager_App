@@ -211,6 +211,7 @@ public class EditController extends Controller {
 
 
     private void asyncAddStudentsToDBListButtonHook() {
+        addWarning("Cargando.", Warning.DURATION.EXTRASHORT, true);
         Runnable runnable = () -> {
 
             Set<Student> uniqueStudentSet = Util.getUniqueStudentSet(model.getTemporaryStudents(), model.getDbStudents());
@@ -218,6 +219,7 @@ public class EditController extends Controller {
                 try {
                     List<String> responseDataUpdate = uploadStudentListToDB(uniqueStudentSet);
                     if (responseDataUpdate.get(0).equals("200")) {
+                        model.setDataModified(true);
                         model.getTemporaryStudents().clear();
                         savePlainStudentDataToFile(uniqueStudentSet);
                         EmailHandler.sendSecretKeyEmails(uniqueStudentSet);
@@ -269,8 +271,8 @@ public class EditController extends Controller {
 
 
     private void asyncRemoveStudentsFromDBButtonHook() {
+        addWarning("Cargando.", Warning.DURATION.EXTRASHORT, true);
         Runnable runnable = () -> {
-
             Set<Student> coincidentStudentSet = Util.getIntersectionOfStudentSets(model.getTemporaryStudents(), model.getDbStudents());
             try {
                 if (!coincidentStudentSet.isEmpty()) {
@@ -280,6 +282,7 @@ public class EditController extends Controller {
                     String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference());
                     List<String> responseDataDelete = dbHandler.updateData(baseURL, combined);
                     if (responseDataDelete.get(0).equals("200")) {
+                        model.setDataModified(true);
                         model.getTemporaryStudents().clear();
                         removePlainStudentDataFromFile(coincidentStudentSet);
                         addWarning("Borrados alumnos de la base de datos.", Warning.DURATION.MEDIUM, true);
@@ -325,15 +328,18 @@ public class EditController extends Controller {
     }
 
     private void asyncEmptyDBButtonHook() {
+        addWarning("Cargando.", Warning.DURATION.EXTRASHORT, true);
         Runnable runnable = () -> {
             try {
                 String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference());
                 List<String> response = dbHandler.emptyDB(baseURL);
                 if (response.get(0).equals("200")) {
-                    LOGGER.info("[General information]: Emptied data from DB.");
                     removePlainStudentDataFromFile(model.getDbStudents());
                     model.getDbStudents().clear();
+                    model.setDataModified(true);
+
                     addWarning("Base de datos vaciada.", Warning.DURATION.MEDIUM, true);
+                    LOGGER.info("[General information]: Emptied data from DB.");
                     controllerLogic();
                 }
             } catch (IOException e) {

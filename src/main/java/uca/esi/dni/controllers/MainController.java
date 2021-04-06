@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.EDIT;
+import static uca.esi.dni.controllers.Controller.VIEW_STATES.STATS;
 
 public class MainController extends Controller {
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -34,8 +35,9 @@ public class MainController extends Controller {
     private void initModelState() {
         model.setSettingsObject(Util.loadJSONObject(DniParser.SETTINGS_FILEPATH));
         model.setdbReference(model.getSettingsObject().getString("databaseURL"));
-        if (model.getDbStudents().isEmpty()) {
+        if (model.getDbStudents().isEmpty() && !model.isDataFirstLoaded()) {
             asyncLoadStudentDataFromDB();
+            model.setDataFirstLoaded(true);
         }
     }
 
@@ -55,6 +57,7 @@ public class MainController extends Controller {
                     generateExcelFiles();
                 } else if (view.getUIElement("generateStatsB").inside(e.getX(), e.getY())) {
                     //TODO: Implement stats view
+                    changeState(STATS);
                 } else if (view.getUIElement("dbStudentsIL").inside(e.getX(), e.getY())) {
                     view.getUIElement("dbStudentsIL").handleInput(e);
                 }

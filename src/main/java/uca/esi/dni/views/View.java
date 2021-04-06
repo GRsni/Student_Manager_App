@@ -54,8 +54,14 @@ public abstract class View {
 
     public static void loadFonts(PApplet parent) {
         if (!loadedFonts) {
-            fontBig = parent.loadFont("data/fonts/Calibri-30.vlw");
-            fontSmall = parent.loadFont("data/fonts/Calibri-14.vlw");
+            if (parent.width > 1024) {
+                fontBig = parent.loadFont("data/fonts/Calibri-30.vlw");
+                fontSmall = parent.loadFont("data/fonts/Calibri-14.vlw");
+            } else {
+                fontBig = parent.loadFont("data/fonts/Calibri-26.vlw");
+                fontSmall = parent.loadFont("data/fonts/Calibri-12.vlw");
+            }
+
             loadedFonts = true;
         }
     }

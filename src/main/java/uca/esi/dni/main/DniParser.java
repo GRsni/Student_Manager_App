@@ -2,6 +2,7 @@ package uca.esi.dni.main;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.core.PVector;
 import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
@@ -31,14 +32,26 @@ public class DniParser extends PApplet {
 
     private PImage icon;
 
+    private int w;
+    private int h;
+
     public static void main(String[] args) {
         PApplet.main(new String[]{DniParser.class.getName()});
     }
 
     @Override
     public void settings() {
-        size(displayWidth / 2, displayHeight / 2);
+        PVector windowSize = calcWindowSize();
+        size((int) windowSize.x, (int) windowSize.y);
+        w = width;
+        h = height;
         icon = loadImage("data/icons/server-storage_filled.png");
+    }
+
+    private PVector calcWindowSize() {
+        float screenWidth = Math.max(1024, displayWidth / 2);
+        float screenHeight = screenWidth * 9 / 16;
+        return new PVector(screenWidth, screenHeight);
     }
 
     @Override
@@ -46,14 +59,19 @@ public class DniParser extends PApplet {
         surface.setTitle("Manual de laboratorio: Gestor de datos");
         surface.setResizable(true);
         surface.setIcon(icon);
-        registerMethod("mouseEvent", this);
-        registerMethod("keyEvent", this);
+        registerMethods();
 
         AppLogger.setup();
         LOGGER.setLevel(Level.INFO);
         LOGGER.info("[General information]: Started app.");
         initMVCObjects();
         setupFileSystem();
+    }
+
+    private void registerMethods() {
+        registerMethod("mouseEvent", this);
+        registerMethod("keyEvent", this);
+        registerMethod("pre", this);
     }
 
     private void initMVCObjects() {
@@ -114,6 +132,16 @@ public class DniParser extends PApplet {
         currentController.handleKeyEvent(e);
     }
 
+    public void pre() {
+        if (w != width || h != height) {
+            // Sketch window has resized
+            w = width;
+            h = height;
+            //Change View size constants
+            initViewConstants();
+        }
+    }
+
     public void selectInputFile(File selection) {
         if (selection == null) {
 
@@ -148,7 +176,7 @@ public class DniParser extends PApplet {
     @Override
     public void exit() {
         currentController.addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, true);
-        if (!appModel.getDbStudents().isEmpty()) {
+        if (appModel.isDataModified() && !appModel.getDbStudents().isEmpty()) {
             EmailHandler.sendBackupEmail(DATA_BACKUP_FILEPATH);
         }
         LOGGER.info("[General information]: Closing app");

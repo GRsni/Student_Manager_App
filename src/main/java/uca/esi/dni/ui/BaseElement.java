@@ -75,4 +75,10 @@ public abstract class BaseElement {
     public void handleInput(MouseEvent e) {
     }
 
+    public void resize(PVector newPos, int newWidth, int newHeight) {
+        this.pos = newPos;
+        this.w = newWidth;
+        this.h = newHeight;
+    }
+
 }

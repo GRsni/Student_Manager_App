@@ -182,6 +182,12 @@ public class TextField extends BaseElement {
             parent.fill(hintColor);
             text = hint;
         }
+        text = getFinalCutScrollText(text);
+        parent.text(text, pos.x + PADDING, pos.y, w, h);
+        parent.pop();
+    }
+
+    private String getFinalCutScrollText(String text) {
         if (parent.textWidth(text) > w) {
             if (isCuttable) {
                 text = text.substring(0, maxNumCharacters());
@@ -190,8 +196,7 @@ public class TextField extends BaseElement {
                 text = text.substring(text.length() - maxNumCharacters());
             }
         }
-        parent.text(text, pos.x + PADDING, pos.y, w, h);
-        parent.pop();
+        return text;
     }
 
     private int maxNumCharacters() {

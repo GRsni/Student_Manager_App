@@ -15,7 +15,11 @@ public class StatsView extends View {
 
     @Override
     protected void onCreate() {
+        background = parent.loadImage("data/background/stats_back.png");
 
+        background.resize(parent.width, parent.height); //resize background image to app size to improve performance
+
+        createElements();
     }
 
     @Override

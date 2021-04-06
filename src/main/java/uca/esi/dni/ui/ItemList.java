@@ -39,6 +39,7 @@ public class ItemList extends BaseElement {
         this.title.setContentColor(textColor);
         this.title.setBackgroundColor(titleBackgroundColor);
         this.title.setIsHeader(true);
+        this.title.setCentered(true);
     }
 
     public int getBackgroundColor() {

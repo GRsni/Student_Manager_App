@@ -14,6 +14,8 @@ public class AppModel implements Model {
     private File outputFolder = new File("");
     private JSONObject settingsObject;
     private String dbReference;
+    private boolean isDataModified = false;
+    private boolean isDataFirstLoaded = false;
 
     public File getInputFile() {
         return inputFile;
@@ -85,6 +87,22 @@ public class AppModel implements Model {
 
     public void removeTemporaryStudent(Student s) {
         temporaryStudents.remove(s);
+    }
+
+    public boolean isDataModified() {
+        return isDataModified;
+    }
+
+    public void setDataModified(boolean dataModified) {
+        isDataModified = dataModified;
+    }
+
+    public boolean isDataFirstLoaded() {
+        return isDataFirstLoaded;
+    }
+
+    public void setDataFirstLoaded(boolean dataFirstLoaded) {
+        isDataFirstLoaded = dataFirstLoaded;
     }
 
 }
