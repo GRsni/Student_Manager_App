@@ -61,7 +61,8 @@ public abstract class Controller {
 
     public abstract void handleKeyEvent(KeyEvent e);
 
-    public abstract void onContextMenuClosed(File file);
+    public void onContextMenuClosed(File file) {
+    }
 
     public void addWarning(String contentString, Warning.DURATION duration, boolean isGood) {
         view.getWarnings().add(View.generateWarning(parent, contentString, duration, isGood));
@@ -87,6 +88,25 @@ public abstract class Controller {
         parent.setCurrentView(newView);
         parent.setCurrentController(newController);
         loadInitialState();
+    }
+
+    protected void removeClick() {
+        if (view.isModalActive()) {
+
+            for (String key : view.getModalElementKeys()) {
+                BaseElement element = view.getUIModalElement(key);
+                if (element.isClicked()) {
+                    element.isClicked(false);
+                }
+            }
+        } else {
+            for (String key : view.getElementKeys()) {
+                BaseElement element = view.getUIElement(key);
+                if (element.isClicked()) {
+                    element.isClicked(false);
+                }
+            }
+        }
     }
 
     public void checkHover(int x, int y) {
@@ -121,10 +141,10 @@ public abstract class Controller {
 
         Runnable runnable = () -> {
             try {
-                String idsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference(), "Ids");
+                String idsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Ids");
                 List<String> responseIDs = dbHandler.getDataFromDB(idsURL);
 
-                String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference(), "Emails");
+                String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Emails");
                 List<String> responseEmails = dbHandler.getDataFromDB(emailsURL);
 
                 if (responseIDs.get(0).equals("200") && responseEmails.get(0).equals("200")) {

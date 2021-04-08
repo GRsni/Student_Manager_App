@@ -4,9 +4,11 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import uca.esi.dni.file.Util;
 import uca.esi.dni.types.Student;
+import uca.esi.dni.types.Survey;
 import uca.esi.dni.ui.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 public class EditView extends View {
@@ -161,7 +163,7 @@ public class EditView extends View {
     }
 
     @Override
-    public void update(Set<Student> dbList, Set<Student> auxList, File inputFile) {
+    public void update(Set<Student> dbList, Set<Student> auxList, File inputFile, List<Survey> surveys) {
 
         TextField inputFileTF = (TextField) elements.get("inputFileTF");
         inputFileTF.setContent(inputFile.getName());

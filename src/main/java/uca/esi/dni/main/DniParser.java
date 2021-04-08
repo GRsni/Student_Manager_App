@@ -176,7 +176,7 @@ public class DniParser extends PApplet {
     @Override
     public void exit() {
         currentController.addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, true);
-        if (appModel.isDataModified() && !appModel.getDbStudents().isEmpty()) {
+        if (appModel.isStudentDataModified() && !appModel.getDbStudents().isEmpty()) {
             EmailHandler.sendBackupEmail(DATA_BACKUP_FILEPATH);
         }
         LOGGER.info("[General information]: Closing app");

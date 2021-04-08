@@ -34,7 +34,7 @@ public class MainController extends Controller {
 
     private void initModelState() {
         model.setSettingsObject(Util.loadJSONObject(DniParser.SETTINGS_FILEPATH));
-        model.setdbReference(model.getSettingsObject().getString("databaseURL"));
+        model.setDBReference(model.getSettingsObject().getString("databaseURL"));
         if (model.getDbStudents().isEmpty() && !model.isDataFirstLoaded()) {
             asyncLoadStudentDataFromDB();
             model.setDataFirstLoaded(true);
@@ -43,7 +43,7 @@ public class MainController extends Controller {
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile());
+        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getStudentSurveys());
     }
 
     @Override
@@ -102,9 +102,9 @@ public class MainController extends Controller {
             Thread.yield(); //We need to wait for the output folder context menu to be closed before resuming execution
         }
 
-        if (model.getdbReference() != null && model.getOutputFolder().exists()) {
+        if (model.getDBReference() != null && model.getOutputFolder().exists()) {
             try {
-                String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference(), "Users");
+                String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
                 List<String> response = dbHandler.getDataFromDB(usersURL);
                 if (response.get(0).equals("200")) {
                     JSONObject studentData = Util.parseJSONObject(response.get(1));

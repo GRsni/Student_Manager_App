@@ -8,6 +8,7 @@ import processing.data.Table;
 import processing.data.TableRow;
 import uca.esi.dni.types.JSONParsingException;
 import uca.esi.dni.types.Student;
+import uca.esi.dni.types.Survey;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -87,14 +88,14 @@ public class Util {
 
     public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) throws NullPointerException {
         Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
-        ArrayList<String> ids = getJSONObjectKeys(allStudentsList);
+        List<String> ids = getJSONObjectKeys(allStudentsList);
         for (String id : ids) {
             Map<String, Table> tableMap = new HashMap<>();
             JSONObject studentData = allStudentsList.getJSONObject(id);
 
             JSONObject labs = studentData.getJSONObject("practicas");
             if (labs != null) {
-                ArrayList<String> labTypes = getJSONObjectKeys(labs);
+                List<String> labTypes = getJSONObjectKeys(labs);
                 for (String labType : labTypes) {
                     JSONObject labRun = labs.getJSONObject(labType);
                     if (labRun != null) {
@@ -108,8 +109,8 @@ public class Util {
         return studentTableMap;
     }
 
-    private static ArrayList<String> getJSONObjectKeys(JSONObject object) throws NullPointerException {
-        ArrayList<String> keys = new ArrayList<>();
+    private static List<String> getJSONObjectKeys(JSONObject object) throws NullPointerException {
+        List<String> keys = new ArrayList<>();
 
         for (Object key : object.keys()) {
             keys.add((String) key);
@@ -119,8 +120,8 @@ public class Util {
 
     private static Table parseJSONDataIntoTable(JSONObject jsonObject) {
         Table table = new Table();
-        ArrayList<String> entries = getJSONObjectKeys(jsonObject);
-        ArrayList<String> entryKeys = getJSONObjectKeys(jsonObject.getJSONObject(entries.get(0)));
+        List<String> entries = getJSONObjectKeys(jsonObject);
+        List<String> entryKeys = getJSONObjectKeys(jsonObject.getJSONObject(entries.get(0)));
 
         for (String key : entryKeys) {
             table.addColumn(key);
@@ -164,7 +165,7 @@ public class Util {
     public static String generateMultiPathJSONString(@NotNull Map<String, JSONObject> urlContentsMap) throws NullPointerException {
         JSONObject multipath = new JSONObject();
         for (Map.Entry<String, JSONObject> entry : urlContentsMap.entrySet()) {
-            ArrayList<String> secondLevelKeys = getJSONObjectKeys(urlContentsMap.get(entry.getKey()));
+            List<String> secondLevelKeys = getJSONObjectKeys(urlContentsMap.get(entry.getKey()));
             for (String key : secondLevelKeys) {
                 multipath.put(entry.getKey() + "/" + key, entry.getValue().getString(key));
             }
@@ -187,7 +188,7 @@ public class Util {
     public static Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws
             JSONParsingException {
         Set<Student> students = new HashSet<>();
-        ArrayList<String> ids = getJSONObjectKeys(emails);
+        List<String> ids = getJSONObjectKeys(emails);
         for (String id : ids) {
             try {
                 Student student = new Student(id, emails.getString(id), hashKeys.getString(id));
@@ -197,6 +198,16 @@ public class Util {
             }
         }
         return students;
+    }
+
+    public static List<Survey> generateSurveyListFromJSONObject(JSONObject surveysJSONObject)
+            throws JSONParsingException {
+        List<Survey> surveyList = new ArrayList<>();
+        List<String> keys = getJSONObjectKeys(surveysJSONObject);
+        for (String surveyId : keys) {
+            surveyList.add(new Survey(surveyId, surveysJSONObject.getJSONObject(surveyId)));
+        }
+        return surveyList;
     }
 
     public static Set<String> studentSetToStringSet(@NotNull Set<Student> students) throws NullPointerException {

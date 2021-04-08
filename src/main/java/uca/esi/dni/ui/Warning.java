@@ -7,7 +7,7 @@ import uca.esi.dni.views.View;
 public class Warning extends TextField {
 
     public enum DURATION {
-        EXTRASHORT,
+        SHORTEST,
         SHORT,
         MEDIUM,
         LONG
@@ -40,7 +40,7 @@ public class Warning extends TextField {
 
     public int getWarningDurationTime(DURATION duration) {
         switch (duration) {
-            case EXTRASHORT:
+            case SHORTEST:
                 return 75;
             case SHORT:
                 return 150;

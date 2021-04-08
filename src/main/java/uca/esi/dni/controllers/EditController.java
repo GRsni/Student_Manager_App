@@ -12,7 +12,6 @@ import uca.esi.dni.file.Util;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.types.Student;
-import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.TextField;
 import uca.esi.dni.ui.Warning;
@@ -39,7 +38,7 @@ public class EditController extends Controller {
 
     @Override
     public void controllerLogic() {
-        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile());
+        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getStudentSurveys());
     }
 
     @Override
@@ -50,20 +49,7 @@ public class EditController extends Controller {
         switch (e.getAction()) {
             case CLICK:
                 handleClickEvent(e, x, y);
-                for (String key : view.getElementKeys()) {
-                    BaseElement element = view.getUIElement(key);
-                    if (element.isClicked()) {
-                        element.isClicked(false);
-                    }
-                }
-
-                for (String key : view.getModalElementKeys()) {
-                    BaseElement element = view.getUIModalElement(key);
-                    if (element.isClicked()) {
-                        element.isClicked(false);
-                    }
-                }
-
+                removeClick();
                 break;
             case MouseEvent.MOVE:
                 checkHover(x, y);
@@ -211,7 +197,7 @@ public class EditController extends Controller {
 
 
     private void asyncAddStudentsToDBListButtonHook() {
-        addWarning("Cargando.", Warning.DURATION.EXTRASHORT, true);
+        addWarning("Cargando.", Warning.DURATION.SHORTEST, true);
         Runnable runnable = () -> {
 
             Set<Student> uniqueStudentSet = Util.getUniqueStudentSet(model.getTemporaryStudents(), model.getDbStudents());
@@ -219,7 +205,7 @@ public class EditController extends Controller {
                 try {
                     List<String> responseDataUpdate = uploadStudentListToDB(uniqueStudentSet);
                     if (responseDataUpdate.get(0).equals("200")) {
-                        model.setDataModified(true);
+                        model.setStudentDataModified(true);
                         model.getTemporaryStudents().clear();
                         savePlainStudentDataToFile(uniqueStudentSet);
                         EmailHandler.sendSecretKeyEmails(uniqueStudentSet);
@@ -243,7 +229,7 @@ public class EditController extends Controller {
     private List<String> uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException {
         Map<String, JSONObject> urlContentsMap = getHashKeyEmailMap(uniqueStudentSet);
         String combined = Util.generateMultiPathJSONString(urlContentsMap);
-        String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference());
+        String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
         return dbHandler.updateData(baseURL, combined);
     }
 
@@ -271,7 +257,7 @@ public class EditController extends Controller {
 
 
     private void asyncRemoveStudentsFromDBButtonHook() {
-        addWarning("Cargando.", Warning.DURATION.EXTRASHORT, true);
+        addWarning("Cargando.", Warning.DURATION.SHORTEST, true);
         Runnable runnable = () -> {
             Set<Student> coincidentStudentSet = Util.getIntersectionOfStudentSets(model.getTemporaryStudents(), model.getDbStudents());
             try {
@@ -279,10 +265,10 @@ public class EditController extends Controller {
                     Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersMap(coincidentStudentSet);
                     String combined = Util.generateMultiPathJSONString(urlContentsMap);
 
-                    String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference());
+                    String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
                     List<String> responseDataDelete = dbHandler.updateData(baseURL, combined);
                     if (responseDataDelete.get(0).equals("200")) {
-                        model.setDataModified(true);
+                        model.setStudentDataModified(true);
                         model.getTemporaryStudents().clear();
                         removePlainStudentDataFromFile(coincidentStudentSet);
                         addWarning("Borrados alumnos de la base de datos.", Warning.DURATION.MEDIUM, true);
@@ -328,15 +314,15 @@ public class EditController extends Controller {
     }
 
     private void asyncEmptyDBButtonHook() {
-        addWarning("Cargando.", Warning.DURATION.EXTRASHORT, true);
+        addWarning("Cargando.", Warning.DURATION.SHORTEST, true);
         Runnable runnable = () -> {
             try {
-                String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getdbReference());
+                String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
                 List<String> response = dbHandler.emptyDB(baseURL);
                 if (response.get(0).equals("200")) {
                     removePlainStudentDataFromFile(model.getDbStudents());
                     model.getDbStudents().clear();
-                    model.setDataModified(true);
+                    model.setStudentDataModified(true);
 
                     addWarning("Base de datos vaciada.", Warning.DURATION.MEDIUM, true);
                     LOGGER.info("[General information]: Emptied data from DB.");

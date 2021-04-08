@@ -2,19 +2,23 @@ package uca.esi.dni.models;
 
 import processing.data.JSONObject;
 import uca.esi.dni.types.Student;
+import uca.esi.dni.types.Survey;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class AppModel implements Model {
     private final Set<Student> dbStudents = new HashSet<>();
     private final Set<Student> temporaryStudents = new HashSet<>();
+    private final List<Survey> studentSurveys = new ArrayList<>();
     private File inputFile = new File("");
     private File outputFolder = new File("");
     private JSONObject settingsObject;
     private String dbReference;
-    private boolean isDataModified = false;
+    private boolean isStudentDataModified = false;
     private boolean isDataFirstLoaded = false;
 
     public File getInputFile() {
@@ -25,11 +29,11 @@ public class AppModel implements Model {
         this.inputFile = inputFile;
     }
 
-    public String getdbReference() {
+    public String getDBReference() {
         return dbReference;
     }
 
-    public void setdbReference(String dbReference) {
+    public void setDBReference(String dbReference) {
         this.dbReference = dbReference;
     }
 
@@ -89,12 +93,32 @@ public class AppModel implements Model {
         temporaryStudents.remove(s);
     }
 
-    public boolean isDataModified() {
-        return isDataModified;
+    public List<Survey> getStudentSurveys() {
+        return studentSurveys;
     }
 
-    public void setDataModified(boolean dataModified) {
-        isDataModified = dataModified;
+    public void addSurvey(Survey s) {
+        studentSurveys.add(s);
+    }
+
+    public void addSurveyList(List<Survey> list) {
+        studentSurveys.addAll(list);
+    }
+
+    public void removeSurveyList(List<Survey> list) {
+        studentSurveys.removeAll(list);
+    }
+
+    public void removeSurvey(Survey s) {
+        studentSurveys.remove(s);
+    }
+
+    public boolean isStudentDataModified() {
+        return isStudentDataModified;
+    }
+
+    public void setStudentDataModified(boolean dataModified) {
+        isStudentDataModified = dataModified;
     }
 
     public boolean isDataFirstLoaded() {

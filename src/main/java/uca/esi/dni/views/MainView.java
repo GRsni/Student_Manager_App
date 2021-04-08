@@ -3,12 +3,14 @@ package uca.esi.dni.views;
 import processing.core.PApplet;
 import uca.esi.dni.file.Util;
 import uca.esi.dni.types.Student;
+import uca.esi.dni.types.Survey;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.Rectangle;
 import uca.esi.dni.ui.TextField;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 
@@ -74,7 +76,7 @@ public class MainView extends View {
     }
 
     @Override
-    public void update(Set<Student> dbList, Set<Student> modList, File inputFile) {
+    public void update(Set<Student> dbList, Set<Student> modList, File inputFile, List<Survey> surveys) {
         TextField dbStudentsCounter = (TextField) elements.get("dbStudentsTF");
         dbStudentsCounter.modifyCounter(dbList.size());
 
