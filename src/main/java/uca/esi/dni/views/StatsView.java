@@ -36,12 +36,12 @@ public class StatsView extends View {
         elements.put("likertBG", likertBarGraph);
 
         PieGraph likePieGraph = new PieGraph(parent,
-                new Rectangle(widthUnitSize * 12f, heightUnitSize * 2f, widthUnitSize * 3, heightUnitSize * 7 / 2),
+                new Rectangle(widthUnitSize * 12f, heightUnitSize * 1.5f, widthUnitSize * 3, heightUnitSize * 7 / 2),
                 "Gusta la aplicación.", "like");
         elements.put("likePG", likePieGraph);
 
         PieGraph learningPieGraph = new PieGraph(parent,
-                new Rectangle(widthUnitSize * 12f, heightUnitSize * 6.5f, widthUnitSize * 3, heightUnitSize * 7 / 2),
+                new Rectangle(widthUnitSize * 12f, heightUnitSize * 6.25f, widthUnitSize * 3, heightUnitSize * 7 / 2),
                 "Mejor aprendizaje.", "learning");
         elements.put("learningPG", learningPieGraph);
 

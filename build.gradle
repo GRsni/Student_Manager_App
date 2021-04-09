@@ -46,6 +46,8 @@ task uberJar(type: Jar) {
 
     from sourceSets.main.output
 
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // allow duplicates
+
     dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
