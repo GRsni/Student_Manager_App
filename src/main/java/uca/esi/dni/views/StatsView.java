@@ -31,23 +31,23 @@ public class StatsView extends View {
     @Override
     protected void createElements() {
         LikertBarGraph likertBarGraph = new LikertBarGraph(parent,
-                new Rectangle(widthUnitSize * 0.5f, heightUnitSize * 1.5f, widthUnitSize * 10, heightUnitSize * 9),
+                new Rectangle(widthUnitSize * 0.5f, heightUnitSize * 1.5f, widthUnitSize * 10, heightUnitSize * 19 / 2),
                 "Valoraciones", "Categorías", "Votos");
         elements.put("likertBG", likertBarGraph);
 
         PieGraph likePieGraph = new PieGraph(parent,
-                new Rectangle(widthUnitSize * 12f, heightUnitSize * 2f, widthUnitSize * 3, heightUnitSize * 3),
+                new Rectangle(widthUnitSize * 12f, heightUnitSize * 2f, widthUnitSize * 3, heightUnitSize * 7 / 2),
                 "Gusta la aplicación.", "like");
         elements.put("likePG", likePieGraph);
 
         PieGraph learningPieGraph = new PieGraph(parent,
-                new Rectangle(widthUnitSize * 12f, heightUnitSize * 6f, widthUnitSize * 3, heightUnitSize * 3),
+                new Rectangle(widthUnitSize * 12f, heightUnitSize * 6.5f, widthUnitSize * 3, heightUnitSize * 7 / 2),
                 "Mejor aprendizaje.", "learning");
         elements.put("learningPG", learningPieGraph);
 
         PieGraph outsidePieGraph = new PieGraph(parent,
-                new Rectangle(widthUnitSize * 12f, heightUnitSize * 10f, widthUnitSize * 3, heightUnitSize * 3),
-                "Uso fuera del laboratorio.", "outside");
+                new Rectangle(widthUnitSize * 12f, heightUnitSize * 11f, widthUnitSize * 3, heightUnitSize * 7 / 2),
+                "Usará otra vez.", "outside");
         elements.put("outsidePG", outsidePieGraph);
 
         Button back = new Button(parent,

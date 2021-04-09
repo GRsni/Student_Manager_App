@@ -55,7 +55,8 @@ public class EmailHandler {
             emailContentMap.put(student.getEmail(), formattedMessage);
         }
         sendEmailCollection(emailContentMap);
-        LOGGER.info("[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size());
+        String toLog = "[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size();
+        LOGGER.info(toLog);
     }
 
     public static void sendBackupEmail(String filepath) {

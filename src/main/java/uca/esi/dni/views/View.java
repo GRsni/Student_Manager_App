@@ -69,6 +69,12 @@ public abstract class View {
 
     protected abstract void onCreate();
 
+    public void reload() {
+        elements.clear();
+        elementsOverModal.clear();
+        onCreate();
+    }
+
     protected abstract void createElements();
 
     public abstract void update(Set<Student> dbList, Set<Student> modList, File inputFile, List<Survey> surveys);
@@ -94,9 +100,9 @@ public abstract class View {
         }
     }
 
-    public static Warning generateWarning(PApplet parent, String contentString, Warning.DURATION duration, boolean isGood) {
+    public static Warning generateWarning(PApplet parent, String contentString, Warning.DURATION duration, Warning.TYPE type) {
         Warning warning = new Warning(parent, new Rectangle(widthUnitSize * 9f, heightUnitSize * 0.5f, widthUnitSize * 6, heightUnitSize),
-                contentString, duration, isGood);
+                contentString, duration, type);
         warning.setFont(fontBig);
         warning.setFontSize(10);
         warning.setContentColor(COLORS.WHITE);
@@ -140,6 +146,8 @@ public abstract class View {
         public static final int ACCENT = 0xffcccccc;
         public static final int WHITE = 0xffffffff;
         public static final int BLACK = 0xff000000;
+        public static final int RED = 0xffdd0000;
+        public static final int RED_DARK = 0xff8a0000;
 
         private COLORS() {
         }

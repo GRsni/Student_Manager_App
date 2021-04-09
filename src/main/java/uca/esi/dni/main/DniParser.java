@@ -36,6 +36,7 @@ public class DniParser extends PApplet {
     private int h;
 
     public static void main(String[] args) {
+        System.setProperty("file.encoding", "UTF-8");
         PApplet.main(new String[]{DniParser.class.getName()});
     }
 
@@ -139,6 +140,8 @@ public class DniParser extends PApplet {
             h = height;
             //Change View size constants
             initViewConstants();
+            currentView.reload();
+            currentController.controllerLogic();
         }
     }
 
@@ -146,7 +149,7 @@ public class DniParser extends PApplet {
         if (selection == null) {
 
             LOGGER.warning("[Error while selecting input file]: No file selected.");
-            currentController.addWarning("Archivo no seleccionado.", Warning.DURATION.SHORT, false);
+            currentController.addWarning("Archivo no seleccionado.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
         } else {
             String filePath = selection.getAbsolutePath();
             if (Util.checkFileExtension(filePath, "csv")) {
@@ -161,7 +164,7 @@ public class DniParser extends PApplet {
     public void selectOutputFolder(File folder) {
         if (folder == null) {
             LOGGER.warning("[Error while selecting output folder]: No folder selected.");
-            currentController.addWarning("Carpeta no seleccionada.", Warning.DURATION.SHORT, false);
+            currentController.addWarning("Carpeta no seleccionada.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             currentController.onContextMenuClosed(new File(""));
         } else {
             if (folder.isDirectory()) {
@@ -175,7 +178,7 @@ public class DniParser extends PApplet {
 
     @Override
     public void exit() {
-        currentController.addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, true);
+        currentController.addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
         if (appModel.isStudentDataModified() && !appModel.getDbStudents().isEmpty()) {
             EmailHandler.sendBackupEmail(DATA_BACKUP_FILEPATH);
         }

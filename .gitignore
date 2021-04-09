@@ -19,7 +19,9 @@ gradle-app.setting
 /src/main/resources/data/files/settings.json
 /src/main/resources/data/files/manualdetorsion-firebase.json
 /data/files
+/data/capturas
 Log.txt
 *.lck
-*.1
+*.txt.*
 src/main/resources/data/files/student_data_backup.json
+	

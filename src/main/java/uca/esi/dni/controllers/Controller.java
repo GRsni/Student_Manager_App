@@ -64,8 +64,8 @@ public abstract class Controller {
     public void onContextMenuClosed(File file) {
     }
 
-    public void addWarning(String contentString, Warning.DURATION duration, boolean isGood) {
-        view.getWarnings().add(View.generateWarning(parent, contentString, duration, isGood));
+    public void addWarning(String contentString, Warning.DURATION duration, Warning.TYPE type) {
+        view.getWarnings().add(View.generateWarning(parent, contentString, duration, type));
     }
 
     public void changeState(VIEW_STATES state) {
@@ -151,16 +151,17 @@ public abstract class Controller {
                     Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
                     model.getDbStudents().clear();
                     model.addDBStudentList(studentsInDB);
-                    addWarning("Cargados datos de la base de datos.", Warning.DURATION.SHORT, true);
+                    addWarning("Cargados datos de la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
                     controllerLogic();
-                    LOGGER.info("[General information]: Loaded " + studentsInDB.size() + " students from DB.");
+                    String toLog = "[General information]: Loaded " + studentsInDB.size() + " students from DB.";
+                    LOGGER.info(toLog);
                 }
             } catch (IOException | NullPointerException e) {
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
-                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, false);
+                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             } catch (RuntimeException e) {
-                LOGGER.warning("[Error generating student list]: " + e.getMessage());
-                addWarning("Error generando la lista de alumnos.", Warning.DURATION.SHORT, false);
+                LOGGER.severe("[Error generating student list]: " + e.getMessage());
+                addWarning("Error generando la lista de alumnos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             }
 
         };

@@ -56,7 +56,6 @@ public class MainController extends Controller {
                 } else if (view.getUIElement("generateFilesB").inside(e.getX(), e.getY())) {
                     generateExcelFiles();
                 } else if (view.getUIElement("generateStatsB").inside(e.getX(), e.getY())) {
-                    //TODO: Implement stats view
                     changeState(STATS);
                 } else if (view.getUIElement("dbStudentsIL").inside(e.getX(), e.getY())) {
                     view.getUIElement("dbStudentsIL").handleInput(e);
@@ -111,15 +110,15 @@ public class MainController extends Controller {
                     Map<String, Map<String, Table>> tableMap = Util.createStudentsDataTables(studentData);
                     if (model.getOutputFolder() != null) {
                         saveLabTables(tableMap, model.getOutputFolder());
-                        addWarning("Generados archivos de alumnos.", Warning.DURATION.SHORT, true);
+                        addWarning("Generados archivos de alumnos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
                     }
                 }
             } catch (IOException e) {
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
-                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, false);
+                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             } catch (RuntimeException e) {
                 LOGGER.severe("[NullPointerException when generating the CSV files]: " + e.getMessage());
-                addWarning("Error generando los archivos.", Warning.DURATION.SHORT, false);
+                addWarning("Error generando los archivos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             }
         }
     }

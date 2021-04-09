@@ -13,29 +13,49 @@ public class Warning extends TextField {
         LONG
     }
 
+    public enum TYPE {
+        INFO,
+        WARNING,
+        SEVERE
+    }
+
     private int fadeout;
     private final int maxLife;
 
-    private final boolean isGood;
+    private static final int BACKGROUND_COLOR_INFO = View.COLORS.PRIMARY;
+    private static final int BACKGROUND_COLOR_WARNING = View.COLORS.SECONDARY_DARK;
+    private static final int BACKGROUND_COLOR_SEVERE = View.COLORS.RED;
 
-    private static final int BACKGROUND_COLOR_GOOD = View.COLORS.PRIMARY;
-    private static final int BACKGROUND_COLOR_BAD = View.COLORS.SECONDARY_DARK;
+    private static final int LINE_COLOR_INFO = View.COLORS.PRIMARY_DARK;
+    private static final int LINE_COLOR_WARNING = View.COLORS.ACCENT_DARK;
+    private static final int LINE_COLOR_SEVERE = View.COLORS.RED_DARK;
 
-    private static final int LINE_COLOR_GOOD = View.COLORS.PRIMARY_DARK;
-    private static final int LINE_COLOR_BAD = View.COLORS.ACCENT_DARK;
+    private int lineColor;
 
-    public Warning(PApplet parent, Rectangle rectangle, String contentString, DURATION duration, boolean good) {
+    public Warning(PApplet parent, Rectangle rectangle, String contentString, DURATION duration, TYPE type) {
         super(parent, rectangle, contentString, "");
 
         this.fadeout = getWarningDurationTime(duration);
         this.maxLife = fadeout;
-        this.isGood = good;
-        if (good) {
-            setBackgroundColor(BACKGROUND_COLOR_GOOD);
-        } else {
-            setBackgroundColor(BACKGROUND_COLOR_BAD);
-        }
+        getWarningColors(type);
         setCentered(true);
+    }
+
+    private void getWarningColors(TYPE type) {
+        switch (type) {
+            case WARNING:
+                lineColor = LINE_COLOR_WARNING;
+                setBackgroundColor(BACKGROUND_COLOR_WARNING);
+                break;
+            case SEVERE:
+                lineColor = LINE_COLOR_SEVERE;
+                setBackgroundColor(BACKGROUND_COLOR_SEVERE);
+                break;
+            default:
+                lineColor = LINE_COLOR_INFO;
+                setBackgroundColor(BACKGROUND_COLOR_INFO);
+                break;
+        }
     }
 
     public int getWarningDurationTime(DURATION duration) {
@@ -55,32 +75,15 @@ public class Warning extends TextField {
 
     @Override
     public void display() {
-        renderBox();
-        renderLifeBar();
         super.display();
+        renderLifeBar();
     }
 
-    private void renderBox() {
-        parent.push();
-        parent.noStroke();
-        if (isGood) {
-            parent.fill(BACKGROUND_COLOR_GOOD);
-        } else {
-            parent.fill(BACKGROUND_COLOR_BAD);
-        }
-        parent.rect(pos.x, pos.y, w, h);
-        parent.pop();
-    }
 
     private void renderLifeBar() {
         parent.push();
-        parent.strokeWeight(2);
-        if (isGood) {
-            parent.stroke(LINE_COLOR_GOOD);
-        } else {
-            parent.stroke(LINE_COLOR_BAD);
-        }
-        parent.strokeWeight(h * 0.2f);
+        parent.stroke(lineColor);
+        parent.strokeWeight(h * 0.1f);
         parent.strokeCap(PConstants.SQUARE);
         parent.line(pos.x, pos.y + h, pos.x + calcLineBarLength(), pos.y + h);
         parent.pop();

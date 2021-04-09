@@ -16,7 +16,24 @@ public class Survey {
         EASE_OF_USE,
         LEARNING_HELP,
         GRASP,
-        UI_LIKING
+        UI_LIKING;
+
+        @Override
+        public String toString() {
+            switch (this){
+                case EASE_OF_USE:
+                    return "Facilidad de uso.";
+                case LEARNING_HELP:
+                    return "Ayuda en el aprendizaje.";
+                case GRASP:
+                    return "Entendimiento de la aplicación.";
+                case UI_LIKING:
+                    return "Interfaz de usuario.";
+                default:
+                    return "";
+
+            }
+        }
     }
 
     public Survey(String id, JSONObject jsonObject) throws JSONParsingException {

@@ -1,7 +1,7 @@
 package uca.esi.dni.ui.graphs;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -9,6 +9,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import uca.esi.dni.types.Survey;
 import uca.esi.dni.ui.Rectangle;
+import uca.esi.dni.views.View;
 
 import java.awt.*;
 import java.util.EnumMap;
@@ -26,24 +27,23 @@ public class LikertBarGraph extends Graph {
                 createEmptyCategoryDataSet(),
                 PlotOrientation.VERTICAL,
                 true, true, false);
-        chart.setBackgroundPaint(new Color(255, 255, 255, 0));
-        chart.setBackgroundImageAlpha(100);
+        setupChart();
         this.chartImage = new PImage(chart.createBufferedImage(w, h));
     }
 
     @Override
-    public void updateData(List<Survey> surveyList) {
-        JFreeChart barChart = ChartFactory.createBarChart(
-                chart.getTitle().getText(),
-                chart.getCategoryPlot().getDomainAxis().getLabel(),
-                chart.getCategoryPlot().getRangeAxis().getLabel(),
-                createCategoryDataset(surveyList),
-                PlotOrientation.VERTICAL,
-                true, true, false);
-        this.chart = barChart;
+    protected void setupChart() {
         chart.setBackgroundPaint(new Color(255, 255, 255, 0));
-        chart.setBackgroundImageAlpha(100);
-        this.chartImage = new PImage(barChart.createBufferedImage(w, h));
+        chart.getPlot().setBackgroundPaint(new Color(View.COLORS.ACCENT));
+        chart.getLegend().setBackgroundPaint(new Color(View.COLORS.ACCENT));
+        chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(2);
+        chart.getCategoryPlot().getRangeAxis().setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+    }
+
+    @Override
+    public void updateData(List<Survey> surveyList) {
+        chart.getCategoryPlot().setDataset(createCategoryDataset(surveyList));
+        chartImage = new PImage(this.chart.createBufferedImage(w, h));
     }
 
     private CategoryDataset createCategoryDataset(List<Survey> surveyList) {

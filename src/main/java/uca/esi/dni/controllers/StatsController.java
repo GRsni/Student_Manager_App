@@ -43,7 +43,7 @@ public class StatsController extends Controller {
                 if (view.getUIElement("backB").inside(x, y)) {
                     changeState(MAIN);
                 } else if (view.getUIElement("screenCapB").inside(x, y)) {
-                    //TODO: save screen capture
+                    makeScreenShot();
                 }
                 removeClick();
                 controllerLogic();
@@ -63,6 +63,12 @@ public class StatsController extends Controller {
         }
     }
 
+    private void makeScreenShot() {
+        parent.saveFrame("data/capturas/Captura-###.png");
+        addWarning("Captura guardada en /data/capturas.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
+        LOGGER.info("[General information]: Captura de pantalla realizada.");
+    }
+
     @Override
     public void handleKeyEvent(KeyEvent e) {
         //No need for key event handling in this view
@@ -75,7 +81,7 @@ public class StatsController extends Controller {
 
 
     private void asyncLoadSurveysFromDB() {
-        addWarning("Cargando.", Warning.DURATION.SHORTEST, true);
+        addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
             try {
                 String surveysURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Surveys");
@@ -85,15 +91,17 @@ public class StatsController extends Controller {
                     List<Survey> surveyList = Util.generateSurveyListFromJSONObject(surveysJSONObject);
                     model.getStudentSurveys().clear();
                     model.addSurveyList(surveyList);
-                    addWarning("Cargados datos de encuestas.", Warning.DURATION.SHORT, true);
+                    addWarning("Cargados datos de encuestas.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
+                    String toLog = "[Cargados datos de encuestas]: " + surveyList.size();
+                    LOGGER.info(toLog);
                     controllerLogic();
                 }
             } catch (IOException e) {
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
-                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, false);
+                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
             } catch (JSONParsingException e) {
-                LOGGER.warning("[Error generating survey list]: " + e.getMessage());
-                addWarning("Error cargando lista de encuestas", Warning.DURATION.SHORT, false);
+                LOGGER.severe("[Error generating survey list]: " + e.getMessage());
+                addWarning("Error cargando lista de encuestas", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             }
         };
 

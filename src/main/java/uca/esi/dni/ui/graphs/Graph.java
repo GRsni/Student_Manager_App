@@ -21,6 +21,8 @@ public abstract class Graph extends BaseElement {
         super(parent, rectangle);
     }
 
+    protected abstract void setupChart();
+
     public abstract void updateData(List<Survey> surveyList);
 
     protected CategoryDataset createEmptyCategoryDataSet() {

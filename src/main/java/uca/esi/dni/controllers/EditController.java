@@ -77,45 +77,53 @@ public class EditController extends Controller {
 
     private void handleClickEvent(MouseEvent e, int x, int y) {
         if (view.isModalActive()) {
-            if (view.getUIModalElement("confirmEmptyB").inside(x, y)) {
-                asyncEmptyDBButtonHook();
-            }
-            setModalVisibility(false);
+            handleModalClickEvent(x, y);
         } else {
-            TextField idTF = (TextField) view.getUIElement("idTF");
-            TextField emailTF = (TextField) view.getUIElement("emailTF");
-            if (view.getUIElement("enterStudentB").inside(x, y)) {
-                if (checkManualStudentData(idTF, emailTF)) {
-                    addManualDataToAuxList(idTF, emailTF);
-                    clearTextFields(idTF, emailTF);
-                }
-            } else if (view.getUIElement("removeStudentAuxB").inside(x, y)) {
-                if (checkManualStudentData(idTF, emailTF)) {
-                    removeStudentFromAuxList(idTF.getContent());
-                    clearTextFields(idTF, emailTF);
-                }
-            } else if (view.getUIElement("selectFileB").inside(x, y)) {
-                selectInputFile();
-            } else if (view.getUIElement("backB").inside(x, y)) {
-                changeState(MAIN);
-            } else if (view.getUIElement("addToListB").inside(x, y)) {
-                asyncAddStudentsToDBListButtonHook();
-            } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
-                asyncRemoveStudentsFromDBButtonHook();
-            } else if (view.getUIElement("emptyListB").inside(x, y)) {
-                setModalVisibility(true);
-            } else if (idTF.inside(x, y)) {
-                idTF.setFocused(true);
-                emailTF.setFocused(false);
-            } else if (emailTF.inside(x, y)) {
-                idTF.setFocused(false);
-                emailTF.setFocused(true);
-            } else if (view.getUIElement("dbStudentIL").inside(x, y)) {
-                view.getUIElement("dbStudentsIL").handleInput(e);
-            } else if (view.getUIElement("auxStudentsIL").inside(x, y)) {
-                view.getUIElement("auxStudentsIL").handleInput(e);
-            }
+            handleNonModalClickEvent(e, x, y);
         }
+    }
+
+    private void handleNonModalClickEvent(MouseEvent e, int x, int y) {
+        TextField idTF = (TextField) view.getUIElement("idTF");
+        TextField emailTF = (TextField) view.getUIElement("emailTF");
+        if (view.getUIElement("enterStudentB").inside(x, y)) {
+            if (checkManualStudentData(idTF, emailTF)) {
+                addManualDataToAuxList(idTF, emailTF);
+                clearTextFields(idTF, emailTF);
+            }
+        } else if (view.getUIElement("removeStudentAuxB").inside(x, y)) {
+            if (checkManualStudentData(idTF, emailTF)) {
+                removeStudentFromAuxList(idTF.getContent());
+                clearTextFields(idTF, emailTF);
+            }
+        } else if (view.getUIElement("selectFileB").inside(x, y)) {
+            selectInputFile();
+        } else if (view.getUIElement("backB").inside(x, y)) {
+            changeState(MAIN);
+        } else if (view.getUIElement("addToListB").inside(x, y)) {
+            asyncAddStudentsToDBListButtonHook();
+        } else if (view.getUIElement("deleteFromListB").inside(x, y)) {
+            asyncRemoveStudentsFromDBButtonHook();
+        } else if (view.getUIElement("emptyListB").inside(x, y)) {
+            setModalVisibility(true);
+        } else if (idTF.inside(x, y)) {
+            idTF.setFocused(true);
+            emailTF.setFocused(false);
+        } else if (emailTF.inside(x, y)) {
+            idTF.setFocused(false);
+            emailTF.setFocused(true);
+        } else if (view.getUIElement("dbStudentIL").inside(x, y)) {
+            view.getUIElement("dbStudentsIL").handleInput(e);
+        } else if (view.getUIElement("auxStudentsIL").inside(x, y)) {
+            view.getUIElement("auxStudentsIL").handleInput(e);
+        }
+    }
+
+    private void handleModalClickEvent(int x, int y) {
+        if (view.getUIModalElement("confirmEmptyB").inside(x, y)) {
+            asyncEmptyDBButtonHook();
+        }
+        setModalVisibility(false);
     }
 
     @Override
@@ -150,10 +158,10 @@ public class EditController extends Controller {
     private void addManualDataToAuxList(TextField idTF, TextField emailTF) {
         try {
             model.addTemporaryStudent(new Student(idTF.getContent().toLowerCase(Locale.ROOT), emailTF.getContent().toLowerCase(Locale.ROOT)));
-            addWarning("Alumno introducido correctamente.", Warning.DURATION.MEDIUM, true);
+            addWarning("Alumno introducido correctamente.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
         } catch (NullPointerException e) {
             LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
-            addWarning("Error al introducir el alumno.", Warning.DURATION.SHORT, false);
+            addWarning("Error al introducir el alumno.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
         }
 
     }
@@ -172,7 +180,7 @@ public class EditController extends Controller {
                     return true;
                 } else {
                     LOGGER.warning("[Error validating email address]: No valid address.");
-                    addWarning("Email no válido.", Warning.DURATION.SHORT, false);
+                    addWarning("Email no válido.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
                     return false;
                 }
             } else {
@@ -180,7 +188,7 @@ public class EditController extends Controller {
             }
         } else {
             LOGGER.warning("[Error while reading student data]:Empty ID field.");
-            addWarning("Identificador no introducido.", Warning.DURATION.SHORT, false);
+            addWarning("Identificador no introducido.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             return false;
         }
     }
@@ -189,7 +197,7 @@ public class EditController extends Controller {
         for (Student student : model.getTemporaryStudents()) {
             if (student.getId().equals(id)) {
                 model.removeTemporaryStudent(student);
-                addWarning("Alumno eliminado de la lista temporal.", Warning.DURATION.MEDIUM, true);
+                addWarning("Alumno eliminado de la lista temporal.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
                 break;
             }
         }
@@ -197,7 +205,7 @@ public class EditController extends Controller {
 
 
     private void asyncAddStudentsToDBListButtonHook() {
-        addWarning("Cargando.", Warning.DURATION.SHORTEST, true);
+        addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
 
             Set<Student> uniqueStudentSet = Util.getUniqueStudentSet(model.getTemporaryStudents(), model.getDbStudents());
@@ -209,15 +217,16 @@ public class EditController extends Controller {
                         model.getTemporaryStudents().clear();
                         savePlainStudentDataToFile(uniqueStudentSet);
                         EmailHandler.sendSecretKeyEmails(uniqueStudentSet);
-                        addWarning("Alumnos añadidos a la base de datos.", Warning.DURATION.MEDIUM, true);
-                        LOGGER.info("[General information]: Added " + uniqueStudentSet.size() + " students to DB.");
+                        addWarning("Alumnos añadidos a la base de datos.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
+                        String toLog = "[General information]: Added " + uniqueStudentSet.size() + " students to DB.";
+                        LOGGER.info(toLog);
                         controllerLogic();
 
                         asyncLoadStudentDataFromDB();
                     }
                 } catch (IOException | NullPointerException e) {
                     LOGGER.severe("[Error while uploading data to the DB]: " + e.getMessage());
-                    addWarning("Error subiendo datos.", Warning.DURATION.SHORT, false);
+                    addWarning("Error subiendo datos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
                 }
             }
         };
@@ -257,7 +266,7 @@ public class EditController extends Controller {
 
 
     private void asyncRemoveStudentsFromDBButtonHook() {
-        addWarning("Cargando.", Warning.DURATION.SHORTEST, true);
+        addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
             Set<Student> coincidentStudentSet = Util.getIntersectionOfStudentSets(model.getTemporaryStudents(), model.getDbStudents());
             try {
@@ -271,8 +280,9 @@ public class EditController extends Controller {
                         model.setStudentDataModified(true);
                         model.getTemporaryStudents().clear();
                         removePlainStudentDataFromFile(coincidentStudentSet);
-                        addWarning("Borrados alumnos de la base de datos.", Warning.DURATION.MEDIUM, true);
-                        LOGGER.info("[General information]: Removed " + coincidentStudentSet.size() + " students from DB.");
+                        addWarning("Borrados alumnos de la base de datos.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
+                        String toLog = "[General information]: Removed " + coincidentStudentSet.size() + " students from DB.";
+                        LOGGER.info(toLog);
                         controllerLogic();
 
                         asyncLoadStudentDataFromDB();
@@ -281,7 +291,7 @@ public class EditController extends Controller {
 
             } catch (IOException | NullPointerException e) {
                 LOGGER.severe("[Error while deleting data from the DB]: " + e.getMessage());
-                addWarning("Error eliminando alumnos.", Warning.DURATION.SHORT, false);
+                addWarning("Error eliminando alumnos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             }
         };
 
@@ -314,7 +324,7 @@ public class EditController extends Controller {
     }
 
     private void asyncEmptyDBButtonHook() {
-        addWarning("Cargando.", Warning.DURATION.SHORTEST, true);
+        addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
             try {
                 String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
@@ -324,13 +334,13 @@ public class EditController extends Controller {
                     model.getDbStudents().clear();
                     model.setStudentDataModified(true);
 
-                    addWarning("Base de datos vaciada.", Warning.DURATION.MEDIUM, true);
+                    addWarning("Base de datos vaciada.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
                     LOGGER.info("[General information]: Emptied data from DB.");
                     controllerLogic();
                 }
             } catch (IOException e) {
                 LOGGER.severe("[Error deleting data from DB]: " + e.getMessage());
-                addWarning("Error vaciando la base de datos.", Warning.DURATION.SHORT, false);
+                addWarning("Error vaciando la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             }
         };
 
