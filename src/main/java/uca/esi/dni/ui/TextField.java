@@ -174,6 +174,13 @@ public class TextField extends BaseElement {
         } else {
             parent.textAlign(PConstants.CENTER, PConstants.CENTER);
         }
+        String text = getContentTextAndFill();
+        text = getFinalCutScrollText(text);
+        parent.text(text, pos.x + getXOffset(), pos.y, w, h);
+        parent.pop();
+    }
+
+    private String getContentTextAndFill() {
         String text;
         if (!content.isEmpty() || isFocused) {
             parent.fill(contentColor);
@@ -182,9 +189,7 @@ public class TextField extends BaseElement {
             parent.fill(hintColor);
             text = hint;
         }
-        text = getFinalCutScrollText(text);
-        parent.text(text, pos.x + PADDING, pos.y, w, h);
-        parent.pop();
+        return text;
     }
 
     private String getFinalCutScrollText(String text) {
@@ -197,6 +202,14 @@ public class TextField extends BaseElement {
             }
         }
         return text;
+    }
+
+    private float getXOffset() {
+        if (isCentered) {
+            return 0;
+        } else {
+            return PADDING;
+        }
     }
 
     private int maxNumCharacters() {

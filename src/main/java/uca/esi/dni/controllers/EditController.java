@@ -87,17 +87,13 @@ public class EditController extends Controller {
         TextField idTF = (TextField) view.getUIElement("idTF");
         TextField emailTF = (TextField) view.getUIElement("emailTF");
         if (view.getUIElement("enterStudentB").inside(x, y)) {
-            if (checkManualStudentData(idTF, emailTF)) {
-                addManualDataToAuxList(idTF, emailTF);
-                clearTextFields(idTF, emailTF);
-            }
+            addManualDataToAuxList(idTF, emailTF);
+            clearTextFields(idTF, emailTF);
         } else if (view.getUIElement("removeStudentAuxB").inside(x, y)) {
-            if (checkManualStudentData(idTF, emailTF)) {
-                removeStudentFromAuxList(idTF.getContent());
-                clearTextFields(idTF, emailTF);
-            }
+            removeStudentFromAuxList(idTF, emailTF);
+            clearTextFields(idTF, emailTF);
         } else if (view.getUIElement("selectFileB").inside(x, y)) {
-            selectInputFile();
+            addStudentsFromFileToTemporaryList();
         } else if (view.getUIElement("backB").inside(x, y)) {
             changeState(MAIN);
         } else if (view.getUIElement("addToListB").inside(x, y)) {
@@ -117,6 +113,7 @@ public class EditController extends Controller {
         } else if (view.getUIElement("auxStudentsIL").inside(x, y)) {
             view.getUIElement("auxStudentsIL").handleInput(e);
         }
+
     }
 
     private void handleModalClickEvent(int x, int y) {
@@ -156,14 +153,15 @@ public class EditController extends Controller {
     }
 
     private void addManualDataToAuxList(TextField idTF, TextField emailTF) {
-        try {
-            model.addTemporaryStudent(new Student(idTF.getContent().toLowerCase(Locale.ROOT), emailTF.getContent().toLowerCase(Locale.ROOT)));
-            addWarning("Alumno introducido correctamente.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
-        } catch (NullPointerException e) {
-            LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
-            addWarning("Error al introducir el alumno.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
+        if (checkValidManualStudentData(idTF, emailTF)) {
+            try {
+                model.addTemporaryStudent(new Student(idTF.getContent().toLowerCase(Locale.ROOT), emailTF.getContent().toLowerCase(Locale.ROOT)));
+                addWarning("Alumno introducido correctamente.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
+            } catch (NullPointerException e) {
+                LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+                addWarning("Error al introducir el alumno.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
+            }
         }
-
     }
 
     private void clearTextFields(TextField idTF, TextField emailTF) {
@@ -173,7 +171,7 @@ public class EditController extends Controller {
     }
 
 
-    private boolean checkManualStudentData(TextField idTF, TextField emailTF) {
+    private boolean checkValidManualStudentData(TextField idTF, TextField emailTF) {
         if (!idTF.getContent().isEmpty()) {
             if (!emailTF.getContent().isEmpty()) {
                 if (EmailHandler.isValidEmailAddress(emailTF.getContent())) {
@@ -193,12 +191,14 @@ public class EditController extends Controller {
         }
     }
 
-    private void removeStudentFromAuxList(String id) {
-        for (Student student : model.getTemporaryStudents()) {
-            if (student.getId().equals(id)) {
-                model.removeTemporaryStudent(student);
-                addWarning("Alumno eliminado de la lista temporal.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
-                break;
+    private void removeStudentFromAuxList(TextField idTF, TextField emailTF) {
+        if (checkValidManualStudentData(idTF, emailTF)) {
+            for (Student student : model.getTemporaryStudents()) {
+                if (student.getId().equals(idTF.getContent())) {
+                    model.removeTemporaryStudent(student);
+                    addWarning("Alumno eliminado de la lista temporal.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
+                    break;
+                }
             }
         }
     }
@@ -348,13 +348,9 @@ public class EditController extends Controller {
         thread.start();
     }
 
-    private void selectInputFile() {
-        closedContextMenu = false;
 
-        parent.selectInput("Seleccione el archivo de texto:", "selectInputFile");
-        while (!closedContextMenu) {
-            Thread.yield();
-        }//We need to wait for the input file context menu to be closed before resuming execution
+    private void addStudentsFromFileToTemporaryList() {
+        selectInputFile();
         if (model.getInputFile().exists()) {
             try {
                 Table studentIDTable = parent.loadTable(model.getInputFile().getAbsolutePath(), "header");
@@ -367,8 +363,18 @@ public class EditController extends Controller {
         }
     }
 
+    private void selectInputFile() {
+        closedContextMenu = false;
+
+        parent.selectInput("Seleccione el archivo de texto:", "selectInputFile");
+        while (!closedContextMenu) {
+            Thread.yield();
+        }//We need to wait for the input file context menu to be closed before resuming execution
+    }
+
     private Set<Student> generateStudentListFromTable(Table studentIDTable) {
         Set<Student> students = new HashSet<>();
+        int failedEmails = 0;
         for (TableRow row : studentIDTable.rows()) {
             String id = row.getString(0);
             String email = row.getString("email");
@@ -378,7 +384,14 @@ public class EditController extends Controller {
                 } catch (NullPointerException e) {
                     LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
                 }
+            } else {
+                failedEmails++;
             }
+        }
+        if (failedEmails > 0) {
+            addWarning("Detectados " + failedEmails + " errores con emails.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
+            String toLog = "[General information]: " + failedEmails + " invalid emails detected.";
+            LOGGER.info(toLog);
         }
         return students;
     }
@@ -395,7 +408,9 @@ public class EditController extends Controller {
 
     @Override
     public void onContextMenuClosed(File file) {
-        model.setInputFile(file);
+        if (file != model.getInputFile()) {
+            model.setInputFile(file);
+        }
         controllerLogic();
     }
 }

@@ -36,7 +36,6 @@ public class DniParser extends PApplet {
     private int h;
 
     public static void main(String[] args) {
-        System.setProperty("file.encoding", "UTF-8");
         PApplet.main(new String[]{DniParser.class.getName()});
     }
 
@@ -97,14 +96,6 @@ public class DniParser extends PApplet {
 
     public AppModel getAppModel() {
         return appModel;
-    }
-
-    public void setAppModel(AppModel appModel) {
-        this.appModel = appModel;
-    }
-
-    public View getCurrentView() {
-        return currentView;
     }
 
     public void setCurrentView(View currentView) {

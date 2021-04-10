@@ -32,27 +32,27 @@ public class StatsView extends View {
     protected void createElements() {
         LikertBarGraph likertBarGraph = new LikertBarGraph(parent,
                 new Rectangle(widthUnitSize * 0.5f, heightUnitSize * 1.5f, widthUnitSize * 10, heightUnitSize * 19 / 2),
-                "Valoraciones", "Categor√≠as", "Votos");
+                "Valoraciones", "CategorÌas", "Votos");
         elements.put("likertBG", likertBarGraph);
 
         PieGraph likePieGraph = new PieGraph(parent,
                 new Rectangle(widthUnitSize * 12f, heightUnitSize * 1.5f, widthUnitSize * 3, heightUnitSize * 7 / 2),
-                "Gusta la aplicaci√≥n.", "like");
+                "Gusta la aplicaciÛn.", "like");
         elements.put("likePG", likePieGraph);
 
         PieGraph learningPieGraph = new PieGraph(parent,
                 new Rectangle(widthUnitSize * 12f, heightUnitSize * 6.25f, widthUnitSize * 3, heightUnitSize * 7 / 2),
-                "Mejor aprendizaje.", "learning");
+                "Mejora aprendizaje.", "learning");
         elements.put("learningPG", learningPieGraph);
 
         PieGraph outsidePieGraph = new PieGraph(parent,
                 new Rectangle(widthUnitSize * 12f, heightUnitSize * 11f, widthUnitSize * 3, heightUnitSize * 7 / 2),
-                "Usar√° otra vez.", "outside");
+                "Usar· otra vez.", "outside");
         elements.put("outsidePG", outsidePieGraph);
 
         Button back = new Button(parent,
                 new Rectangle(widthUnitSize * 2f, heightUnitSize * 13.5f, widthUnitSize * 3, heightUnitSize),
-                3, "Volver atr√°s", true);
+                3, "Volver atr·s", true);
         back.setIcon(parent.loadImage("data/icons/back-arrow.png"));
         back.setFont(fontSmall);
         elements.put("backB", back);
