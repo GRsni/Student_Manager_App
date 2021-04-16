@@ -24,7 +24,7 @@ public class AppLogger {
             logFile = new FileHandler("Log.txt", true);
 
         } catch (IOException e) {
-            System.err.println("[Error creating log files]");
+            //If the logger fails, reload the app
         }
         LoggerFormatter formatter = new LoggerFormatter();
         logFile.setFormatter(formatter);
