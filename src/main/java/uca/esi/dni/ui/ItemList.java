@@ -100,6 +100,7 @@ public class ItemList extends BaseElement {
         renderContainer();
         title.display();
         renderItems();
+        renderScrollBar();
     }
 
     private void renderContainer() {
@@ -134,6 +135,38 @@ public class ItemList extends BaseElement {
         textField.setBackgroundColor(View.COLORS.ACCENT);
         textField.setFont(font);
         return textField;
+    }
+
+    private void renderScrollBar() {
+        parent.push();
+        parent.fill(View.COLORS.ACCENT_DARK);
+        parent.noStroke();
+        parent.rect(pos.x + w * 0.9f, pos.y, w * 0.1f, h);
+        if (items.size() > visibleItems) {
+            renderScroll(pos.x + w * .95f, w * 0.1f);
+        }
+        parent.pop();
+    }
+
+    private void renderScroll(float xCenterPos, float scrollBarWidth) {
+        parent.push();
+        parent.fill(View.COLORS.BLACK);
+        parent.rectMode(PConstants.CORNER);
+        float scrollWidth = scrollBarWidth * 0.75f;
+        float scrollHeight = getScrollHeight();
+        System.out.println(scrollHeight);
+        float scrollYOffset = getScrollYOffset(scrollHeight);
+        parent.rect(xCenterPos - scrollWidth * 0.25f, pos.y + scrollYOffset, scrollWidth * 0.5f, scrollHeight, scrollWidth / 2);
+        parent.pop();
+    }
+
+    private float getScrollHeight() {
+        int itemsHidden = items.size() - visibleItems;
+        return Math.max(20, (h - 20) / itemsHidden);
+    }
+
+    private float getScrollYOffset(float scrollHeight) {
+        return PApplet.map(scrollIndex, 0, maxScroll, 10, h - scrollHeight - 10);
     }
 
     private int calculateNumberOfVisibleItems() {

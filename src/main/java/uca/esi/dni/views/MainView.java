@@ -51,7 +51,7 @@ public class MainView extends View {
 
         Button generateStatsButton = new Button(parent,
                 new Rectangle(widthUnitSize, heightUnitSize * 11f, widthUnitSize * 6, heightUnitSize * 3),
-                6, "Generar estadísticas", true);
+                6, "Generar estadÃ­sticas", true);
         generateStatsButton.setIcon(parent.loadImage("data/icons/statistics.png"));
         generateStatsButton.setFont(fontBig);
         generateStatsButton.setFontSize(30);

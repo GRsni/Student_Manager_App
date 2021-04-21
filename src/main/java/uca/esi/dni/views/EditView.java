@@ -52,14 +52,14 @@ public class EditView extends View {
 
         Button back = new Button(parent,
                 new Rectangle(widthUnitSize, heightUnitSize * 13f, widthUnitSize * 2, heightUnitSize),
-                3, "Volver atr·s", true);
+                3, "Volver atr√°s", true);
         back.setIcon(parent.loadImage("data/icons/back-arrow.png"));
         back.setFont(fontSmall);
         elements.put("backB", back);
 
         Button addToList = new Button(parent,
                 new Rectangle(widthUnitSize * 7f, heightUnitSize * 2f, widthUnitSize * 2, heightUnitSize),
-                3, "AÒadir a base de datos", true);
+                3, "A√±adir a base de datos", true);
         addToList.setIcon(parent.loadImage("data/icons/add-to-list.png"));
         addToList.setFont(fontSmall);
         elements.put("addToListB", addToList);
