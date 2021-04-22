@@ -154,7 +154,6 @@ public class ItemList extends BaseElement {
         parent.rectMode(PConstants.CORNER);
         float scrollWidth = scrollBarWidth * 0.75f;
         float scrollHeight = getScrollHeight();
-        System.out.println(scrollHeight);
         float scrollYOffset = getScrollYOffset(scrollHeight);
         parent.rect(xCenterPos - scrollWidth * 0.25f, pos.y + scrollYOffset, scrollWidth * 0.5f, scrollHeight, scrollWidth / 2);
         parent.pop();
