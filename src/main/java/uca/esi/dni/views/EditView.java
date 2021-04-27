@@ -51,7 +51,7 @@ public class EditView extends View {
         elements.put("selectFileB", selectFile);
 
         Button back = new Button(parent,
-                new Rectangle(widthUnitSize, heightUnitSize * 13f, widthUnitSize * 2, heightUnitSize),
+                new Rectangle(widthUnitSize, heightUnitSize * 13.5f, widthUnitSize * 2, heightUnitSize),
                 3, "Volver atrás", true);
         back.setIcon(parent.loadImage("data/icons/back-arrow.png"));
         back.setFont(fontSmall);
@@ -124,7 +124,6 @@ public class EditView extends View {
         inputFile.setCuttable(true);
         elements.put("inputFileTF", inputFile);
 
-
         ItemList auxStudentsItemList = new ItemList(parent,
                 new Rectangle(widthUnitSize * 7f, heightUnitSize * 4f, widthUnitSize * 3, heightUnitSize * 10),
                 "Lista previa");
@@ -137,7 +136,8 @@ public class EditView extends View {
                 "Alumnos en BD");
         dbStudentsItemList.setFont(fontSmall);
         dbStudentsItemList.setTitleFont(fontBig);
-        elements.put("dbStudentIL", dbStudentsItemList);
+        elements.put("dbStudentsIL", dbStudentsItemList);
+
 
         PImage modal = parent.loadImage("data/background/modal.png");
         ModalCard modalCard = new ModalCard(parent, new Rectangle(0, 0, widthUnitSize * 16, heightUnitSize * 16), modal);
@@ -179,7 +179,7 @@ public class EditView extends View {
         auxItemList.getContentList().clear();
         auxItemList.addList(auxStrings);
 
-        ItemList dbItemList = (ItemList) elements.get("dbStudentIL");
+        ItemList dbItemList = (ItemList) elements.get("dbStudentsIL");
         Set<String> dbStrings = Util.studentSetToStringSet(dbList);
         dbItemList.getContentList().clear();
         dbItemList.addList(dbStrings);

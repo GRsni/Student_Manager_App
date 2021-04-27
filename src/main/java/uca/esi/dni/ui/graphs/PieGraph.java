@@ -4,6 +4,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.labels.PieSectionLabelGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.Dataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import processing.core.PApplet;
@@ -16,13 +17,14 @@ import java.awt.*;
 import java.util.List;
 
 public class PieGraph extends Graph {
+
     private final String field;
 
     public PieGraph(PApplet parent, Rectangle rectangle, String charTitle, String field) {
         super(parent, rectangle);
         this.chart = ChartFactory.createPieChart(
                 charTitle,
-                createEmptyPieDataSet(),
+                new DefaultPieDataset(),
                 false, true, false);
         setupChart();
         this.chartImage = new PImage(chart.createBufferedImage(w, h));
@@ -38,7 +40,7 @@ public class PieGraph extends Graph {
 
     @Override
     public void updateData(List<Survey> surveyList) {
-        ((PiePlot) this.chart.getPlot()).setDataset(createPieDataset(surveyList, field));
+        ((PiePlot) this.chart.getPlot()).setDataset((PieDataset) createDataset(surveyList));
         this.chartImage = new PImage(this.chart.createBufferedImage(w, h));
     }
 
@@ -46,7 +48,8 @@ public class PieGraph extends Graph {
         return new StandardPieSectionLabelGenerator("{0} ({2})");
     }
 
-    private PieDataset createPieDataset(List<Survey> surveyList, String field) {
+    @Override
+    protected Dataset createDataset(List<Survey> surveyList) {
         final DefaultPieDataset dataset = new DefaultPieDataset();
         int[] results = getCombinedData(surveyList, field);
 

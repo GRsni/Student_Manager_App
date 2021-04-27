@@ -4,6 +4,7 @@ package uca.esi.dni.file;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import okhttp3.*;
+import uca.esi.dni.types.DatabaseResponseException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,41 +46,45 @@ public class DatabaseHandler {
         return token.getTokenValue();
     }
 
-    public List<String> getDataFromDB(String url) throws IOException, NullPointerException {
+    public String getDataFromDB(String url) throws IOException, NullPointerException, DatabaseResponseException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
-        return callAndParseResponse(request);
+        List<String> response = sendRequest(request);
+        return parseResponse(response);
     }
 
-    public List<String> putDataToDB(String url, String jsonString) throws IOException, NullPointerException {
+    public String putDataToDB(String url, String jsonString) throws IOException, NullPointerException, DatabaseResponseException {
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .put(body)
                 .build();
-        return callAndParseResponse(request);
+        List<String> response = sendRequest(request);
+        return parseResponse(response);
     }
 
-    public List<String> updateData(String url, String jsonString) throws IOException, NullPointerException {
+    public String updateData(String url, String jsonString) throws IOException, NullPointerException, DatabaseResponseException {
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .patch(body)
                 .build();
-        return callAndParseResponse(request);
+        List<String> response = sendRequest(request);
+        return parseResponse(response);
     }
 
-    public List<String> emptyDB(String url) throws IOException, NullPointerException {
+    public String deleteData(String url) throws IOException, NullPointerException, DatabaseResponseException {
         Request request = new Request.Builder()
                 .url(url)
                 .delete()
                 .build();
-        return callAndParseResponse(request);
+        List<String> response = sendRequest(request);
+        return parseResponse(response);
     }
 
-    private ArrayList<String> callAndParseResponse(Request request) throws IOException {
-        ArrayList<String> responseStrings = new ArrayList<>();
+    private List<String> sendRequest(Request request) throws IOException {
+        List<String> responseStrings = new ArrayList<>();
         try (Response response = client.newCall(request).execute()) {
             responseStrings.add(Integer.toString(response.code()));
             responseStrings.add(Objects.requireNonNull(response.body()).string());
@@ -87,4 +92,11 @@ public class DatabaseHandler {
         return responseStrings;
     }
 
+    private String parseResponse(List<String> response) throws DatabaseResponseException {
+        if (response.get(0).equals("200")) {
+            return response.get(1);
+        } else {
+            throw new DatabaseResponseException("Failed request: " + response.get(0));
+        }
+    }
 }

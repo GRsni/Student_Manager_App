@@ -1,10 +1,7 @@
 package uca.esi.dni.ui.graphs;
 
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.general.PieDataset;
+import org.jfree.data.general.Dataset;
 import processing.core.PApplet;
 import processing.core.PImage;
 import uca.esi.dni.types.Survey;
@@ -25,13 +22,7 @@ public abstract class Graph extends BaseElement {
 
     public abstract void updateData(List<Survey> surveyList);
 
-    protected CategoryDataset createEmptyCategoryDataSet() {
-        return new DefaultCategoryDataset();
-    }
-
-    protected PieDataset createEmptyPieDataSet() {
-        return new DefaultPieDataset();
-    }
+    protected abstract Dataset createDataset(List<Survey> surveyList);
 
     @Override
     public void display() {

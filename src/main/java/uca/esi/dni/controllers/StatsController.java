@@ -7,6 +7,7 @@ import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.Util;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
+import uca.esi.dni.types.DatabaseResponseException;
 import uca.esi.dni.types.JSONParsingException;
 import uca.esi.dni.types.Survey;
 import uca.esi.dni.ui.Warning;
@@ -85,18 +86,17 @@ public class StatsController extends Controller {
         Runnable runnable = () -> {
             try {
                 String surveysURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Surveys");
-                List<String> responseSurveys = dbHandler.getDataFromDB(surveysURL);
-                if (responseSurveys.get(0).equals("200")) {
-                    JSONObject surveysJSONObject = Util.parseJSONObject(responseSurveys.get(1));
-                    List<Survey> surveyList = Util.generateSurveyListFromJSONObject(surveysJSONObject);
-                    model.getStudentSurveys().clear();
-                    model.addSurveyList(surveyList);
-                    addWarning("Cargados datos de encuestas.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
-                    String toLog = "[Cargados datos de encuestas]: " + surveyList.size();
-                    LOGGER.info(toLog);
-                    controllerLogic();
-                }
-            } catch (IOException e) {
+                String responseSurveys = dbHandler.getDataFromDB(surveysURL);
+                JSONObject surveysJSONObject = Util.parseJSONObject(responseSurveys);
+                List<Survey> surveyList = Util.generateSurveyListFromJSONObject(surveysJSONObject);
+                model.getStudentSurveys().clear();
+                model.addSurveyList(surveyList);
+                addWarning("Cargados datos de encuestas.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
+                String toLog = "[Cargados datos de encuestas]: " + surveyList.size();
+                LOGGER.info(toLog);
+                controllerLogic();
+
+            } catch (IOException | DatabaseResponseException e) {
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
                 addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
             } catch (JSONParsingException e) {

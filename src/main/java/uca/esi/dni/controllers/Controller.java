@@ -9,6 +9,7 @@ import uca.esi.dni.file.EmailHandler;
 import uca.esi.dni.file.Util;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
+import uca.esi.dni.types.DatabaseResponseException;
 import uca.esi.dni.types.Student;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.Warning;
@@ -19,7 +20,6 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -142,21 +142,20 @@ public abstract class Controller {
         Runnable runnable = () -> {
             try {
                 String idsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                List<String> responseIDs = dbHandler.getDataFromDB(idsURL);
+                String responseIDs = dbHandler.getDataFromDB(idsURL);
 
                 String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Emails");
-                List<String> responseEmails = dbHandler.getDataFromDB(emailsURL);
+                String responseEmails = dbHandler.getDataFromDB(emailsURL);
 
-                if (responseIDs.get(0).equals("200") && responseEmails.get(0).equals("200")) {
-                    Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
-                    model.getDbStudents().clear();
-                    model.addDBStudentList(studentsInDB);
-                    addWarning("Cargados datos de la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
-                    controllerLogic();
-                    String toLog = "[General information]: Loaded " + studentsInDB.size() + " students from DB.";
-                    LOGGER.info(toLog);
-                }
-            } catch (IOException | NullPointerException e) {
+                Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
+                model.getDbStudents().clear();
+                model.addDBStudentList(studentsInDB);
+                addWarning("Cargados datos de la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
+                controllerLogic();
+                String toLog = "[General information]: Loaded " + studentsInDB.size() + " students from DB.";
+                LOGGER.info(toLog);
+
+            } catch (IOException | NullPointerException | DatabaseResponseException e) {
                 LOGGER.warning("[Error loading data from DB]: " + e.getMessage());
                 addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             } catch (RuntimeException e) {
@@ -171,9 +170,9 @@ public abstract class Controller {
     }
 
     @NotNull
-    private Set<Student> generateStudentSetFromDB(List<String> responseIDs, List<String> responseEmails) {
-        JSONObject studentKeys = Util.parseJSONObject(responseIDs.get(1));
-        JSONObject studentEmails = Util.parseJSONObject(responseEmails.get((1)));
+    private Set<Student> generateStudentSetFromDB(String responseIDs, String responseEmails) {
+        JSONObject studentKeys = Util.parseJSONObject(responseIDs);
+        JSONObject studentEmails = Util.parseJSONObject(responseEmails);
         return Util.generateStudentListFromJSONObject(studentKeys, studentEmails);
     }
 

@@ -167,10 +167,20 @@ public class Util {
         for (Map.Entry<String, JSONObject> entry : urlContentsMap.entrySet()) {
             List<String> secondLevelKeys = getJSONObjectKeys(urlContentsMap.get(entry.getKey()));
             for (String key : secondLevelKeys) {
-                multipath.put(entry.getKey() + "/" + key, entry.getValue().getString(key));
+                multipath.put(entry.getKey() + "/" + key, getStringValueInJSONObject(entry.getValue(), key));
             }
         }
         return multipath.toString();
+    }
+
+    private static Object getStringValueInJSONObject(JSONObject jsonObject, String key) {
+        if (jsonObject == null || jsonObject.size() == 0) {
+            return null;
+        } else if (jsonObject.isNull(key)) {
+            return JSONObject.NULL;
+        } else {
+            return jsonObject.getString(key);
+        }
     }
 
     public static JSONObject getStudentAttributeJSONObject(Set<Student> students, String attribute) {

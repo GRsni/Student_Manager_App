@@ -35,7 +35,7 @@ public class MainView extends View {
 
         Button editButton = new Button(parent,
                 new Rectangle(widthUnitSize, heightUnitSize * 2f, widthUnitSize * 6, heightUnitSize * 3),
-                6, "Editar Lista", true);
+                6, "Editar lista de alumnos", true);
         editButton.setIcon(parent.loadImage("data/icons/edit-list.png"));
         editButton.setFont(fontBig);
         editButton.setFontSize(10);

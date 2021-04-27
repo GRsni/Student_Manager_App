@@ -8,6 +8,7 @@ import uca.esi.dni.file.DatabaseHandler;
 import uca.esi.dni.file.Util;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
+import uca.esi.dni.types.DatabaseResponseException;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.ItemList;
 import uca.esi.dni.ui.Warning;
@@ -15,7 +16,6 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -104,21 +104,23 @@ public class MainController extends Controller {
         if (model.getDBReference() != null && model.getOutputFolder().exists()) {
             try {
                 String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
-                List<String> response = dbHandler.getDataFromDB(usersURL);
-                if (response.get(0).equals("200")) {
-                    JSONObject studentData = Util.parseJSONObject(response.get(1));
-                    Map<String, Map<String, Table>> tableMap = Util.createStudentsDataTables(studentData);
-                    if (model.getOutputFolder() != null) {
-                        saveLabTables(tableMap, model.getOutputFolder());
-                        addWarning("Generados archivos de alumnos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
-                    }
+                String response = dbHandler.getDataFromDB(usersURL);
+                JSONObject studentData = Util.parseJSONObject(response);
+                Map<String, Map<String, Table>> tableMap = Util.createStudentsDataTables(studentData);
+                if (model.getOutputFolder() != null) {
+                    saveLabTables(tableMap, model.getOutputFolder());
+                    addWarning("Generados archivos de alumnos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
                 }
+
             } catch (IOException e) {
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
                 addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             } catch (RuntimeException e) {
                 LOGGER.severe("[NullPointerException when generating the CSV files]: " + e.getMessage());
                 addWarning("Error generando los archivos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
+            } catch (DatabaseResponseException e) {
+                LOGGER.warning("[Error while getting data from the DB]: " + e.getMessage());
+                addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             }
         }
     }
