@@ -34,7 +34,7 @@ public class PieGraph extends Graph {
     @Override
     protected void setupChart() {
         chart.setBackgroundPaint(new Color(255, 255, 255, 0));
-        chart.getPlot().setBackgroundPaint(new Color(View.COLORS.ACCENT));
+        chart.getPlot().setBackgroundPaint(new Color(View.COLORS.ACCENT_LIGHT));
         ((PiePlot) this.chart.getPlot()).setLabelGenerator(getLabelGenerator());
     }
 

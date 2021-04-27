@@ -85,8 +85,8 @@ public class LikertBarGraph extends Graph {
     @Override
     protected void setupChart() {
         chart.setBackgroundPaint(new Color(255, 255, 255, 0));
-        chart.getPlot().setBackgroundPaint(new Color(View.COLORS.ACCENT));
-        chart.getLegend().setBackgroundPaint(new Color(View.COLORS.ACCENT));
+        chart.getPlot().setBackgroundPaint(new Color(View.COLORS.ACCENT_LIGHT));
+        chart.getLegend().setBackgroundPaint(new Color(View.COLORS.ACCENT_LIGHT));
         chart.getCategoryPlot().setRenderer(getBarRenderer());
         chart.getCategoryPlot().getDomainAxis().setMaximumCategoryLabelLines(2);
         chart.getCategoryPlot().getRangeAxis().setStandardTickUnits(NumberAxis.createIntegerTickUnits());

@@ -31,7 +31,7 @@ public class StatsView extends View {
     @Override
     protected void createElements() {
         LikertBarGraph likertBarGraph = new LikertBarGraph(parent,
-                new Rectangle(widthUnitSize * 0.5f, heightUnitSize * 1.5f, widthUnitSize * 10, heightUnitSize * 19 / 2),
+                new Rectangle(widthUnitSize * 0.5f, heightUnitSize * 1.5f, widthUnitSize * 10, heightUnitSize * 10),
                 "Valoraciones", "Categorías", "Votos");
         elements.put("likertBG", likertBarGraph);
 

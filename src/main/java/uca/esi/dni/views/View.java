@@ -144,6 +144,7 @@ public abstract class View {
         public static final int SECONDARY_DARK = 0xff9a7519;
         public static final int ACCENT_DARK = 0xffaaaaaa;
         public static final int ACCENT = 0xffcccccc;
+        public static final int ACCENT_LIGHT = 0xffdddddd;
         public static final int WHITE = 0xffffffff;
         public static final int BLACK = 0xff000000;
         public static final int RED = 0xffdd0000;
