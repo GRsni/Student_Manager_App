@@ -105,13 +105,13 @@ public class EditView extends View {
         elements.put("emailTF", emailTF);
 
         TextField auxStudentsCounter = new TextField(parent,
-                new Rectangle(widthUnitSize * 7f, heightUnitSize * 14f, widthUnitSize * 2, heightUnitSize),
-                "Alumnos en lista actual: 0", "");
+                new Rectangle(widthUnitSize * 7f, heightUnitSize * 14f, widthUnitSize * 3, heightUnitSize),
+                "Alumnos en lista temporal: 0", "");
         auxStudentsCounter.setFont(fontSmall);
         elements.put("auxStudentsTF", auxStudentsCounter);
 
         TextField dbStudentsCounter = new TextField(parent,
-                new Rectangle(widthUnitSize * 12f, heightUnitSize * 14f, widthUnitSize * 2, heightUnitSize),
+                new Rectangle(widthUnitSize * 12f, heightUnitSize * 14f, widthUnitSize * 3, heightUnitSize),
                 "Alumnos en BD: 0", "");
         dbStudentsCounter.setFont(fontSmall);
         elements.put("dbStudentsTF", dbStudentsCounter);
@@ -126,7 +126,7 @@ public class EditView extends View {
 
         ItemList auxStudentsItemList = new ItemList(parent,
                 new Rectangle(widthUnitSize * 7f, heightUnitSize * 4f, widthUnitSize * 3, heightUnitSize * 10),
-                "Lista previa");
+                "Lista temporal");
         auxStudentsItemList.setFont(fontSmall);
         auxStudentsItemList.setTitleFont(fontBig);
         elements.put("auxStudentsIL", auxStudentsItemList);

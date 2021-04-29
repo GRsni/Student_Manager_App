@@ -62,7 +62,7 @@ public class PieGraph extends Graph {
     private int[] getCombinedData(List<Survey> surveyList, String field) {
         int[] combined = new int[2];
         for (Survey survey : surveyList) {
-            if (survey.getValue(field)) {
+            if (survey.getYesNoAnswer(field)) {
                 combined[0]++;
             } else {
                 combined[1]++;

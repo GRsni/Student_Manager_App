@@ -16,7 +16,8 @@ public class Survey {
         EASE_OF_USE,
         LEARNING_HELP,
         GRASP,
-        UI_LIKING;
+        UI_LIKING,
+        UX_FEEL;
 
         @Override
         public String toString() {
@@ -29,6 +30,8 @@ public class Survey {
                     return "Entendimiento de la aplicación.";
                 case UI_LIKING:
                     return "Interfaz de usuario.";
+                case UX_FEEL:
+                    return "Experiencia de usuario.";
                 default:
                     return "";
 
@@ -66,7 +69,7 @@ public class Survey {
         return useOutside;
     }
 
-    public boolean getValue(String field) {
+    public boolean getYesNoAnswer(String field) {
         switch (field) {
             case "like":
                 return likeTheApp;
@@ -89,6 +92,8 @@ public class Survey {
                 return likert[2];
             case UI_LIKING:
                 return likert[3];
+            case UX_FEEL:
+                return likert[4];
             default:
                 return 0;
         }
