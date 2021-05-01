@@ -1,12 +1,12 @@
 package uca.esi.dni.views;
 
 import processing.core.PApplet;
-import uca.esi.dni.file.Util;
+import uca.esi.dni.handlers.Util;
 import uca.esi.dni.types.Student;
 import uca.esi.dni.types.Survey;
+import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.Button;
 import uca.esi.dni.ui.ItemList;
-import uca.esi.dni.ui.Rectangle;
 import uca.esi.dni.ui.TextField;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class MainView extends View {
     protected void createElements() {
 
         Button editButton = new Button(parent,
-                new Rectangle(widthUnitSize, heightUnitSize * 2f, widthUnitSize * 6, heightUnitSize * 3),
+                new BaseElement.Rectangle(widthUnitSize, heightUnitSize * 2f, widthUnitSize * 6, heightUnitSize * 3),
                 6, "Editar lista de alumnos", true);
         editButton.setIcon(parent.loadImage("data/icons/edit-list.png"));
         editButton.setFont(fontBig);
@@ -42,7 +42,7 @@ public class MainView extends View {
         elements.put("editB", editButton);
 
         Button generateFilesButton = new Button(parent,
-                new Rectangle(widthUnitSize, heightUnitSize * 6.5f, widthUnitSize * 6, heightUnitSize * 3),
+                new BaseElement.Rectangle(widthUnitSize, heightUnitSize * 6.5f, widthUnitSize * 6, heightUnitSize * 3),
                 6, "Generar archivos Excel", true);
         generateFilesButton.setIcon(parent.loadImage("data/icons/excel.png"));
         generateFilesButton.setFont(fontBig);
@@ -50,7 +50,7 @@ public class MainView extends View {
         elements.put("generateFilesB", generateFilesButton);
 
         Button generateStatsButton = new Button(parent,
-                new Rectangle(widthUnitSize, heightUnitSize * 11f, widthUnitSize * 6, heightUnitSize * 3),
+                new BaseElement.Rectangle(widthUnitSize, heightUnitSize * 11f, widthUnitSize * 6, heightUnitSize * 3),
                 6, "Generar estadísticas", true);
         generateStatsButton.setIcon(parent.loadImage("data/icons/statistics.png"));
         generateStatsButton.setFont(fontBig);
@@ -58,7 +58,7 @@ public class MainView extends View {
         elements.put("generateStatsB", generateStatsButton);
 
         TextField dbStudentsCounter = new TextField(parent,
-                new Rectangle(widthUnitSize * 13f, heightUnitSize * 14f, widthUnitSize * 2, heightUnitSize),
+                new BaseElement.Rectangle(widthUnitSize * 13f, heightUnitSize * 14f, widthUnitSize * 2, heightUnitSize),
                 "Alumnos en BD: 0", "");
         dbStudentsCounter.setFont(fontSmall);
         dbStudentsCounter.setFontSize(10);
@@ -66,7 +66,7 @@ public class MainView extends View {
 
 
         ItemList dbStudentsItemList = new ItemList(parent,
-                new Rectangle(widthUnitSize * 12f, heightUnitSize * 2f, widthUnitSize * 3, heightUnitSize * 12),
+                new BaseElement.Rectangle(widthUnitSize * 12f, heightUnitSize * 2f, widthUnitSize * 3, heightUnitSize * 12),
                 "Alumnos en BD");
         dbStudentsItemList.setFont(fontSmall);
         dbStudentsItemList.setFontSize(10);

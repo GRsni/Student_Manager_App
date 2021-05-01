@@ -3,8 +3,8 @@ package uca.esi.dni.controllers;
 import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.file.DatabaseHandler;
-import uca.esi.dni.file.Util;
+import uca.esi.dni.handlers.DatabaseHandler;
+import uca.esi.dni.handlers.JSONHandler;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.types.DatabaseResponseException;
@@ -15,6 +15,7 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -26,12 +27,12 @@ public class StatsController extends Controller {
 
     public StatsController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
-        asyncLoadSurveysFromDB();
+        onCreate();
     }
 
     @Override
-    public void controllerLogic() {
-        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getStudentSurveys());
+    protected void onCreate() {
+        asyncLoadSurveysFromDB();
     }
 
     @Override
@@ -86,9 +87,9 @@ public class StatsController extends Controller {
         Runnable runnable = () -> {
             try {
                 String surveysURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Surveys");
-                String responseSurveys = dbHandler.getDataFromDB(surveysURL);
-                JSONObject surveysJSONObject = Util.parseJSONObject(responseSurveys);
-                List<Survey> surveyList = Util.generateSurveyListFromJSONObject(surveysJSONObject);
+                String responseSurveys = dbHandler.getData(surveysURL);
+                JSONObject surveysJSONObject = JSONHandler.parseJSONObject(responseSurveys);
+                List<Survey> surveyList = generateSurveyListFromJSONObject(surveysJSONObject);
                 model.getStudentSurveys().clear();
                 model.addSurveyList(surveyList);
                 addWarning("Cargados datos de encuestas.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
@@ -107,5 +108,15 @@ public class StatsController extends Controller {
 
         Thread thread = new Thread(runnable);
         thread.start();
+    }
+
+    private List<Survey> generateSurveyListFromJSONObject(JSONObject surveysJSONObject)
+            throws JSONParsingException {
+        List<Survey> surveyList = new ArrayList<>();
+        List<String> keys = JSONHandler.getJSONObjectKeys(surveysJSONObject);
+        for (String surveyId : keys) {
+            surveyList.add(new Survey(surveyId, surveysJSONObject.getJSONObject(surveyId)));
+        }
+        return surveyList;
     }
 }

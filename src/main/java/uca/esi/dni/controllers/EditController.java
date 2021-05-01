@@ -6,9 +6,7 @@ import processing.data.Table;
 import processing.data.TableRow;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.file.DatabaseHandler;
-import uca.esi.dni.file.EmailHandler;
-import uca.esi.dni.file.Util;
+import uca.esi.dni.handlers.*;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.types.DatabaseResponseException;
@@ -34,12 +32,12 @@ public class EditController extends Controller {
 
     public EditController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
-        controllerLogic();
+        onCreate();
     }
 
     @Override
-    public void controllerLogic() {
-        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getStudentSurveys());
+    protected void onCreate() {
+        controllerLogic();
     }
 
     @Override
@@ -175,7 +173,7 @@ public class EditController extends Controller {
     private boolean checkValidManualStudentData(TextField idTF, TextField emailTF) {
         if (!idTF.getContent().isEmpty()) {
             if (!emailTF.getContent().isEmpty()) {
-                if (EmailHandler.isValidEmailAddress(emailTF.getContent())) {
+                if (EmailHandlerI.isValidEmailAddress(emailTF.getContent())) {
                     return true;
                 } else {
                     LOGGER.warning("[Error validating email address]: No valid address.");
@@ -208,7 +206,6 @@ public class EditController extends Controller {
     private void asyncAddStudentsToDBListButtonHook() {
         addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
-
             Set<Student> uniqueStudentSet = Util.getUniqueStudentSet(model.getTemporaryStudents(), model.getDbStudents());
             if (!uniqueStudentSet.isEmpty()) {
                 try {
@@ -217,7 +214,7 @@ public class EditController extends Controller {
                     model.setStudentDataModified(true);
                     model.getTemporaryStudents().clear();
                     savePlainStudentDataToFile(uniqueStudentSet);
-                    EmailHandler.sendSecretKeyEmails(uniqueStudentSet);
+                    emailHandler.sendSecretKeyEmails(uniqueStudentSet);
                     addWarning("Alumnos añadidos a la base de datos.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
                     String toLog = "[General information]: Added " + uniqueStudentSet.size() + " students to DB.";
                     LOGGER.info(toLog);
@@ -236,11 +233,11 @@ public class EditController extends Controller {
         thread.start();
     }
 
-    private String uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException, DatabaseResponseException {
+    private void uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException, DatabaseResponseException {
         Map<String, JSONObject> urlContentsMap = getHashKeyEmailMap(uniqueStudentSet);
-        String combined = Util.generateMultiPathJSONString(urlContentsMap);
+        String combined = JSONHandler.generateMultiPathJSONString(urlContentsMap);
         String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
-        return dbHandler.updateData(baseURL, combined);
+        dbHandler.updateData(baseURL, combined);
     }
 
     @NotNull
@@ -273,7 +270,7 @@ public class EditController extends Controller {
             try {
                 if (!coincidentStudentSet.isEmpty()) {
                     Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersNullListMap(coincidentStudentSet);
-                    String combined = Util.generateMultiPathJSONString(urlContentsMap);
+                    String combined = JSONHandler.generateMultiPathJSONString(urlContentsMap);
                     String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
                     dbHandler.updateData(baseURL, combined);
 
@@ -330,7 +327,7 @@ public class EditController extends Controller {
                 String baseURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference());
 
                 Map<String, JSONObject> urlContentsMap = getIDsEmailsUsersNullListMap(model.getDbStudents());
-                String combined = Util.generateMultiPathJSONString(urlContentsMap);
+                String combined = JSONHandler.generateMultiPathJSONString(urlContentsMap);
 
                 dbHandler.updateData(baseURL, combined);
                 removePlainStudentDataFromFile(model.getDbStudents());
@@ -380,7 +377,7 @@ public class EditController extends Controller {
         for (TableRow row : studentIDTable.rows()) {
             String id = row.getString(0);
             String email = row.getString("email");
-            if (EmailHandler.isValidEmailAddress(email)) {
+            if (EmailHandlerI.isValidEmailAddress(email)) {
                 try {
                     students.add(new Student(id, email));
                 } catch (NullPointerException e) {

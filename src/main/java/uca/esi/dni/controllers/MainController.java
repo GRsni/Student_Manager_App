@@ -4,8 +4,8 @@ import processing.data.JSONObject;
 import processing.data.Table;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.file.DatabaseHandler;
-import uca.esi.dni.file.Util;
+import uca.esi.dni.handlers.DatabaseHandler;
+import uca.esi.dni.handlers.JSONHandler;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.types.DatabaseResponseException;
@@ -16,6 +16,8 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -29,21 +31,15 @@ public class MainController extends Controller {
     public MainController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
 
-        initModelState();
+        onCreate();
     }
 
-    private void initModelState() {
-        model.setSettingsObject(Util.loadJSONObject(DniParser.SETTINGS_FILEPATH));
-        model.setDBReference(model.getSettingsObject().getString("databaseURL"));
+    @Override
+    protected void onCreate() {
         if (model.getDbStudents().isEmpty() && !model.isDataFirstLoaded()) {
             asyncLoadStudentDataFromDB();
             model.setDataFirstLoaded(true);
         }
-    }
-
-    @Override
-    public void controllerLogic() {
-        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getStudentSurveys());
     }
 
     @Override
@@ -104,9 +100,9 @@ public class MainController extends Controller {
         if (model.getDBReference() != null && model.getOutputFolder().exists()) {
             try {
                 String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
-                String response = dbHandler.getDataFromDB(usersURL);
-                JSONObject studentData = Util.parseJSONObject(response);
-                Map<String, Map<String, Table>> tableMap = Util.createStudentsDataTables(studentData);
+                String response = dbHandler.getData(usersURL);
+                JSONObject studentData = JSONHandler.parseJSONObject(response);
+                Map<String, Map<String, Table>> tableMap = createStudentsDataTables(studentData);
                 if (model.getOutputFolder() != null) {
                     saveLabTables(tableMap, model.getOutputFolder());
                     addWarning("Generados archivos de alumnos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
@@ -123,6 +119,29 @@ public class MainController extends Controller {
                 addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             }
         }
+    }
+
+    private Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) throws NullPointerException {
+        Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
+        List<String> ids = JSONHandler.getJSONObjectKeys(allStudentsList);
+        for (String id : ids) {
+            Map<String, Table> tableMap = new HashMap<>();
+            JSONObject studentData = allStudentsList.getJSONObject(id);
+
+            JSONObject labs = studentData.getJSONObject("practicas");
+            if (labs != null) {
+                List<String> labTypes = JSONHandler.getJSONObjectKeys(labs);
+                for (String labType : labTypes) {
+                    JSONObject labRun = labs.getJSONObject(labType);
+                    if (labRun != null) {
+                        Table dataTable = JSONHandler.parseJSONDataIntoTable(labRun);
+                        tableMap.put(labType, dataTable);
+                    }
+                }
+                studentTableMap.put(id, tableMap);
+            }
+        }
+        return studentTableMap;
     }
 
     private void saveLabTables(Map<String, Map<String, Table>> studentLabsMap, File route) {

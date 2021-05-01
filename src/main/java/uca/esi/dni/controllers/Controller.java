@@ -4,12 +4,11 @@ import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
-import uca.esi.dni.file.DatabaseHandler;
-import uca.esi.dni.file.EmailHandler;
-import uca.esi.dni.file.Util;
+import uca.esi.dni.handlers.*;
 import uca.esi.dni.main.DniParser;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.types.DatabaseResponseException;
+import uca.esi.dni.types.JSONParsingException;
 import uca.esi.dni.types.Student;
 import uca.esi.dni.ui.BaseElement;
 import uca.esi.dni.ui.Warning;
@@ -20,6 +19,8 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -32,7 +33,8 @@ public abstract class Controller {
         STATS
     }
 
-    protected static final DatabaseHandler dbHandler = new DatabaseHandler();
+    protected static final DatabaseHandlerI dbHandler = new DatabaseHandler();
+    protected static final EmailHandlerI emailHandler = new EmailHandler();
     protected final AppModel model;
     protected final View view;
     protected final DniParser parent;
@@ -44,8 +46,11 @@ public abstract class Controller {
         this.parent = parent;
         this.model = model;
         this.view = view;
-        EmailHandler.loadSettings();
+        emailHandler.loadSettings(model.getSettingsObject());
+
     }
+
+    protected abstract void onCreate();
 
     public boolean isClosedContextMenu() {
         return closedContextMenu;
@@ -55,14 +60,15 @@ public abstract class Controller {
         this.closedContextMenu = closedContextMenu;
     }
 
-    public abstract void controllerLogic();
+    public void controllerLogic() {
+        view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getStudentSurveys());
+    }
 
     public abstract void handleMouseEvent(MouseEvent e);
 
     public abstract void handleKeyEvent(KeyEvent e);
 
-    public void onContextMenuClosed(File file) {
-    }
+    public abstract void onContextMenuClosed(File file);
 
     public void addWarning(String contentString, Warning.DURATION duration, Warning.TYPE type) {
         view.getWarnings().add(View.generateWarning(parent, contentString, duration, type));
@@ -142,10 +148,10 @@ public abstract class Controller {
         Runnable runnable = () -> {
             try {
                 String idsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Ids");
-                String responseIDs = dbHandler.getDataFromDB(idsURL);
+                String responseIDs = dbHandler.getData(idsURL);
 
                 String emailsURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Emails");
-                String responseEmails = dbHandler.getDataFromDB(emailsURL);
+                String responseEmails = dbHandler.getData(emailsURL);
 
                 Set<Student> studentsInDB = generateStudentSetFromDB(responseIDs, responseEmails);
                 model.getDbStudents().clear();
@@ -171,13 +177,35 @@ public abstract class Controller {
 
     @NotNull
     private Set<Student> generateStudentSetFromDB(String responseIDs, String responseEmails) {
-        JSONObject studentKeys = Util.parseJSONObject(responseIDs);
-        JSONObject studentEmails = Util.parseJSONObject(responseEmails);
-        return Util.generateStudentListFromJSONObject(studentKeys, studentEmails);
+        JSONObject studentKeys = JSONHandler.parseJSONObject(responseIDs);
+        JSONObject studentEmails = JSONHandler.parseJSONObject(responseEmails);
+        return generateStudentListFromJSONObject(studentKeys, studentEmails);
+    }
+
+    private Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws
+            JSONParsingException {
+        Set<Student> students = new HashSet<>();
+        List<String> ids = JSONHandler.getJSONObjectKeys(emails);
+        for (String id : ids) {
+            try {
+                Student student = new Student(id, emails.getString(id), hashKeys.getString(id));
+                students.add(student);
+            } catch (RuntimeException e) {
+                throw new JSONParsingException(e.getMessage());
+            }
+        }
+        return students;
     }
 
     private void loadInitialState() {
         parent.getCurrentController().controllerLogic();
     }
 
+    public void onAppClosing() {
+        addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
+        if (model.isStudentDataModified() && !model.getDbStudents().isEmpty()) {
+            emailHandler.sendBackupEmail(DniParser.DATA_BACKUP_FILEPATH);
+        }
+        LOGGER.info("[General information]: Closing app");
+    }
 }

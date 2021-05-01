@@ -19,6 +19,22 @@ public abstract class BaseElement {
     protected PFont font;
     protected int fontSize = 10;
 
+    public static class Rectangle {
+        public final float x;
+        public final float y;
+        public final int w;
+        public final int h;
+
+        public Rectangle(float x, float y, int w, int h) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+        }
+
+    }
+
+
     protected BaseElement(PApplet parent, Rectangle rectangle) {
         this.parent = parent;
         this.pos = new PVector(rectangle.x, rectangle.y);

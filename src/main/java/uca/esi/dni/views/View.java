@@ -6,7 +6,6 @@ import processing.core.PImage;
 import uca.esi.dni.types.Student;
 import uca.esi.dni.types.Survey;
 import uca.esi.dni.ui.BaseElement;
-import uca.esi.dni.ui.Rectangle;
 import uca.esi.dni.ui.Warning;
 
 import java.io.File;
@@ -101,7 +100,7 @@ public abstract class View {
     }
 
     public static Warning generateWarning(PApplet parent, String contentString, Warning.DURATION duration, Warning.TYPE type) {
-        Warning warning = new Warning(parent, new Rectangle(widthUnitSize * 9f, heightUnitSize * 0.5f, widthUnitSize * 6, heightUnitSize),
+        Warning warning = new Warning(parent, new BaseElement.Rectangle(widthUnitSize * 9f, heightUnitSize * 0.5f, widthUnitSize * 6, heightUnitSize),
                 contentString, duration, type);
         warning.setFont(fontBig);
         warning.setFontSize(10);

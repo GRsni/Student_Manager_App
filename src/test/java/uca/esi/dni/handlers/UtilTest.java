@@ -1,25 +1,15 @@
-package uca.esi.dni.file;
+package uca.esi.dni.handlers;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import processing.core.PApplet;
-import processing.data.JSONObject;
 import uca.esi.dni.types.Student;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 class UtilTest {
-
-    private static PApplet mockedPApplet;
-
-    @BeforeAll
-    public static void initMockPApplet() {
-        mockedPApplet = mock(PApplet.class);
-    }
 
     @Test
     @DisplayName("ExtractID should return an ID from a String with a valid ID")
@@ -142,91 +132,7 @@ class UtilTest {
     }
 
     @Test
-    @DisplayName("loadJSONObject should return an empty JSONObject when no input file is given")
-    void givenAnEmptyInputFilepathReturnAnEmptyJSONObject() {
-        assertEquals(0, Util.loadJSONObject("").size(),
-                "JSONObject should be empty");
-    }
-
-    @Test
-    @DisplayName("loadJSONObject should return an empty JSONObject from a null file")
-    void givenANullInputFilepathReturnAnEmptyJSONObject() {
-        assertEquals(0, Util.loadJSONObject(null).size(),
-                "JSONObject should be empty");
-    }
-
-    @Test
-    @DisplayName("loadJSONObject should return an empty JSONObject if the file extension is not .json")
-    void givenAFilepathWithAnIncorrectFileExtensionReturnAnEmptyJSONObject() {
-        String file = "data/files/jsonTestFile.txt";
-        assertEquals(0, Util.loadJSONObject(file).size(),
-                "JSONObject should be empty");
-    }
-
-    @Test
-    @DisplayName("parseJSONObject should return an empty JSONObject from an empty string")
-    void givenAnEmptyStringReturnAnEmptyJSONObject() {
-        assertEquals(0, Util.parseJSONObject("").size(),
-                "Parsed JSONObject should be empty");
-    }
-
-    @Test
-    @DisplayName("parseJSONObject should return an empty JSONObject from a null input String")
-    void givenANullInputStringReturnAnEmptyJSONObject() {
-        assertEquals(0, Util.parseJSONObject(null).size(),
-                "Parsed JSONObject should be empty");
-    }
-
-    @Test
-    @DisplayName("createStudentDataTables should return an empty map if JSONObject is empty")
-    void givenAnEmptyJSONObjectReturnAnEmptyMap() {
-        JSONObject testObject = JSONObject.parse("{}");
-        assertEquals(0, Util.createStudentsDataTables(testObject).size(),
-                "Map should be empty");
-    }
-
-    @Test
-    @DisplayName("createStudentDataTables should throw a NPE if the JSONObject is null")
-    void givenANullJSONObjectReturnAnEmptyMap() {
-        assertThrows(NullPointerException.class, () -> Util.createStudentsDataTables(null),
-                "JSONObject cannot be null in createStudentDataTables");
-    }
-
-    @Test
-    @DisplayName("createStudentDataTables should return an empty map if the JSONObject doesnt contain practicas innerJSONObjects")
-    void givenAJSONObjectWhenTheContentsDontMatchReturnAnEmptyMap() {
-        JSONObject testObject = JSONObject.parse("{ \"u11111111\":{}}");
-        assertEquals(0, Util.createStudentsDataTables(testObject).size(),
-                "Map should be empty if contents dont match");
-    }
-
-    @Test
-    @DisplayName("generateMultiPath should return an empty string if the input map is empty")
-    void givenAnEmptyMapReturnAnEmptyPathString() {
-        Map<String, JSONObject> testMap = new HashMap<>();
-        String emptyJSONString = new JSONObject().toString();
-        assertEquals(emptyJSONString, Util.generateMultiPathJSONString(testMap),
-                "String should be empty if input map is empty");
-    }
-
-    @Test
-    @DisplayName("generateMultiPath should throw a NullPointerException if the input map is null")
-    void givenANullInputMapThrowANullPointerException() {
-        assertThrows(NullPointerException.class, () -> Util.generateMultiPathJSONString(null),
-                "Input map cannot be null in generateMultiPath");
-    }
-
-    @Test
-    @DisplayName("generateMultiPath should throw and exception if the map contains null JSONObjects")
-    void givenAMapWithNullInputJSONObjectsThrowANullPointerException() {
-        Map<String, JSONObject> testMap = new HashMap<>();
-        testMap.put("test", null);
-        assertThrows(NullPointerException.class, () -> Util.generateMultiPathJSONString(testMap),
-                "Input map cannot contain null JSONObjects");
-    }
-
-    @Test
-    @DisplayName("getStundentAttributeJSONObject should return an empty JSONObject if the student set is empty")
+    @DisplayName("getStudentAttributeJSONObject should return an empty JSONObject if the student set is empty")
     void givenAnEmptyStudentSetReturnAnEmptyJSONObject() {
         Set<Student> testSet = new HashSet<>();
         assertEquals(0, Util.getStudentAttributeJSONObject(testSet, "").size(),
@@ -234,7 +140,7 @@ class UtilTest {
     }
 
     @Test
-    @DisplayName("getStudentAttributJSONObject should throw a NullPointerException if the set is null")
+    @DisplayName("getStudentAttributeJSONObject should throw a NullPointerException if the set is null")
     void givenANullStudentSetThrowANullPointerException() {
         assertThrows(NullPointerException.class, () -> Util.getStudentAttributeJSONObject(null, ""),
                 "Student set cannot be null");

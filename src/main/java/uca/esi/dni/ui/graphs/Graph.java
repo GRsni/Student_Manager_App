@@ -6,7 +6,6 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import uca.esi.dni.types.Survey;
 import uca.esi.dni.ui.BaseElement;
-import uca.esi.dni.ui.Rectangle;
 
 import java.util.List;
 

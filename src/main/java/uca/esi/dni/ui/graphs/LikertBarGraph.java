@@ -10,7 +10,6 @@ import org.jfree.data.general.Dataset;
 import processing.core.PApplet;
 import processing.core.PImage;
 import uca.esi.dni.types.Survey;
-import uca.esi.dni.ui.Rectangle;
 import uca.esi.dni.views.View;
 
 import java.awt.*;

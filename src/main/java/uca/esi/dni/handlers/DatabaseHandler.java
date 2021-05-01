@@ -1,4 +1,4 @@
-package uca.esi.dni.file;
+package uca.esi.dni.handlers;
 
 
 import com.google.auth.oauth2.AccessToken;
@@ -12,9 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class DatabaseHandler {
-    private static final MediaType JSON
-            = MediaType.parse("application/json; charset=utf-8");
+public class DatabaseHandler implements DatabaseHandlerI {
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     final OkHttpClient client = new OkHttpClient();
 
@@ -46,7 +45,7 @@ public class DatabaseHandler {
         return token.getTokenValue();
     }
 
-    public String getDataFromDB(String url) throws IOException, NullPointerException, DatabaseResponseException {
+    public String getData(String url) throws IOException, NullPointerException, DatabaseResponseException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -54,7 +53,7 @@ public class DatabaseHandler {
         return parseResponse(response);
     }
 
-    public String putDataToDB(String url, String jsonString) throws IOException, NullPointerException, DatabaseResponseException {
+    public String putData(String url, String jsonString) throws IOException, NullPointerException, DatabaseResponseException {
         RequestBody body = RequestBody.create(jsonString, JSON);
         Request request = new Request.Builder()
                 .url(url)

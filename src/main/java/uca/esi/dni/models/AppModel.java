@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AppModel implements Model {
+
     private final Set<Student> dbStudents = new HashSet<>();
     private final Set<Student> temporaryStudents = new HashSet<>();
     private final List<Survey> studentSurveys = new ArrayList<>();
@@ -20,6 +21,11 @@ public class AppModel implements Model {
     private String dbReference;
     private boolean isStudentDataModified = false;
     private boolean isDataFirstLoaded = false;
+
+    public AppModel(JSONObject settingsObject) {
+        this.settingsObject = settingsObject;
+        this.dbReference = settingsObject.getString("databaseURL");
+    }
 
     public File getInputFile() {
         return inputFile;

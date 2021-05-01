@@ -1,7 +1,7 @@
 package uca.esi.dni.types;
 
 import org.jetbrains.annotations.NotNull;
-import uca.esi.dni.file.Util;
+import uca.esi.dni.handlers.Util;
 
 import java.security.SecureRandom;
 import java.util.Random;

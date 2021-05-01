@@ -8,8 +8,8 @@ import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.controllers.Controller;
 import uca.esi.dni.controllers.MainController;
-import uca.esi.dni.file.EmailHandler;
-import uca.esi.dni.file.Util;
+import uca.esi.dni.handlers.JSONHandler;
+import uca.esi.dni.handlers.Util;
 import uca.esi.dni.logger.AppLogger;
 import uca.esi.dni.models.AppModel;
 import uca.esi.dni.ui.Warning;
@@ -75,7 +75,7 @@ public class DniParser extends PApplet {
     }
 
     private void initMVCObjects() {
-        appModel = new AppModel();
+        appModel = new AppModel(JSONHandler.loadJSONObject(SETTINGS_FILEPATH));
         initViewConstants();
         currentView = new MainView(this);
         currentController = new MainController(this, appModel, currentView);
@@ -138,7 +138,7 @@ public class DniParser extends PApplet {
 
     public void selectInputFile(File selection) {
         if (selection == null) {
-
+            currentController.onContextMenuClosed(new File(""));
             LOGGER.warning("[Error while selecting input file]: No file selected.");
             currentController.addWarning("Archivo no seleccionado.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
         } else {
@@ -169,11 +169,7 @@ public class DniParser extends PApplet {
 
     @Override
     public void exit() {
-        currentController.addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
-        if (appModel.isStudentDataModified() && !appModel.getDbStudents().isEmpty()) {
-            EmailHandler.sendBackupEmail(DATA_BACKUP_FILEPATH);
-        }
-        LOGGER.info("[General information]: Closing app");
+        currentController.onAppClosing();
         super.exit();
     }
 }
