@@ -171,21 +171,43 @@ public class EditController extends Controller {
 
 
     private boolean checkValidManualStudentData(TextField idTF, TextField emailTF) {
+        return checkUserIDTextField(idTF) && checkUserEmailTextField(emailTF);
+    }
+
+    private boolean checkUserIDTextField(TextField idTF) {
         if (!idTF.getContent().isEmpty()) {
-            if (!emailTF.getContent().isEmpty()) {
-                if (EmailHandlerI.isValidEmailAddress(emailTF.getContent())) {
-                    return true;
-                } else {
-                    LOGGER.warning("[Error validating email address]: No valid address.");
-                    addWarning("Email no válido.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
-                    return false;
-                }
-            } else {
-                return true;
-            }
+            return checkUserIDString(idTF.getContent());
         } else {
             LOGGER.warning("[Error while reading student data]:Empty ID field.");
             addWarning("Identificador no introducido.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
+            return false;
+        }
+    }
+
+    private boolean checkUserIDString(String id) {
+        if (Util.checkId(id)) {
+            return true;
+        } else {
+            LOGGER.warning("[Error validating user Id]: Wrong user ID.");
+            addWarning("Identificador no válido", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
+            return false;
+        }
+    }
+
+    private boolean checkUserEmailTextField(TextField emailTF) {
+        if (!emailTF.getContent().isEmpty()) {
+            return checkUserEmailString(emailTF.getContent());
+        } else {
+            return true;
+        }
+    }
+
+    private boolean checkUserEmailString(String email) {
+        if (EmailHandlerI.isValidEmailAddress(email)) {
+            return true;
+        } else {
+            LOGGER.warning("[Error validating email address]: No valid address.");
+            addWarning("Email no válido.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             return false;
         }
     }
@@ -300,7 +322,7 @@ public class EditController extends Controller {
         try {
             JSONObject studentBackup = parent.loadJSONObject(DniParser.DATA_BACKUP_FILEPATH);
             for (Student student : students) {
-                if (studentBackup.keys().contains(student.getId())) {
+                if (!studentBackup.isNull(student.getId())) {
                     studentBackup.remove(student.getId());
                 }
             }
@@ -374,23 +396,33 @@ public class EditController extends Controller {
     private Set<Student> generateStudentListFromTable(Table studentIDTable) {
         Set<Student> students = new HashSet<>();
         int failedEmails = 0;
+        int failedIDs = 0;
         for (TableRow row : studentIDTable.rows()) {
             String id = row.getString(0);
             String email = row.getString("email");
-            if (EmailHandlerI.isValidEmailAddress(email)) {
-                try {
-                    students.add(new Student(id, email));
-                } catch (NullPointerException e) {
-                    LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+            if (Util.checkId(id)) {
+                if (EmailHandlerI.isValidEmailAddress(email)) {
+                    try {
+                        students.add(new Student(id, email));
+                    } catch (NullPointerException e) {
+                        LOGGER.severe("[Error while trying to insert new Student into temporary list]: " + e.getMessage());
+                    }
+                } else {
+                    failedEmails++;
                 }
             } else {
-                failedEmails++;
+                failedIDs++;
             }
+        }
+        if (failedIDs > 0) {
+            addWarning("Detectados " + failedIDs + " errores con indentificadores.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
+            String toLog = "[General information]: " + failedIDs + " invalid user IDs detected.";
+            LOGGER.warning(toLog);
         }
         if (failedEmails > 0) {
             addWarning("Detectados " + failedEmails + " errores con emails.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             String toLog = "[General information]: " + failedEmails + " invalid emails detected.";
-            LOGGER.info(toLog);
+            LOGGER.warning(toLog);
         }
         return students;
     }

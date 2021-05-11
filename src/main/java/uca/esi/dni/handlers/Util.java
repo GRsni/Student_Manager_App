@@ -17,11 +17,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Util {
-    private static final Pattern idPattern = Pattern.compile("u[a-zA-Z0-9]{8}");
+    private static final Pattern idPattern = Pattern.compile("u[0-9xXyYzZ][0-9]{7}");
 
-    private Util() { }
+    private Util() {
+    }
 
-    public static String extractId(String line) {
+    public static boolean checkId(@NotNull String id) {
+        Matcher m = idPattern.matcher(id);
+        return m.matches();
+    }
+
+    public static String extractId(@NotNull String line) {
 
         Matcher m = idPattern.matcher(line);
         String match = "";

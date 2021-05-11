@@ -40,9 +40,23 @@ public class EmailHandler implements EmailHandlerI {
             String formattedMessage = String.format(GENERAL_CONTENT_TEXT, student.getKey(), student.getId(), sender);
             emailContentMap.put(student.getEmail(), formattedMessage);
         }
-        sendEmailCollection(emailContentMap);
-        String toLog = "[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + students.size();
+        int sentEmails = sendEmailCollection(emailContentMap);
+        String toLog = "[Mensaje/s enviado/s correctamente]: Numero de recipientes:" + sentEmails;
         LOGGER.info(toLog);
+    }
+
+    private int sendEmailCollection(Map<String, String> emailContentMap) {
+        int sentEmails = 0;
+        Session session = getSessionObject();
+        for (Map.Entry<String, String> entry : emailContentMap.entrySet()) {
+            try {
+                sendHTMLEmail(entry.getKey(), EmailHandler.GENERAL_HEADER_TEXT, entry.getValue(), session);
+                sentEmails++;
+            } catch (MessagingException e) {
+                LOGGER.severe("[Error sending email]: " + e.getMessage());
+            }
+        }
+        return sentEmails;
     }
 
     public void sendBackupEmail(String filepath) {
@@ -51,22 +65,11 @@ public class EmailHandler implements EmailHandlerI {
             Session session = getSessionObject();
             String header = String.format(BACKUP_HEADER_TEXT, new Date());
             sendHTMLEmail(backupEmail, header, BACKUP_CONTENT_TEXT, attachment, session);
+            LOGGER.info("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
         } catch (NullPointerException e) {
             LOGGER.severe("[Error while sending student data backup email]: " + e.getMessage());
         } catch (MessagingException e) {
             LOGGER.severe("[Error sending email]: " + e.getMessage());
-        }
-        LOGGER.info("[Mensaje enviado correctamente]: Copia de seguridad de alumnos introducidos.");
-    }
-
-    private void sendEmailCollection(Map<String, String> emailContentMap) {
-        Session session = getSessionObject();
-        for (Map.Entry<String, String> entry : emailContentMap.entrySet()) {
-            try {
-                sendHTMLEmail(entry.getKey(), EmailHandler.GENERAL_HEADER_TEXT, entry.getValue(), session);
-            } catch (MessagingException e) {
-                LOGGER.severe("[Error sending email]: " + e.getMessage());
-            }
         }
     }
 
@@ -86,6 +89,7 @@ public class EmailHandler implements EmailHandlerI {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.trust", HOST);
         props.put("mail.smtp.host", HOST);
         props.put("mail.smtp.port", "587");
         return props;

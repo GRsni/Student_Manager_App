@@ -81,13 +81,13 @@ public class JSONHandler {
         for (String entry : entries) {
             JSONObject entryJSONObject = jsonObject.getJSONObject(entry);
             TableRow row = table.addRow();
-            populateRowFromLabRunObject(entryJSONObject, row);
+            populateRowFromJSONObject(entryJSONObject, row);
         }
 
         return table;
     }
 
-    private static void populateRowFromLabRunObject(JSONObject jsonObject, TableRow row) {
+    private static void populateRowFromJSONObject(JSONObject jsonObject, TableRow row) {
         for (String k : getJSONObjectKeys(jsonObject)) {
             try {
                 Object v = jsonObject.get(k);

@@ -2,6 +2,9 @@ package uca.esi.dni.handlers;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uca.esi.dni.types.Student;
 
 import java.util.HashSet;
@@ -11,12 +14,35 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UtilTest {
 
+    @ParameterizedTest
+    @DisplayName("CheckID should return true for a valid user ID")
+    @ValueSource(strings = {"u99999999", "uy9999999", "uY9999999", "ux9999999", "uX9999999", "uz9999999", "uZ9999999"})
+    void givenAValid8DigitFormatIDReturnTrue(String input) {
+        assertTrue(Util.checkId(input),
+                "CheckId should return true");
+    }
+
     @Test
-    @DisplayName("ExtractID should return an ID from a String with a valid ID")
-    void givenAStringWhenIDIsContainedThenReturnAValidID() {
-        String test = "u99999999";
-        assertEquals("u99999999", Util.extractId(test),
-                "ID returned should be u99999999");
+    @DisplayName("CheckID should return false for an empty ID String")
+    void givenAnEmptyIDStringReturnFalse() {
+        assertFalse(Util.checkId(""),
+                "Empty String should return false");
+    }
+
+    @ParameterizedTest
+    @DisplayName("CheckID should return false for invalid user IDs")
+    @ValueSource(strings = {"1111111", "111111111", "uuuu99999999"})
+    void givenAnInvalidUserIDThenReturnFalse(String input) {
+        assertFalse(Util.checkId(input),
+                "CheckID should return false for " + input);
+    }
+
+    @ParameterizedTest
+    @DisplayName("ExtractId should return the correct ID for valid ID Strings")
+    @ValueSource(strings = {"u99999999", "uy9999999", "uY9999999", "ux9999999", "uX9999999", "uz9999999", "uZ9999999"})
+    void givenAValidStringIDReturnTheValidID(String input) {
+        assertEquals(input, Util.extractId(input),
+                "ExtractID should return " + input);
     }
 
     @Test
@@ -230,15 +256,15 @@ class UtilTest {
     @Test
     @DisplayName("getUniqueStudentSet should throw a NPE if any of the sets is null")
     void givenTheFirstStudentSetIsNullWhenGettingAnIntersectionSetThrowANullPointerException() {
-        Set<Student> set=new HashSet<>();
-        assertThrows(NullPointerException.class, () -> Util.getIntersectionOfStudentSets(null,set),
+        Set<Student> set = new HashSet<>();
+        assertThrows(NullPointerException.class, () -> Util.getIntersectionOfStudentSets(null, set),
                 "First student set cannot be null");
     }
 
     @Test
     @DisplayName("getUniqueStudentSet should throw a NPE if any of the sets is null")
     void givenTheSecondStudentSetIsNullWhenGettingAnIntersectionSetThrowANullPointerException() {
-        Set<Student> set=new HashSet<>();
+        Set<Student> set = new HashSet<>();
         assertThrows(NullPointerException.class, () -> Util.getIntersectionOfStudentSets(set, null),
                 "Second student set cannot be null");
     }
