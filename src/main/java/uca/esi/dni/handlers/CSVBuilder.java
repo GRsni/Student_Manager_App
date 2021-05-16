@@ -1,9 +1,9 @@
 package uca.esi.dni.handlers;
 
-import javafx.util.Pair;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
+import uca.esi.dni.types.Pair;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -16,11 +16,11 @@ public class CSVBuilder {
     private static final String TRACCION_STRING = "traccion";
     private static final String FLEXION_STRING = "flexion";
 
-    private static final List<Pair<String, String>> GENERAL_LAB_KEYS = new ArrayList<>();
-    private static final List<Pair<String, String>> PANDEO_LAB_KEYS = new ArrayList<>();
-    private static final List<Pair<String, String>> TORSION_LAB_KEYS = new ArrayList<>();
-    private static final List<Pair<String, String>> TRACCION_LAB_KEYS = new ArrayList<>();
-    private static final List<Pair<String, String>> FLEXION_LAB_KEYS = new ArrayList<>();
+    private static final List<Pair> GENERAL_LAB_KEYS = new ArrayList<>();
+    private static final List<Pair> PANDEO_LAB_KEYS = new ArrayList<>();
+    private static final List<Pair> TORSION_LAB_KEYS = new ArrayList<>();
+    private static final List<Pair> TRACCION_LAB_KEYS = new ArrayList<>();
+    private static final List<Pair> FLEXION_LAB_KEYS = new ArrayList<>();
 
     static {
         loadGeneralLabKeyList();
@@ -29,36 +29,36 @@ public class CSVBuilder {
     }
 
     private static void loadGeneralLabKeyList() {
-        GENERAL_LAB_KEYS.add(new Pair<>("pId", "Identificador de práctica"));
-        GENERAL_LAB_KEYS.add(new Pair<>("typeP", "Tipo de práctica"));
-        GENERAL_LAB_KEYS.add(new Pair<>("date", "Fecha"));
-        GENERAL_LAB_KEYS.add(new Pair<>("manual", "Manual usado"));
-        GENERAL_LAB_KEYS.add(new Pair<>("inLab", "Realizado en laboratorio"));
-        GENERAL_LAB_KEYS.add(new Pair<>("valTeo", "Valor teórico a calcular"));
-        GENERAL_LAB_KEYS.add(new Pair<>("valExp", "Valor experimental calculado"));
-        GENERAL_LAB_KEYS.add(new Pair<>("errVal", "Errores calculando valor experimental"));
-        GENERAL_LAB_KEYS.add(new Pair<>("data", "Datos"));
-        GENERAL_LAB_KEYS.add(new Pair<>("q1", "Pregunta 1 correcta"));
-        GENERAL_LAB_KEYS.add(new Pair<>("q2", "Pregunta 2 correcta"));
-        GENERAL_LAB_KEYS.add(new Pair<>("q3", "Pregunta 3 correcta"));
-        GENERAL_LAB_KEYS.add(new Pair<>("q4", "Pregunta 4 correcta"));
+        GENERAL_LAB_KEYS.add(new Pair("pId", "Identificador de práctica"));
+        GENERAL_LAB_KEYS.add(new Pair("typeP", "Tipo de práctica"));
+        GENERAL_LAB_KEYS.add(new Pair("date", "Fecha"));
+        GENERAL_LAB_KEYS.add(new Pair("manual", "Manual usado"));
+        GENERAL_LAB_KEYS.add(new Pair("inLab", "Realizado en laboratorio"));
+        GENERAL_LAB_KEYS.add(new Pair("valTeo", "Valor teórico a calcular"));
+        GENERAL_LAB_KEYS.add(new Pair("valExp", "Valor experimental calculado"));
+        GENERAL_LAB_KEYS.add(new Pair("errVal", "Errores calculando valor experimental"));
+        GENERAL_LAB_KEYS.add(new Pair("data", "Datos"));
+        GENERAL_LAB_KEYS.add(new Pair("q1", "Pregunta 1 correcta"));
+        GENERAL_LAB_KEYS.add(new Pair("q2", "Pregunta 2 correcta"));
+        GENERAL_LAB_KEYS.add(new Pair("q3", "Pregunta 3 correcta"));
+        GENERAL_LAB_KEYS.add(new Pair("q4", "Pregunta 4 correcta"));
     }
 
     private static void loadPandeoLabKeyList() {
-        PANDEO_LAB_KEYS.add(new Pair<>("bar", "Barra asignada"));
-        PANDEO_LAB_KEYS.add(new Pair<>("errBar", "Errores eligiendo barra"));
-        PANDEO_LAB_KEYS.add(new Pair<>("fixtures", "Apoyos asignados"));
-        PANDEO_LAB_KEYS.add(new Pair<>("errFixtures", "Errores eligiendo apoyos"));
+        PANDEO_LAB_KEYS.add(new Pair("bar", "Barra asignada"));
+        PANDEO_LAB_KEYS.add(new Pair("errBar", "Errores eligiendo barra"));
+        PANDEO_LAB_KEYS.add(new Pair("fixtures", "Apoyos asignados"));
+        PANDEO_LAB_KEYS.add(new Pair("errFixtures", "Errores eligiendo apoyos"));
     }
 
     private static void loadTorsionLabKeyList() {
-        TORSION_LAB_KEYS.add(new Pair<>("weights", "Carga asignada"));
-        TORSION_LAB_KEYS.add(new Pair<>("errWeights", "Errores eligiendo pesas"));
-        TORSION_LAB_KEYS.add(new Pair<>("ampliTeo", "Valor teórico del amplificador"));
-        TORSION_LAB_KEYS.add(new Pair<>("ampliExp", "Valor experimental del amplificador"));
+        TORSION_LAB_KEYS.add(new Pair("weights", "Carga asignada"));
+        TORSION_LAB_KEYS.add(new Pair("errWeights", "Errores eligiendo pesas"));
+        TORSION_LAB_KEYS.add(new Pair("ampliTeo", "Valor teórico del amplificador"));
+        TORSION_LAB_KEYS.add(new Pair("ampliExp", "Valor experimental del amplificador"));
     }
 
-    private static List<Pair<String, String>> getLabKeysList(String labType) {
+    private static List<Pair> getLabKeysList(String labType) {
         switch (labType) {
             case TORSION_STRING:
                 return TORSION_LAB_KEYS;
@@ -115,11 +115,11 @@ public class CSVBuilder {
     }
 
     private static void addColumnsToTable(String labType, Table table) {
-        for (Pair<String, String> keyValuePair : GENERAL_LAB_KEYS) {
+        for (Pair keyValuePair : GENERAL_LAB_KEYS) {
             table.addColumn(keyValuePair.getKey());
         }
-        List<Pair<String, String>> keyList = getLabKeysList(labType);
-        for (Pair<String, String> keyValuePair : keyList) {
+        List<Pair> keyList = getLabKeysList(labType);
+        for (Pair keyValuePair : keyList) {
             table.addColumn(keyValuePair.getKey());
         }
     }
@@ -154,7 +154,7 @@ public class CSVBuilder {
             table.setColumnTitle(i, GENERAL_LAB_KEYS.get(i).getValue());
         }
         int lastGeneralColumn = GENERAL_LAB_KEYS.size();
-        List<Pair<String, String>> keyList = getLabKeysList(labType);
+        List<Pair> keyList = getLabKeysList(labType);
         for (int i = 0; i < keyList.size(); i++) {
             table.setColumnTitle(i + lastGeneralColumn, keyList.get(i).getValue());
         }
