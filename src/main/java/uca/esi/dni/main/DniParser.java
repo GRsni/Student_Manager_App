@@ -17,6 +17,8 @@ import uca.esi.dni.views.MainView;
 import uca.esi.dni.views.View;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +27,7 @@ public class DniParser extends PApplet {
 
     public static final String DATA_BACKUP_FILEPATH = "data/files/student_data_backup.json";
     public static final String SETTINGS_FILEPATH = "data/files/settings.json";
+    public static final String PROPERTIES_FILEPATH = "data/files/app.properties";
 
     private AppModel appModel;
     private View currentView;
@@ -56,16 +59,30 @@ public class DniParser extends PApplet {
 
     @Override
     public void setup() {
-        surface.setTitle("Manual de laboratorio: Gestor de datos");
+        AppLogger.setup();
+        LOGGER.setLevel(Level.INFO);
+
+        surface.setTitle("Manual de laboratorio: Gestor de usuarios v" + getAppVersion());
         surface.setResizable(true);
         surface.setIcon(icon);
         registerMethods();
 
-        AppLogger.setup();
-        LOGGER.setLevel(Level.INFO);
+
         LOGGER.info("[General information]: Started app.");
         initMVCObjects();
         setupFileSystem();
+    }
+
+    private String getAppVersion() {
+        Properties properties = new Properties();
+        String version = "";
+        try {
+            properties.load(Util.class.getClassLoader().getResourceAsStream(PROPERTIES_FILEPATH));
+            version = properties.getProperty("version");
+        } catch (IOException e) {
+            LOGGER.warning("[Error loading app version]: " + e.getMessage());
+        }
+        return version;
     }
 
     private void registerMethods() {

@@ -4,6 +4,7 @@ import processing.data.JSONObject;
 import processing.data.Table;
 import processing.event.KeyEvent;
 import processing.event.MouseEvent;
+import uca.esi.dni.handlers.CSVBuilder;
 import uca.esi.dni.handlers.DatabaseHandler;
 import uca.esi.dni.handlers.JSONHandler;
 import uca.esi.dni.main.DniParser;
@@ -16,8 +17,6 @@ import uca.esi.dni.views.View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -30,7 +29,6 @@ public class MainController extends Controller {
 
     public MainController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
-
         onCreate();
     }
 
@@ -47,10 +45,9 @@ public class MainController extends Controller {
         switch (e.getAction()) {
             case CLICK:
                 if (view.getUIElement("editB").inside(e.getX(), e.getY())) {
-                    //change view to editView
                     changeState(EDIT);
                 } else if (view.getUIElement("generateFilesB").inside(e.getX(), e.getY())) {
-                    generateExcelFiles();
+                    generateExcelFilesButtonHook();
                 } else if (view.getUIElement("generateStatsB").inside(e.getX(), e.getY())) {
                     changeState(STATS);
                 } else if (view.getUIElement("dbStudentsIL").inside(e.getX(), e.getY())) {
@@ -89,20 +86,15 @@ public class MainController extends Controller {
         // There are no UI elements that need to handle key inputs in the main View
     }
 
-    public void generateExcelFiles() {
-        closedContextMenu = false;
-
-        parent.selectFolder("Seleccione la carpeta de destino:", "selectOutputFolder");
-        while (!closedContextMenu) {
-            Thread.yield(); //We need to wait for the output folder context menu to be closed before resuming execution
-        }
+    public void generateExcelFilesButtonHook() {
+        selectOutputFolder();
 
         if (model.getDBReference() != null && model.getOutputFolder().exists()) {
             try {
                 String usersURL = DatabaseHandler.getDatabaseDirectoryURL(model.getDBReference(), "Users");
                 String response = dbHandler.getData(usersURL);
                 JSONObject studentData = JSONHandler.parseJSONObject(response);
-                Map<String, Map<String, Table>> tableMap = createStudentsDataTables(studentData);
+                Map<String, Map<String, Table>> tableMap = CSVBuilder.createStudentsDataTables(studentData);
                 if (model.getOutputFolder() != null) {
                     saveLabTables(tableMap, model.getOutputFolder());
                     addWarning("Generados archivos de alumnos.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
@@ -112,7 +104,7 @@ public class MainController extends Controller {
                 LOGGER.warning("[IOException when reading database]: " + e.getMessage());
                 addWarning("Error leyendo la base de datos.", Warning.DURATION.SHORT, Warning.TYPE.WARNING);
             } catch (RuntimeException e) {
-                LOGGER.severe("[NullPointerException when generating the CSV files]: " + e.getMessage());
+                LOGGER.severe("[Error when generating the CSV files]: " + e.getMessage());
                 addWarning("Error generando los archivos.", Warning.DURATION.SHORT, Warning.TYPE.SEVERE);
             } catch (DatabaseResponseException e) {
                 LOGGER.warning("[Error while getting data from the DB]: " + e.getMessage());
@@ -121,27 +113,13 @@ public class MainController extends Controller {
         }
     }
 
-    private Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) throws NullPointerException {
-        Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
-        List<String> ids = JSONHandler.getJSONObjectKeys(allStudentsList);
-        for (String id : ids) {
-            Map<String, Table> tableMap = new HashMap<>();
-            JSONObject studentData = allStudentsList.getJSONObject(id);
+    private void selectOutputFolder() {
+        closedContextMenu = false;
 
-            JSONObject labs = studentData.getJSONObject("practicas");
-            if (labs != null) {
-                List<String> labTypes = JSONHandler.getJSONObjectKeys(labs);
-                for (String labType : labTypes) {
-                    JSONObject labRun = labs.getJSONObject(labType);
-                    if (labRun != null) {
-                        Table dataTable = JSONHandler.parseJSONDataIntoTable(labRun);
-                        tableMap.put(labType, dataTable);
-                    }
-                }
-                studentTableMap.put(id, tableMap);
-            }
+        parent.selectFolder("Seleccione la carpeta de destino:", "selectOutputFolder");
+        while (!closedContextMenu) {
+            Thread.yield(); //We need to wait for the output folder context menu to be closed before resuming execution
         }
-        return studentTableMap;
     }
 
     private void saveLabTables(Map<String, Map<String, Table>> studentLabsMap, File route) {
