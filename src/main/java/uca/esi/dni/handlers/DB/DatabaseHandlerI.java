@@ -1,4 +1,4 @@
-package uca.esi.dni.handlers;
+package uca.esi.dni.handlers.DB;
 
 import uca.esi.dni.types.DatabaseResponseException;
 

@@ -1,7 +1,8 @@
-package uca.esi.dni.handlers;
+package uca.esi.dni.handlers.JSON;
 
 import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;
+import uca.esi.dni.handlers.Util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class JSONHandler {
+public class JSONHandler implements JSONHandlerI {
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private JSONHandler() {

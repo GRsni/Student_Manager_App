@@ -1,14 +1,15 @@
-package uca.esi.dni.handlers;
+package uca.esi.dni.handlers.CSV;
 
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
+import uca.esi.dni.handlers.JSON.JSONHandler;
 import uca.esi.dni.types.Pair;
 
 import java.util.*;
 import java.util.logging.Logger;
 
-public class CSVBuilder {
+public class CSVBuilder implements CSVBuilderI {
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     private static final String PANDEO_STRING = "pandeo";

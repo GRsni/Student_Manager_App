@@ -1,4 +1,4 @@
-package uca.esi.dni.handlers;
+package uca.esi.dni.handlers.Email;
 
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;

@@ -3,6 +3,7 @@ package uca.esi.dni.handlers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import processing.data.JSONObject;
+import uca.esi.dni.handlers.JSON.JSONHandler;
 
 import java.util.HashMap;
 import java.util.Map;

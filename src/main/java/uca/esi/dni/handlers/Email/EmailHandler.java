@@ -1,4 +1,4 @@
-package uca.esi.dni.handlers;
+package uca.esi.dni.handlers.Email;
 
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
