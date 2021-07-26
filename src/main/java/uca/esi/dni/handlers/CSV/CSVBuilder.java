@@ -30,8 +30,8 @@ public class CSVBuilder implements CSVBuilderI {
     }
 
     private static void loadGeneralLabKeyList() {
-        GENERAL_LAB_KEYS.add(new Pair("pId", "Identificador de práctica"));
-        GENERAL_LAB_KEYS.add(new Pair("typeP", "Tipo de práctica"));
+        GENERAL_LAB_KEYS.add(new Pair("userID", "Identificador de práctica"));
+        GENERAL_LAB_KEYS.add(new Pair("labType", "Tipo de práctica"));
         GENERAL_LAB_KEYS.add(new Pair("date", "Fecha"));
         GENERAL_LAB_KEYS.add(new Pair("manual", "Manual usado"));
         GENERAL_LAB_KEYS.add(new Pair("inLab", "Realizado en laboratorio"));

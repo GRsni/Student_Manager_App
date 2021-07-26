@@ -19,8 +19,6 @@ repositories {
 dependencies {
     // processing core library
     implementation files("libs/core.jar")
-    //application data files
-    //implementation files("data/")
 
     // OKHTTP http API
     implementation 'com.squareup.okhttp3:okhttp:4.9.1'
