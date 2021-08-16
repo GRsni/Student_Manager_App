@@ -30,7 +30,7 @@ public class CSVBuilder implements CSVBuilderI {
     }
 
     private static void loadGeneralLabKeyList() {
-        GENERAL_LAB_KEYS.add(new Pair("userID", "Identificador de práctica"));
+        GENERAL_LAB_KEYS.add(new Pair("userID", "Identificador"));
         GENERAL_LAB_KEYS.add(new Pair("labType", "Tipo de práctica"));
         GENERAL_LAB_KEYS.add(new Pair("date", "Fecha"));
         GENERAL_LAB_KEYS.add(new Pair("manual", "Manual usado"));
@@ -103,23 +103,22 @@ public class CSVBuilder implements CSVBuilderI {
     private static Table parseJSONDataIntoTable(String labType, JSONObject jsonObject) {
         Table table = new Table();
         List<String> labRuns = JSONHandler.getJSONObjectKeys(jsonObject);
-
-        addColumnsToTable(labType, table);
+        List<Pair> keyList = getLabKeysList(labType);
+        addColumnsToTable(table, keyList);
 
         for (String lab : labRuns) {
             JSONObject entryJSONObject = jsonObject.getJSONObject(lab);
             TableRow row = table.addRow();
             populateRowFromJSONObject(entryJSONObject, row);
         }
-        changeTableColumnTitles(labType, table);
+        changeTableColumnTitles(table, keyList);
         return table;
     }
 
-    private static void addColumnsToTable(String labType, Table table) {
+    private static void addColumnsToTable(Table table, List<Pair> keyList) {
         for (Pair keyValuePair : GENERAL_LAB_KEYS) {
             table.addColumn(keyValuePair.getKey());
         }
-        List<Pair> keyList = getLabKeysList(labType);
         for (Pair keyValuePair : keyList) {
             table.addColumn(keyValuePair.getKey());
         }
@@ -150,12 +149,11 @@ public class CSVBuilder implements CSVBuilderI {
         }
     }
 
-    private static void changeTableColumnTitles(String labType, Table table) {
+    private static void changeTableColumnTitles(Table table, List<Pair> keyList) {
         for (int i = 0; i < GENERAL_LAB_KEYS.size(); i++) {
             table.setColumnTitle(i, GENERAL_LAB_KEYS.get(i).getValue());
         }
         int lastGeneralColumn = GENERAL_LAB_KEYS.size();
-        List<Pair> keyList = getLabKeysList(labType);
         for (int i = 0; i < keyList.size(); i++) {
             table.setColumnTitle(i + lastGeneralColumn, keyList.get(i).getValue());
         }
