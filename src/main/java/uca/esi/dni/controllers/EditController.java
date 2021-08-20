@@ -30,19 +30,40 @@ import static processing.event.KeyEvent.TYPE;
 import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.MAIN;
 
+/**
+ * The type Edit controller.
+ */
 public class EditController extends Controller {
+    /**
+     * The constant LOGGER.
+     */
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    /**
+     * Instantiates a new Edit controller.
+     *
+     * @param parent the parent
+     * @param model  the model
+     * @param view   the view
+     */
     public EditController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
         onCreate();
     }
 
+    /**
+     * On create.
+     */
     @Override
     protected void onCreate() {
         controllerLogic();
     }
 
+    /**
+     * Handle mouse event.
+     *
+     * @param e the e
+     */
     @Override
     public void handleMouseEvent(MouseEvent e) {
         int x = e.getX();
@@ -77,6 +98,13 @@ public class EditController extends Controller {
         controllerLogic();
     }
 
+    /**
+     * Handle click event.
+     *
+     * @param e the e
+     * @param x the x
+     * @param y the y
+     */
     private void handleClickEvent(MouseEvent e, int x, int y) {
         if (view.isModalActive()) {
             handleModalClickEvent(x, y);
@@ -85,6 +113,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Handle modal click event.
+     *
+     * @param x the x
+     * @param y the y
+     */
     private void handleModalClickEvent(int x, int y) {
         if (view.getUIModalElement("confirmEmptyB").inside(x, y)) {
             asyncEmptyDBButtonHook();
@@ -92,6 +126,13 @@ public class EditController extends Controller {
         setModalVisibility(false);
     }
 
+    /**
+     * Handle non modal click event.
+     *
+     * @param e the e
+     * @param x the x
+     * @param y the y
+     */
     private void handleNonModalClickEvent(MouseEvent e, int x, int y) {
         TextField idTF = (TextField) view.getUIElement("idTF");
         TextField emailTF = (TextField) view.getUIElement("emailTF");
@@ -125,6 +166,11 @@ public class EditController extends Controller {
 
     }
 
+    /**
+     * Handle key event.
+     *
+     * @param e the e
+     */
     @Override
     public void handleKeyEvent(KeyEvent e) {
         if (e.getKey() == ESC) {
@@ -147,6 +193,11 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Sets modal visibility.
+     *
+     * @param visibility the visibility
+     */
     private void setModalVisibility(boolean visibility) {
         view.setModalActive(visibility);
         for (String key : view.getModalElementKeys()) {
@@ -154,6 +205,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Add manual data to aux list.
+     *
+     * @param idTF    the id tf
+     * @param emailTF the email tf
+     */
     private void addManualDataToAuxList(TextField idTF, TextField emailTF) {
         if (checkValidManualStudentData(idTF, emailTF)) {
             try {
@@ -166,6 +223,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Clear text fields.
+     *
+     * @param idTF    the id tf
+     * @param emailTF the email tf
+     */
     private void clearTextFields(TextField idTF, TextField emailTF) {
         idTF.setContent("");
         emailTF.setContent("");
@@ -173,10 +236,23 @@ public class EditController extends Controller {
     }
 
 
+    /**
+     * Check valid manual student data boolean.
+     *
+     * @param idTF    the id tf
+     * @param emailTF the email tf
+     * @return the boolean
+     */
     private boolean checkValidManualStudentData(TextField idTF, TextField emailTF) {
         return checkUserIDTextField(idTF) && checkUserEmailTextField(emailTF);
     }
 
+    /**
+     * Check user id text field boolean.
+     *
+     * @param idTF the id tf
+     * @return the boolean
+     */
     private boolean checkUserIDTextField(TextField idTF) {
         if (!idTF.getContent().isEmpty()) {
             return checkUserIDString(idTF.getContent());
@@ -187,6 +263,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Check user id string boolean.
+     *
+     * @param id the id
+     * @return the boolean
+     */
     private boolean checkUserIDString(String id) {
         if (Util.checkId(id)) {
             return true;
@@ -197,6 +279,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Check user email text field boolean.
+     *
+     * @param emailTF the email tf
+     * @return the boolean
+     */
     private boolean checkUserEmailTextField(TextField emailTF) {
         if (!emailTF.getContent().isEmpty()) {
             return checkUserEmailString(emailTF.getContent());
@@ -205,6 +293,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Check user email string boolean.
+     *
+     * @param email the email
+     * @return the boolean
+     */
     private boolean checkUserEmailString(String email) {
         if (EmailHandlerI.isValidEmailAddress(email)) {
             return true;
@@ -215,6 +309,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Remove student from aux list.
+     *
+     * @param idTF    the id tf
+     * @param emailTF the email tf
+     */
     private void removeStudentFromAuxList(TextField idTF, TextField emailTF) {
         if (checkValidManualStudentData(idTF, emailTF)) {
             for (Student student : model.getTemporaryStudents()) {
@@ -228,6 +328,9 @@ public class EditController extends Controller {
     }
 
 
+    /**
+     * Async add students to db list button hook.
+     */
     private void asyncAddStudentsToDBListButtonHook() {
         addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
@@ -258,6 +361,13 @@ public class EditController extends Controller {
         thread.start();
     }
 
+    /**
+     * Upload student list to db.
+     *
+     * @param uniqueStudentSet the unique student set
+     * @throws IOException               the io exception
+     * @throws DatabaseResponseException the database response exception
+     */
     private void uploadStudentListToDB(Set<Student> uniqueStudentSet) throws IOException, DatabaseResponseException {
         Map<String, JSONObject> urlContentsMap = getHashKeyEmailMap(uniqueStudentSet);
         String combined = JSONHandler.generateMultiPathJSONString(urlContentsMap);
@@ -265,6 +375,12 @@ public class EditController extends Controller {
         dbHandler.updateData(baseURL, combined);
     }
 
+    /**
+     * Gets hash key email map.
+     *
+     * @param uniqueStudentSet the unique student set
+     * @return the hash key email map
+     */
     @NotNull
     private Map<String, JSONObject> getHashKeyEmailMap(Set<Student> uniqueStudentSet) {
         JSONObject hashKeyList = Util.getStudentAttributeJSONObject(uniqueStudentSet, "hashKey");
@@ -275,6 +391,11 @@ public class EditController extends Controller {
         return urlContentsMap;
     }
 
+    /**
+     * Save plain student data to file.
+     *
+     * @param students the students
+     */
     private void savePlainStudentDataToFile(Set<Student> students) {
         try {
             JSONObject studentBackup = parent.loadJSONObject(DniParser.DATA_BACKUP_FILEPATH);
@@ -288,6 +409,9 @@ public class EditController extends Controller {
     }
 
 
+    /**
+     * Async remove students from db button hook.
+     */
     private void asyncRemoveStudentsFromDBButtonHook() {
         addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
@@ -321,6 +445,11 @@ public class EditController extends Controller {
         thread.start();
     }
 
+    /**
+     * Remove plain student data from file.
+     *
+     * @param students the students
+     */
     private void removePlainStudentDataFromFile(Set<Student> students) {
         try {
             JSONObject studentBackup = parent.loadJSONObject(DniParser.DATA_BACKUP_FILEPATH);
@@ -335,6 +464,12 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Gets i ds emails users null list map.
+     *
+     * @param coincidentStudentSet the coincident student set
+     * @return the i ds emails users null list map
+     */
     @NotNull
     private Map<String, JSONObject> getIDsEmailsUsersNullListMap(Set<Student> coincidentStudentSet) {
         JSONObject nullList = Util.getStudentAttributeJSONObject(coincidentStudentSet, null);
@@ -345,6 +480,9 @@ public class EditController extends Controller {
         return urlContentsMap;
     }
 
+    /**
+     * Async empty db button hook.
+     */
     private void asyncEmptyDBButtonHook() {
         addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
@@ -373,6 +511,9 @@ public class EditController extends Controller {
         thread.start();
     }
 
+    /**
+     * Add students from file to temporary list.
+     */
     private void addStudentsFromFileToTemporaryList() {
         selectInputFile();
         if (model.getInputFile().exists()) {
@@ -387,6 +528,9 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * Select input file.
+     */
     private void selectInputFile() {
         closedContextMenu = false;
 
@@ -396,6 +540,12 @@ public class EditController extends Controller {
         }//We need to wait for the input file context menu to be closed before resuming execution
     }
 
+    /**
+     * Generate student list from table set.
+     *
+     * @param studentIDTable the student id table
+     * @return the set
+     */
     private Set<Student> generateStudentListFromTable(Table studentIDTable) {
         Set<Student> students = new HashSet<>();
         int failedEmails = 0;
@@ -430,6 +580,11 @@ public class EditController extends Controller {
         return students;
     }
 
+    /**
+     * Gets focused text field.
+     *
+     * @return the focused text field
+     */
     private TextField getFocusedTextField() {
         TextField idTF = (TextField) view.getUIElement("idTF");
         TextField emailTF = (TextField) view.getUIElement("emailTF");
@@ -440,6 +595,11 @@ public class EditController extends Controller {
         }
     }
 
+    /**
+     * On context menu closed.
+     *
+     * @param file the file
+     */
     @Override
     public void onContextMenuClosed(File file) {
         if (file != model.getInputFile()) {

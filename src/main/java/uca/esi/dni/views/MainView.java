@@ -14,14 +14,26 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * The type Main view.
+ */
 public class MainView extends View {
 
+    /**
+     * Instantiates a new Main view.
+     *
+     * @param parent the parent
+     */
     public MainView(PApplet parent) {
         super(parent);
         onCreate();
 
     }
 
+    /**
+     * On create.
+     */
+    @Override
     protected void onCreate() {
         background = parent.loadImage("data/background/main_back.png");
 
@@ -30,6 +42,9 @@ public class MainView extends View {
         createElements();
     }
 
+    /**
+     * Create elements.
+     */
     @Override
     protected void createElements() {
 
@@ -75,6 +90,14 @@ public class MainView extends View {
         elements.put("dbStudentsIL", dbStudentsItemList);
     }
 
+    /**
+     * Update.
+     *
+     * @param dbList    the db list
+     * @param modList   the mod list
+     * @param inputFile the input file
+     * @param surveys   the surveys
+     */
     @Override
     public void update(Set<Student> dbList, Set<Student> modList, File inputFile, List<Survey> surveys) {
         TextField dbStudentsCounter = (TextField) elements.get("dbStudentsTF");

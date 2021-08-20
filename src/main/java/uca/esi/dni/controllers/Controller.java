@@ -28,24 +28,67 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+/**
+ * The type Controller.
+ */
 public abstract class Controller {
+    /**
+     * The constant LOGGER.
+     */
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    /**
+     * The enum View states.
+     */
     public enum VIEW_STATES {
+        /**
+         * Main view states.
+         */
         MAIN,
+        /**
+         * Edit view states.
+         */
         EDIT,
+        /**
+         * Stats view states.
+         */
         STATS
     }
 
+    /**
+     * The constant dbHandler.
+     */
     protected static final DatabaseHandlerI dbHandler = new DatabaseHandler();
+    /**
+     * The constant emailHandler.
+     */
     protected static final EmailHandlerI emailHandler = new EmailHandler();
+    /**
+     * The Model.
+     */
     protected final AppModel model;
+    /**
+     * The View.
+     */
     protected final View view;
+    /**
+     * The Parent.
+     */
     protected final DniParser parent;
 
+    /**
+     * The Closed context menu.
+     */
     protected volatile boolean closedContextMenu = false;
 
 
+    /**
+     * Instantiates a new Controller.
+     *
+     * @param parent the parent
+     * @param model  the model
+     * @param view   the view
+     */
     protected Controller(DniParser parent, AppModel model, View view) {
         this.parent = parent;
         this.model = model;
@@ -54,30 +97,73 @@ public abstract class Controller {
 
     }
 
+    /**
+     * On create.
+     */
     protected abstract void onCreate();
 
+    /**
+     * Is closed context menu boolean.
+     *
+     * @return the boolean
+     */
     public boolean isClosedContextMenu() {
         return closedContextMenu;
     }
 
+    /**
+     * Sets closed context menu.
+     *
+     * @param closedContextMenu the closed context menu
+     */
     public void setClosedContextMenu(boolean closedContextMenu) {
         this.closedContextMenu = closedContextMenu;
     }
 
+    /**
+     * Controller logic.
+     */
     public void controllerLogic() {
         view.update(model.getDbStudents(), model.getTemporaryStudents(), model.getInputFile(), model.getStudentSurveys());
     }
 
+    /**
+     * Handle mouse event.
+     *
+     * @param e the e
+     */
     public abstract void handleMouseEvent(MouseEvent e);
 
+    /**
+     * Handle key event.
+     *
+     * @param e the e
+     */
     public abstract void handleKeyEvent(KeyEvent e);
 
+    /**
+     * On context menu closed.
+     *
+     * @param file the file
+     */
     public abstract void onContextMenuClosed(File file);
 
+    /**
+     * Add warning.
+     *
+     * @param contentString the content string
+     * @param duration      the duration
+     * @param type          the type
+     */
     public void addWarning(String contentString, Warning.DURATION duration, Warning.TYPE type) {
         view.getWarnings().add(View.generateWarning(parent, contentString, duration, type));
     }
 
+    /**
+     * Change state.
+     *
+     * @param state the state
+     */
     public void changeState(VIEW_STATES state) {
         View newView;
         Controller newController;
@@ -100,6 +186,9 @@ public abstract class Controller {
         loadInitialState();
     }
 
+    /**
+     * Remove click.
+     */
     protected void removeClick() {
         if (view.isModalActive()) {
 
@@ -119,6 +208,12 @@ public abstract class Controller {
         }
     }
 
+    /**
+     * Check hover.
+     *
+     * @param x the x
+     * @param y the y
+     */
     public void checkHover(int x, int y) {
         if (!view.isModalActive()) {
             for (String key : view.getElementKeys()) {
@@ -133,6 +228,12 @@ public abstract class Controller {
         }
     }
 
+    /**
+     * Check press.
+     *
+     * @param x the x
+     * @param y the y
+     */
     public void checkPress(int x, int y) {
         if (!view.isModalActive()) {
             for (String key : view.getElementKeys()) {
@@ -147,6 +248,9 @@ public abstract class Controller {
         }
     }
 
+    /**
+     * Async load student data from db.
+     */
     protected void asyncLoadStudentDataFromDB() {
 
         Runnable runnable = () -> {
@@ -179,6 +283,13 @@ public abstract class Controller {
         thread.start();
     }
 
+    /**
+     * Generate student set from db set.
+     *
+     * @param responseIDs    the response i ds
+     * @param responseEmails the response emails
+     * @return the set
+     */
     @NotNull
     private Set<Student> generateStudentSetFromDB(String responseIDs, String responseEmails) {
         JSONObject studentKeys = JSONHandler.parseJSONObject(responseIDs);
@@ -186,6 +297,14 @@ public abstract class Controller {
         return generateStudentListFromJSONObject(studentKeys, studentEmails);
     }
 
+    /**
+     * Generate student list from json object set.
+     *
+     * @param hashKeys the hash keys
+     * @param emails   the emails
+     * @return the set
+     * @throws JSONParsingException the json parsing exception
+     */
     private Set<Student> generateStudentListFromJSONObject(JSONObject hashKeys, JSONObject emails) throws
             JSONParsingException {
         Set<Student> students = new HashSet<>();
@@ -201,10 +320,16 @@ public abstract class Controller {
         return students;
     }
 
+    /**
+     * Load initial state.
+     */
     private void loadInitialState() {
         parent.getCurrentController().controllerLogic();
     }
 
+    /**
+     * On app closing.
+     */
     public void onAppClosing() {
         addWarning("Cerrando aplicación.", Warning.DURATION.SHORT, Warning.TYPE.INFO);
         if (model.isStudentDataModified() && !model.getDbStudents().isEmpty()) {

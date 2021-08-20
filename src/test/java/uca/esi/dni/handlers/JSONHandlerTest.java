@@ -11,8 +11,14 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * The type Json handler test.
+ */
 class JSONHandlerTest {
 
+    /**
+     * Given an empty input filepath return an empty json object.
+     */
     @Test
     @DisplayName("loadJSONObject should return an empty JSONObject when no input file is given")
     void givenAnEmptyInputFilepathReturnAnEmptyJSONObject() {
@@ -20,6 +26,9 @@ class JSONHandlerTest {
                 "JSONObject should be empty");
     }
 
+    /**
+     * Given a null input filepath return an empty json object.
+     */
     @Test
     @DisplayName("loadJSONObject should return an empty JSONObject from a null file")
     void givenANullInputFilepathReturnAnEmptyJSONObject() {
@@ -27,6 +36,9 @@ class JSONHandlerTest {
                 "JSONObject should be empty");
     }
 
+    /**
+     * Given a filepath with an incorrect file extension return an empty json object.
+     */
     @Test
     @DisplayName("loadJSONObject should return an empty JSONObject if the file extension is not .json")
     void givenAFilepathWithAnIncorrectFileExtensionReturnAnEmptyJSONObject() {
@@ -35,6 +47,9 @@ class JSONHandlerTest {
                 "JSONObject should be empty");
     }
 
+    /**
+     * Given an empty string return an empty json object.
+     */
     @Test
     @DisplayName("parseJSONObject should return an empty JSONObject from an empty string")
     void givenAnEmptyStringReturnAnEmptyJSONObject() {
@@ -42,6 +57,9 @@ class JSONHandlerTest {
                 "Parsed JSONObject should be empty");
     }
 
+    /**
+     * Given a null input string return an empty json object.
+     */
     @Test
     @DisplayName("parseJSONObject should return an empty JSONObject from a null input String")
     void givenANullInputStringReturnAnEmptyJSONObject() {
@@ -49,6 +67,9 @@ class JSONHandlerTest {
                 "Parsed JSONObject should be empty");
     }
 
+    /**
+     * Given an empty map return an empty path string.
+     */
     @Test
     @DisplayName("generateMultiPath should return an empty string if the input map is empty")
     void givenAnEmptyMapReturnAnEmptyPathString() {
@@ -58,6 +79,9 @@ class JSONHandlerTest {
                 "String should be empty if input map is empty");
     }
 
+    /**
+     * Given a null input map throw a null pointer exception.
+     */
     @Test
     @DisplayName("generateMultiPath should throw a NullPointerException if the input map is null")
     void givenANullInputMapThrowANullPointerException() {
@@ -65,6 +89,9 @@ class JSONHandlerTest {
                 "Input map cannot be null in generateMultiPath");
     }
 
+    /**
+     * Given a map with null input json objects throw a null pointer exception.
+     */
     @Test
     @DisplayName("generateMultiPath should throw and exception if the map contains null JSONObjects")
     void givenAMapWithNullInputJSONObjectsThrowANullPointerException() {

@@ -1,6 +1,7 @@
 package uca.esi.dni.models;
 
 
-public interface Model {
-
-}
+/**
+ * The interface Model.
+ */
+public interface Model { }

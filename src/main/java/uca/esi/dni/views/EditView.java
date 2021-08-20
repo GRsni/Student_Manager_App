@@ -11,13 +11,24 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The type Edit view.
+ */
 public class EditView extends View {
 
+    /**
+     * Instantiates a new Edit view.
+     *
+     * @param parent the parent
+     */
     public EditView(PApplet parent) {
         super(parent);
         onCreate();
     }
 
+    /**
+     * On create.
+     */
     @Override
     protected void onCreate() {
         background = parent.loadImage("data/background/edit_back.png");
@@ -27,6 +38,9 @@ public class EditView extends View {
 
     }
 
+    /**
+     * Create elements.
+     */
     @Override
     protected void createElements() {
 
@@ -162,6 +176,14 @@ public class EditView extends View {
 
     }
 
+    /**
+     * Update.
+     *
+     * @param dbList    the db list
+     * @param auxList   the aux list
+     * @param inputFile the input file
+     * @param surveys   the surveys
+     */
     @Override
     public void update(Set<Student> dbList, Set<Student> auxList, File inputFile, List<Survey> surveys) {
 

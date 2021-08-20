@@ -12,13 +12,24 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The type Stats view.
+ */
 public class StatsView extends View {
 
+    /**
+     * Instantiates a new Stats view.
+     *
+     * @param parent the parent
+     */
     public StatsView(PApplet parent) {
         super(parent);
         onCreate();
     }
 
+    /**
+     * On create.
+     */
     @Override
     protected void onCreate() {
         background = parent.loadImage("data/background/stats_back.png");
@@ -28,6 +39,9 @@ public class StatsView extends View {
         createElements();
     }
 
+    /**
+     * Create elements.
+     */
     @Override
     protected void createElements() {
         LikertBarGraph likertBarGraph = new LikertBarGraph(parent,
@@ -65,6 +79,14 @@ public class StatsView extends View {
         elements.put("screenCapB", screenCap);
     }
 
+    /**
+     * Update.
+     *
+     * @param dbList    the db list
+     * @param modList   the mod list
+     * @param inputFile the input file
+     * @param surveys   the surveys
+     */
     @Override
     public void update(Set<Student> dbList, Set<Student> modList, File inputFile, List<Survey> surveys) {
         LikertBarGraph likertBarGraph = (LikertBarGraph) elements.get("likertBG");

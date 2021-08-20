@@ -7,8 +7,17 @@ import uca.esi.dni.types.Student;
 
 import java.util.Set;
 
+/**
+ * The interface Email handler i.
+ */
 public interface EmailHandlerI {
 
+    /**
+     * Is valid email address boolean.
+     *
+     * @param email the email
+     * @return the boolean
+     */
     static boolean isValidEmailAddress(String email) {
         boolean result = true;
         try {
@@ -20,9 +29,24 @@ public interface EmailHandlerI {
         return result;
     }
 
+    /**
+     * Send secret key emails.
+     *
+     * @param students the students
+     */
     void sendSecretKeyEmails(Set<Student> students);
 
+    /**
+     * Send backup email.
+     *
+     * @param filepath the filepath
+     */
     void sendBackupEmail(String filepath);
 
+    /**
+     * Load settings.
+     *
+     * @param settingsObject the settings object
+     */
     void loadSettings(JSONObject settingsObject);
 }

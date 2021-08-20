@@ -12,11 +12,26 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * The type Email handler.
+ */
 public class EmailHandler implements EmailHandlerI {
+    /**
+     * The constant LOGGER.
+     */
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    /**
+     * The constant HOST.
+     */
     private static final String HOST = "smtp.gmail.com";
+    /**
+     * The constant GENERAL_HEADER_TEXT.
+     */
     private static final String GENERAL_HEADER_TEXT = "Clave segura para aplicación de Manual de Laboratorio Escuela Superior de Ingeniería";
+    /**
+     * The constant GENERAL_CONTENT_TEXT.
+     */
     private static final String GENERAL_CONTENT_TEXT = "<h1>Clave de acceso al manual de laboratorio de la Escuela Superior de Ingeniería</h1>" +
             "<p>Has recibido este correo porque se te ha incluido en la lista de alumnos con acceso a la aplicación " +
             "Android de manual de laboratorio de Resistencia de Materiales de la Escuela Superior de Ingeniería.</p>" +
@@ -25,15 +40,38 @@ public class EmailHandler implements EmailHandlerI {
             "<p>Este mensaje ha sido generado de forma automática. Si has recibido este mensaje por error, puedes ignorarlo. Si tu identificador único de la UCA " +
             "no coincide con el mostrado en el mensaje, envía un correo electrónico a la dirección: %s .</p>";
 
+    /**
+     * The constant BACKUP_HEADER_TEXT.
+     */
     private static final String BACKUP_HEADER_TEXT = "Archivo de copia de seguridad de datos de alumnos [%s]";
+    /**
+     * The constant BACKUP_CONTENT_TEXT.
+     */
     private static final String BACKUP_CONTENT_TEXT = "<p>Se adjunta la lista de contraseñas en texto plano de los alumnos añadidos a la base de datos.</p>";
 
+    /**
+     * The Sender.
+     */
     private String sender;
+    /**
+     * The Username.
+     */
     private String username;
+    /**
+     * The Password.
+     */
     private String password;
+    /**
+     * The Backup email.
+     */
     private String backupEmail;
 
 
+    /**
+     * Send secret key emails.
+     *
+     * @param students the students
+     */
     public void sendSecretKeyEmails(Set<Student> students) {
         Map<String, String> emailContentMap = new HashMap<>();
         for (Student student : students) {
@@ -45,6 +83,12 @@ public class EmailHandler implements EmailHandlerI {
         LOGGER.info(toLog);
     }
 
+    /**
+     * Send email collection int.
+     *
+     * @param emailContentMap the email content map
+     * @return the int
+     */
     private int sendEmailCollection(Map<String, String> emailContentMap) {
         int sentEmails = 0;
         Session session = getSessionObject();
@@ -59,6 +103,11 @@ public class EmailHandler implements EmailHandlerI {
         return sentEmails;
     }
 
+    /**
+     * Send backup email.
+     *
+     * @param filepath the filepath
+     */
     public void sendBackupEmail(String filepath) {
         try {
             File attachment = new File(filepath);
@@ -73,6 +122,11 @@ public class EmailHandler implements EmailHandlerI {
         }
     }
 
+    /**
+     * Gets session object.
+     *
+     * @return the session object
+     */
     private Session getSessionObject() {
         Properties props = generatePropertiesObject();
         //create the Session object
@@ -85,6 +139,11 @@ public class EmailHandler implements EmailHandlerI {
                 });
     }
 
+    /**
+     * Generate properties object properties.
+     *
+     * @return the properties
+     */
     private Properties generatePropertiesObject() {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -95,11 +154,30 @@ public class EmailHandler implements EmailHandlerI {
         return props;
     }
 
+    /**
+     * Send html email.
+     *
+     * @param dest        the dest
+     * @param header      the header
+     * @param contentText the content text
+     * @param session     the session
+     * @throws MessagingException the messaging exception
+     */
     private void sendHTMLEmail(String dest, String header, String contentText, Session session) throws
             MessagingException {
         sendHTMLEmail(dest, header, contentText, null, session);
     }
 
+    /**
+     * Send html email.
+     *
+     * @param dest        the dest
+     * @param header      the header
+     * @param contentText the content text
+     * @param attachment  the attachment
+     * @param session     the session
+     * @throws MessagingException the messaging exception
+     */
     private void sendHTMLEmail(String dest, String header, String contentText, File attachment, Session
             session) throws MessagingException {
         MimeMessage message = new MimeMessage(session);
@@ -110,6 +188,14 @@ public class EmailHandler implements EmailHandlerI {
         Transport.send(message);
     }
 
+    /**
+     * Sets multi part content.
+     *
+     * @param message     the message
+     * @param textContent the text content
+     * @param attachment  the attachment
+     * @throws MessagingException the messaging exception
+     */
     private void setMultiPartContent(Message message, String textContent, File attachment) throws
             MessagingException {
         Multipart multipart = new MimeMultipart();
@@ -123,6 +209,13 @@ public class EmailHandler implements EmailHandlerI {
         message.setContent(multipart);
     }
 
+    /**
+     * Gets attachment body part.
+     *
+     * @param filename the filename
+     * @return the attachment body part
+     * @throws MessagingException the messaging exception
+     */
     private BodyPart getAttachmentBodyPart(File filename) throws MessagingException {
         BodyPart messageBodyPart = new MimeBodyPart();
 
@@ -134,6 +227,11 @@ public class EmailHandler implements EmailHandlerI {
         return messageBodyPart;
     }
 
+    /**
+     * Load settings.
+     *
+     * @param settingsObject the settings object
+     */
     public void loadSettings(JSONObject settingsObject) {
         sender = settingsObject.getString("senderEmail");
         username = settingsObject.getString("senderUsername");

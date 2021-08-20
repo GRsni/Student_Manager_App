@@ -1,26 +1,61 @@
 package uca.esi.dni.handlers.CSV;
 
+import processing.data.JSONArray;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
 import uca.esi.dni.handlers.JSON.JSONHandler;
 import uca.esi.dni.types.Pair;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.logging.Logger;
 
+/**
+ * The type Csv builder.
+ */
 public class CSVBuilder implements CSVBuilderI {
+    /**
+     * The constant LOGGER.
+     */
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    /**
+     * The constant PANDEO_STRING.
+     */
     private static final String PANDEO_STRING = "pandeo";
+    /**
+     * The constant TORSION_STRING.
+     */
     private static final String TORSION_STRING = "torsion";
+    /**
+     * The constant TRACCION_STRING.
+     */
     private static final String TRACCION_STRING = "traccion";
+    /**
+     * The constant FLEXION_STRING.
+     */
     private static final String FLEXION_STRING = "flexion";
 
+    /**
+     * The constant GENERAL_LAB_KEYS.
+     */
     private static final List<Pair> GENERAL_LAB_KEYS = new ArrayList<>();
+    /**
+     * The constant PANDEO_LAB_KEYS.
+     */
     private static final List<Pair> PANDEO_LAB_KEYS = new ArrayList<>();
+    /**
+     * The constant TORSION_LAB_KEYS.
+     */
     private static final List<Pair> TORSION_LAB_KEYS = new ArrayList<>();
+    /**
+     * The constant TRACCION_LAB_KEYS.
+     */
     private static final List<Pair> TRACCION_LAB_KEYS = new ArrayList<>();
+    /**
+     * The constant FLEXION_LAB_KEYS.
+     */
     private static final List<Pair> FLEXION_LAB_KEYS = new ArrayList<>();
 
     static {
@@ -29,6 +64,9 @@ public class CSVBuilder implements CSVBuilderI {
         loadTorsionLabKeyList();
     }
 
+    /**
+     * Load general lab key list.
+     */
     private static void loadGeneralLabKeyList() {
         GENERAL_LAB_KEYS.add(new Pair("userID", "Identificador"));
         GENERAL_LAB_KEYS.add(new Pair("labType", "Tipo de práctica"));
@@ -45,6 +83,9 @@ public class CSVBuilder implements CSVBuilderI {
         GENERAL_LAB_KEYS.add(new Pair("q4", "Pregunta 4 correcta"));
     }
 
+    /**
+     * Load pandeo lab key list.
+     */
     private static void loadPandeoLabKeyList() {
         PANDEO_LAB_KEYS.add(new Pair("bar", "Barra asignada"));
         PANDEO_LAB_KEYS.add(new Pair("errBar", "Errores eligiendo barra"));
@@ -52,6 +93,9 @@ public class CSVBuilder implements CSVBuilderI {
         PANDEO_LAB_KEYS.add(new Pair("errFixtures", "Errores eligiendo apoyos"));
     }
 
+    /**
+     * Load torsion lab key list.
+     */
     private static void loadTorsionLabKeyList() {
         TORSION_LAB_KEYS.add(new Pair("weights", "Carga asignada"));
         TORSION_LAB_KEYS.add(new Pair("errWeights", "Errores eligiendo pesas"));
@@ -59,6 +103,12 @@ public class CSVBuilder implements CSVBuilderI {
         TORSION_LAB_KEYS.add(new Pair("ampliExp", "Valor experimental del amplificador"));
     }
 
+    /**
+     * Gets lab keys list.
+     *
+     * @param labType the lab type
+     * @return the lab keys list
+     */
     private static List<Pair> getLabKeysList(String labType) {
         switch (labType) {
             case TORSION_STRING:
@@ -74,9 +124,19 @@ public class CSVBuilder implements CSVBuilderI {
         }
     }
 
+    /**
+     * Instantiates a new Csv builder.
+     */
     private CSVBuilder() {
     }
 
+    /**
+     * Create students data tables map.
+     *
+     * @param allStudentsList the all students list
+     * @return the map
+     * @throws NullPointerException the null pointer exception
+     */
     public static Map<String, Map<String, Table>> createStudentsDataTables(JSONObject allStudentsList) throws NullPointerException {
         Map<String, Map<String, Table>> studentTableMap = new HashMap<>();
         List<String> ids = JSONHandler.getJSONObjectKeys(allStudentsList);
@@ -100,6 +160,13 @@ public class CSVBuilder implements CSVBuilderI {
         return studentTableMap;
     }
 
+    /**
+     * Parse json data into table table.
+     *
+     * @param labType    the lab type
+     * @param jsonObject the json object
+     * @return the table
+     */
     private static Table parseJSONDataIntoTable(String labType, JSONObject jsonObject) {
         Table table = new Table();
         List<String> labRuns = JSONHandler.getJSONObjectKeys(jsonObject);
@@ -115,6 +182,12 @@ public class CSVBuilder implements CSVBuilderI {
         return table;
     }
 
+    /**
+     * Add columns to table.
+     *
+     * @param table   the table
+     * @param keyList the key list
+     */
     private static void addColumnsToTable(Table table, List<Pair> keyList) {
         for (Pair keyValuePair : GENERAL_LAB_KEYS) {
             table.addColumn(keyValuePair.getKey());
@@ -124,6 +197,12 @@ public class CSVBuilder implements CSVBuilderI {
         }
     }
 
+    /**
+     * Populate row from json object.
+     *
+     * @param jsonObject the json object
+     * @param row        the row
+     */
     private static void populateRowFromJSONObject(JSONObject jsonObject, TableRow row) {
         for (String k : JSONHandler.getJSONObjectKeys(jsonObject)) {
             try {
@@ -139,6 +218,8 @@ public class CSVBuilder implements CSVBuilderI {
                     row.setDouble(k, floatToUse);
                 } else if (JSONObject.NULL.equals(v)) {
                     row.setString(k, "null");
+                } else if (v instanceof JSONArray) {
+
                 } else {
                     String stringToUse = jsonObject.getString(k);
                     row.setString(k, stringToUse);
@@ -149,6 +230,12 @@ public class CSVBuilder implements CSVBuilderI {
         }
     }
 
+    /**
+     * Change table column titles.
+     *
+     * @param table   the table
+     * @param keyList the key list
+     */
     private static void changeTableColumnTitles(Table table, List<Pair> keyList) {
         for (int i = 0; i < GENERAL_LAB_KEYS.size(); i++) {
             table.setColumnTitle(i, GENERAL_LAB_KEYS.get(i).getValue());

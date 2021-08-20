@@ -19,15 +19,41 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * The type Likert bar graph.
+ */
 public class LikertBarGraph extends Graph {
 
+    /**
+     * The enum Likert legend.
+     */
     private enum LIKERT_LEGEND {
+        /**
+         * Very bad likert legend.
+         */
         VERY_BAD(1),
+        /**
+         * Bad likert legend.
+         */
         BAD(2),
+        /**
+         * Average likert legend.
+         */
         AVERAGE(3),
+        /**
+         * Good likert legend.
+         */
         GOOD(4),
+        /**
+         * Very good likert legend.
+         */
         VERY_GOOD(5);
 
+        /**
+         * To string string.
+         *
+         * @return the string
+         */
         @Override
         public String toString() {
             switch (this) {
@@ -46,9 +72,20 @@ public class LikertBarGraph extends Graph {
             }
         }
 
+        /**
+         * The Value.
+         */
         private final int value;
+        /**
+         * The constant map.
+         */
         private static final Map<Object, Object> map = new HashMap<>();
 
+        /**
+         * Instantiates a new Likert legend.
+         *
+         * @param value the value
+         */
         LIKERT_LEGEND(int value) {
             this.value = value;
         }
@@ -59,15 +96,35 @@ public class LikertBarGraph extends Graph {
             }
         }
 
+        /**
+         * Value of likert legend.
+         *
+         * @param pageType the page type
+         * @return the likert legend
+         */
         public static LIKERT_LEGEND valueOf(int pageType) {
             return (LIKERT_LEGEND) map.get(pageType);
         }
 
+        /**
+         * Gets value.
+         *
+         * @return the value
+         */
         public int getValue() {
             return value;
         }
     }
 
+    /**
+     * Instantiates a new Likert bar graph.
+     *
+     * @param parent     the parent
+     * @param rectangle  the rectangle
+     * @param chartTitle the chart title
+     * @param xAxisLabel the x axis label
+     * @param yAxisLabel the y axis label
+     */
     public LikertBarGraph(PApplet parent, Rectangle rectangle, String chartTitle, String xAxisLabel, String yAxisLabel) {
         super(parent, rectangle);
         this.chart = ChartFactory.createBarChart(
@@ -81,6 +138,9 @@ public class LikertBarGraph extends Graph {
         this.chartImage = new PImage(chart.createBufferedImage(w, h));
     }
 
+    /**
+     * Sets chart.
+     */
     @Override
     protected void setupChart() {
         chart.setBackgroundPaint(new Color(255, 255, 255, 0));
@@ -91,6 +151,11 @@ public class LikertBarGraph extends Graph {
         chart.getCategoryPlot().getRangeAxis().setStandardTickUnits(NumberAxis.createIntegerTickUnits());
     }
 
+    /**
+     * Gets bar renderer.
+     *
+     * @return the bar renderer
+     */
     private BarRenderer getBarRenderer() {
         BarRenderer bar = new BarRenderer();
         bar.setSeriesPaint(0, new Color(View.COLORS.SECONDARY_DARK)); //first bar
@@ -101,12 +166,23 @@ public class LikertBarGraph extends Graph {
         return bar;
     }
 
+    /**
+     * Update data.
+     *
+     * @param surveyList the survey list
+     */
     @Override
     public void updateData(List<Survey> surveyList) {
         chart.getCategoryPlot().setDataset((CategoryDataset) createDataset(surveyList));
         chartImage = new PImage(this.chart.createBufferedImage(w, h));
     }
 
+    /**
+     * Create dataset dataset.
+     *
+     * @param surveyList the survey list
+     * @return the dataset
+     */
     @Override
     protected Dataset createDataset(List<Survey> surveyList) {
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
@@ -120,6 +196,12 @@ public class LikertBarGraph extends Graph {
         return dataset;
     }
 
+    /**
+     * Gets combined data.
+     *
+     * @param surveyList the survey list
+     * @return the combined data
+     */
     private Map<Survey.LIKERT_FIELDS, Map<LIKERT_LEGEND, Integer>> getCombinedData(List<Survey> surveyList) {
         Map<Survey.LIKERT_FIELDS, Map<LIKERT_LEGEND, Integer>> combined = getEmptyMap();
 
@@ -129,6 +211,11 @@ public class LikertBarGraph extends Graph {
         return combined;
     }
 
+    /**
+     * Gets empty map.
+     *
+     * @return the empty map
+     */
     private Map<Survey.LIKERT_FIELDS, Map<LIKERT_LEGEND, Integer>> getEmptyMap() {
         Map<Survey.LIKERT_FIELDS, Map<LIKERT_LEGEND, Integer>> map = new EnumMap<>(Survey.LIKERT_FIELDS.class);
         for (Survey.LIKERT_FIELDS field : Survey.LIKERT_FIELDS.values()) {
@@ -141,6 +228,12 @@ public class LikertBarGraph extends Graph {
         return map;
     }
 
+    /**
+     * Populate likert graph data map.
+     *
+     * @param combined the combined
+     * @param survey   the survey
+     */
     private void populateLikertGraphDataMap(Map<Survey.LIKERT_FIELDS, Map<LIKERT_LEGEND, Integer>> combined, Survey survey) {
         for (Survey.LIKERT_FIELDS field : Survey.LIKERT_FIELDS.values()) {
             Map<LIKERT_LEGEND, Integer> legendIntegerEntry = combined.get(field);

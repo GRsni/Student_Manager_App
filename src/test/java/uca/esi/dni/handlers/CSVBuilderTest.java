@@ -9,8 +9,14 @@ import uca.esi.dni.handlers.CSV.CSVBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * The type Csv builder test.
+ */
 class CSVBuilderTest {
 
+    /**
+     * Given an empty json object return an empty studen table map.
+     */
     @Test
     @DisplayName("createStudentDataTables should return an empty table map if the student list is empty")
     void givenAnEmptyJSONObjectReturnAnEmptyStudenTableMap() {
@@ -19,6 +25,9 @@ class CSVBuilderTest {
                 "Map should be empty");
     }
 
+    /**
+     * Given a null json object throw a null pointer exception.
+     */
     @Test
     @DisplayName("createStudentDataTables should throw a NPE if the student list is null ")
     void givenANullJSONObjectThrowANullPointerException() {
@@ -27,6 +36,9 @@ class CSVBuilderTest {
                 "Input JSONObject cant be null");
     }
 
+    /**
+     * Given a student list without lab runs return a map containing empty maps.
+     */
     @Test
     @DisplayName("createStudentDataTables inner table map should be empty students have no lab runs")
     void givenAStudentListWithoutLabRunsReturnAMapContainingEmptyMaps() {

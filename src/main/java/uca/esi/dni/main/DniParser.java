@@ -22,26 +22,67 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * The type Dni parser.
+ */
 public class DniParser extends PApplet {
+    /**
+     * The constant LOGGER.
+     */
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    /**
+     * The constant DATA_BACKUP_FILEPATH.
+     */
     public static final String DATA_BACKUP_FILEPATH = "data/files/student_data_backup.json";
+    /**
+     * The constant SETTINGS_FILEPATH.
+     */
     public static final String SETTINGS_FILEPATH = "data/files/settings.json";
+    /**
+     * The constant PROPERTIES_FILEPATH.
+     */
     public static final String PROPERTIES_FILEPATH = "data/files/app.properties";
 
+    /**
+     * The App model.
+     */
     private AppModel appModel;
+    /**
+     * The Current view.
+     */
     private View currentView;
+    /**
+     * The Current controller.
+     */
     private Controller currentController;
 
+    /**
+     * The Icon.
+     */
     private PImage icon;
 
+    /**
+     * The W.
+     */
     private int w;
+    /**
+     * The H.
+     */
     private int h;
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         PApplet.main(new String[]{DniParser.class.getName()});
     }
 
+    /**
+     * Sets .
+     */
     @Override
     public void settings() {
         PVector windowSize = calcWindowSize();
@@ -51,12 +92,20 @@ public class DniParser extends PApplet {
         icon = loadImage("data/icons/server-storage_filled.png");
     }
 
+    /**
+     * Calc window size p vector.
+     *
+     * @return the p vector
+     */
     private PVector calcWindowSize() {
         float screenWidth = Math.max(1024, displayWidth / 2);
         float screenHeight = screenWidth * 9 / 16;
         return new PVector(screenWidth, screenHeight);
     }
 
+    /**
+     * Sets .
+     */
     @Override
     public void setup() {
         AppLogger.setup();
@@ -73,6 +122,11 @@ public class DniParser extends PApplet {
         setupFileSystem();
     }
 
+    /**
+     * Gets app version.
+     *
+     * @return the app version
+     */
     private String getAppVersion() {
         Properties properties = new Properties();
         String version = "";
@@ -85,12 +139,18 @@ public class DniParser extends PApplet {
         return version;
     }
 
+    /**
+     * Register methods.
+     */
     private void registerMethods() {
         registerMethod("mouseEvent", this);
         registerMethod("keyEvent", this);
         registerMethod("pre", this);
     }
 
+    /**
+     * Init mvc objects.
+     */
     private void initMVCObjects() {
         appModel = new AppModel(JSONHandler.loadJSONObject(SETTINGS_FILEPATH));
         initViewConstants();
@@ -98,12 +158,18 @@ public class DniParser extends PApplet {
         currentController = new MainController(this, appModel, currentView);
     }
 
+    /**
+     * Init view constants.
+     */
     private void initViewConstants() {
         View.setWidthUnitSize(width / 16);
         View.setHeightUnitSize(height / 16);
         View.loadFonts(this);
     }
 
+    /**
+     * Sets file system.
+     */
     private void setupFileSystem() {
         File studentData = new File(DATA_BACKUP_FILEPATH);
         if (!studentData.exists()) {
@@ -111,36 +177,72 @@ public class DniParser extends PApplet {
         }
     }
 
+    /**
+     * Gets app model.
+     *
+     * @return the app model
+     */
     public AppModel getAppModel() {
         return appModel;
     }
 
+    /**
+     * Sets current view.
+     *
+     * @param currentView the current view
+     */
     public void setCurrentView(View currentView) {
         this.currentView = currentView;
     }
 
+    /**
+     * Gets current controller.
+     *
+     * @return the current controller
+     */
     public Controller getCurrentController() {
         return currentController;
     }
 
+    /**
+     * Sets current controller.
+     *
+     * @param currentController the current controller
+     */
     public void setCurrentController(Controller currentController) {
         this.currentController = currentController;
     }
 
+    /**
+     * Draw.
+     */
     @Override
     public void draw() {
         background(255);
         currentView.show();
     }
 
+    /**
+     * Mouse event.
+     *
+     * @param e the event
+     */
     public void mouseEvent(MouseEvent e) {
         currentController.handleMouseEvent(e);
     }
 
+    /**
+     * Key event.
+     *
+     * @param e the event
+     */
     public void keyEvent(KeyEvent e) {
         currentController.handleKeyEvent(e);
     }
 
+    /**
+     * Pre.
+     */
     public void pre() {
         if (w != width || h != height) {
             // Sketch window has resized
@@ -153,6 +255,11 @@ public class DniParser extends PApplet {
         }
     }
 
+    /**
+     * Select input file.
+     *
+     * @param selection the selection
+     */
     public void selectInputFile(File selection) {
         if (selection == null) {
             currentController.onContextMenuClosed(new File(""));
@@ -169,6 +276,11 @@ public class DniParser extends PApplet {
         currentController.setClosedContextMenu(true);
     }
 
+    /**
+     * Select output folder.
+     *
+     * @param folder the folder
+     */
     public void selectOutputFolder(File folder) {
         if (folder == null) {
             LOGGER.warning("[Error while selecting output folder]: No folder selected.");
@@ -184,6 +296,9 @@ public class DniParser extends PApplet {
         currentController.setClosedContextMenu(true);
     }
 
+    /**
+     * Exit.
+     */
     @Override
     public void exit() {
         currentController.onAppClosing();

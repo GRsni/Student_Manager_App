@@ -16,17 +16,32 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The type Util.
+ */
 public class Util {
+    /**
+     * The constant idPattern.
+     */
     private static final Pattern idPattern = Pattern.compile("u[0-9xXyYzZ][0-9]{7}");
 
-    private Util() {
-    }
-
+    /**
+     * Check id boolean.
+     *
+     * @param id the id
+     * @return the boolean
+     */
     public static boolean checkId(@NotNull String id) {
         Matcher m = idPattern.matcher(id);
         return m.matches();
     }
 
+    /**
+     * Extract id string.
+     *
+     * @param line the line
+     * @return the string
+     */
     public static String extractId(@NotNull String line) {
 
         Matcher m = idPattern.matcher(line);
@@ -39,6 +54,13 @@ public class Util {
         return match;
     }
 
+    /**
+     * Check file extension boolean.
+     *
+     * @param file the file
+     * @param ext  the ext
+     * @return the boolean
+     */
     public static boolean checkFileExtension(String file, String ext) {
         String fileExtension = PApplet.checkExtension(file);
         if (fileExtension == null) {
@@ -48,11 +70,24 @@ public class Util {
         }
     }
 
+    /**
+     * Gets sha 256 hashed string.
+     *
+     * @param plain the plain
+     * @return the sha 256 hashed string
+     */
     @NotNull
     public static String getSHA256HashedString(String plain) {
         return Hashing.sha256().hashString(plain, StandardCharsets.UTF_8).toString();
     }
 
+    /**
+     * Read from input stream string.
+     *
+     * @param inputStream the input stream
+     * @return the string
+     * @throws IOException the io exception
+     */
     public static String readFromInputStream(InputStream inputStream) throws IOException {
         StringBuilder resultStringBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
@@ -65,6 +100,13 @@ public class Util {
     }
 
 
+    /**
+     * Gets student attribute json object.
+     *
+     * @param students  the students
+     * @param attribute the attribute
+     * @return the student attribute json object
+     */
     public static JSONObject getStudentAttributeJSONObject(Set<Student> students, String attribute) {
         JSONObject jsonObject = new JSONObject();
         for (Student student : students) {
@@ -77,6 +119,13 @@ public class Util {
         return jsonObject;
     }
 
+    /**
+     * Student set to string set set.
+     *
+     * @param students the students
+     * @return the set
+     * @throws NullPointerException the null pointer exception
+     */
     public static Set<String> studentSetToStringSet(@NotNull Set<Student> students) throws NullPointerException {
         Set<String> stringSet = new HashSet<>();
         for (Student s : students) {
@@ -85,6 +134,14 @@ public class Util {
         return stringSet;
     }
 
+    /**
+     * Gets unique student set.
+     *
+     * @param set1 the set 1
+     * @param set2 the set 2
+     * @return the unique student set
+     * @throws NullPointerException the null pointer exception
+     */
     public static Set<Student> getUniqueStudentSet(Set<Student> set1, Set<Student> set2) throws NullPointerException {
         if (set1 == null || set2 == null) {
             throw new NullPointerException("Student set cannot be null");
@@ -106,6 +163,14 @@ public class Util {
         }
     }
 
+    /**
+     * Gets intersection of student sets.
+     *
+     * @param set1 the set 1
+     * @param set2 the set 2
+     * @return the intersection of student sets
+     * @throws NullPointerException the null pointer exception
+     */
     public static Set<Student> getIntersectionOfStudentSets(Set<Student> set1, Set<Student> set2) throws NullPointerException {
         if (set1 == null || set2 == null) {
             throw new NullPointerException("Student set cannot be null");

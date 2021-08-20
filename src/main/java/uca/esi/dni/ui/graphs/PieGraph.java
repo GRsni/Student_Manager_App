@@ -15,10 +15,24 @@ import uca.esi.dni.views.View;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * The type Pie graph.
+ */
 public class PieGraph extends Graph {
 
+    /**
+     * The Field.
+     */
     private final String field;
 
+    /**
+     * Instantiates a new Pie graph.
+     *
+     * @param parent    the parent
+     * @param rectangle the rectangle
+     * @param charTitle the char title
+     * @param field     the field
+     */
     public PieGraph(PApplet parent, Rectangle rectangle, String charTitle, String field) {
         super(parent, rectangle);
         this.chart = ChartFactory.createPieChart(
@@ -30,6 +44,9 @@ public class PieGraph extends Graph {
         this.field = field;
     }
 
+    /**
+     * Sets chart.
+     */
     @Override
     protected void setupChart() {
         chart.setBackgroundPaint(new Color(255, 255, 255, 0));
@@ -37,16 +54,32 @@ public class PieGraph extends Graph {
         ((PiePlot) this.chart.getPlot()).setLabelGenerator(getLabelGenerator());
     }
 
+    /**
+     * Update data.
+     *
+     * @param surveyList the survey list
+     */
     @Override
     public void updateData(List<Survey> surveyList) {
         ((PiePlot) this.chart.getPlot()).setDataset((PieDataset) createDataset(surveyList));
         this.chartImage = new PImage(this.chart.createBufferedImage(w, h));
     }
 
+    /**
+     * Gets label generator.
+     *
+     * @return the label generator
+     */
     private PieSectionLabelGenerator getLabelGenerator() {
         return new StandardPieSectionLabelGenerator("{0} ({2})");
     }
 
+    /**
+     * Create dataset dataset.
+     *
+     * @param surveyList the survey list
+     * @return the dataset
+     */
     @Override
     protected Dataset createDataset(List<Survey> surveyList) {
         final DefaultPieDataset dataset = new DefaultPieDataset();
@@ -58,6 +91,13 @@ public class PieGraph extends Graph {
         return dataset;
     }
 
+    /**
+     * Get combined data int [ ].
+     *
+     * @param surveyList the survey list
+     * @param field      the field
+     * @return the int [ ]
+     */
     private int[] getCombinedData(List<Survey> surveyList, String field) {
         int[] combined = new int[2];
         for (Survey survey : surveyList) {

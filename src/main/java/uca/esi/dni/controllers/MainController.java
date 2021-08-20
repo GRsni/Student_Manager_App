@@ -24,14 +24,30 @@ import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.EDIT;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.STATS;
 
+/**
+ * The type Main controller.
+ */
 public class MainController extends Controller {
+    /**
+     * The constant LOGGER.
+     */
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    /**
+     * Instantiates a new Main controller.
+     *
+     * @param parent the parent
+     * @param model  the model
+     * @param view   the view
+     */
     public MainController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
         onCreate();
     }
 
+    /**
+     * On create.
+     */
     @Override
     protected void onCreate() {
         if (model.getDbStudents().isEmpty() && !model.isDataFirstLoaded()) {
@@ -40,6 +56,11 @@ public class MainController extends Controller {
         }
     }
 
+    /**
+     * Handle mouse event.
+     *
+     * @param e the e
+     */
     @Override
     public void handleMouseEvent(MouseEvent e) {
         switch (e.getAction()) {
@@ -81,11 +102,19 @@ public class MainController extends Controller {
         controllerLogic();
     }
 
+    /**
+     * Handle key event.
+     *
+     * @param e the e
+     */
     @Override
     public void handleKeyEvent(KeyEvent e) {
         // There are no UI elements that need to handle key inputs in the main View
     }
 
+    /**
+     * Generate excel files button hook.
+     */
     public void generateExcelFilesButtonHook() {
         selectOutputFolder();
 
@@ -113,6 +142,9 @@ public class MainController extends Controller {
         }
     }
 
+    /**
+     * Select output folder.
+     */
     private void selectOutputFolder() {
         closedContextMenu = false;
 
@@ -122,6 +154,12 @@ public class MainController extends Controller {
         }
     }
 
+    /**
+     * Save lab tables.
+     *
+     * @param studentLabsMap the student labs map
+     * @param route          the route
+     */
     private void saveLabTables(Map<String, Map<String, Table>> studentLabsMap, File route) {
         String pathToFolder = route.getAbsolutePath() + File.separator + "datos" + File.separator;
         for (Map.Entry<String, Map<String, Table>> studentLabEntry : studentLabsMap.entrySet()) {
@@ -140,6 +178,11 @@ public class MainController extends Controller {
         LOGGER.info("[General information]: Generated all CSV files.");
     }
 
+    /**
+     * On context menu closed.
+     *
+     * @param folder the folder
+     */
     @Override
     public void onContextMenuClosed(File folder) {
         model.setOutputFolder(folder);

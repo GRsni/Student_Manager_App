@@ -22,19 +22,40 @@ import java.util.logging.Logger;
 import static processing.event.MouseEvent.*;
 import static uca.esi.dni.controllers.Controller.VIEW_STATES.MAIN;
 
+/**
+ * The type Stats controller.
+ */
 public class StatsController extends Controller {
+    /**
+     * The constant LOGGER.
+     */
     private static final Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
+    /**
+     * Instantiates a new Stats controller.
+     *
+     * @param parent the parent
+     * @param model  the model
+     * @param view   the view
+     */
     public StatsController(DniParser parent, AppModel model, View view) {
         super(parent, model, view);
         onCreate();
     }
 
+    /**
+     * On create.
+     */
     @Override
     protected void onCreate() {
         asyncLoadSurveysFromDB();
     }
 
+    /**
+     * Handle mouse event.
+     *
+     * @param e the e
+     */
     @Override
     public void handleMouseEvent(MouseEvent e) {
         int x = e.getX();
@@ -65,23 +86,39 @@ public class StatsController extends Controller {
         }
     }
 
+    /**
+     * Make screen shot.
+     */
     private void makeScreenShot() {
         parent.saveFrame("data/capturas/Captura-###.png");
         addWarning("Captura guardada en /data/capturas.", Warning.DURATION.MEDIUM, Warning.TYPE.INFO);
         LOGGER.info("[General information]: Captura de pantalla realizada.");
     }
 
+    /**
+     * Handle key event.
+     *
+     * @param e the e
+     */
     @Override
     public void handleKeyEvent(KeyEvent e) {
         //No need for key event handling in this view
     }
 
+    /**
+     * On context menu closed.
+     *
+     * @param file the file
+     */
     @Override
     public void onContextMenuClosed(File file) {
         //There are no context menus in this view
     }
 
 
+    /**
+     * Async load surveys from db.
+     */
     private void asyncLoadSurveysFromDB() {
         addWarning("Cargando.", Warning.DURATION.SHORTEST, Warning.TYPE.INFO);
         Runnable runnable = () -> {
@@ -110,6 +147,13 @@ public class StatsController extends Controller {
         thread.start();
     }
 
+    /**
+     * Generate survey list from json object list.
+     *
+     * @param surveysJSONObject the surveys json object
+     * @return the list
+     * @throws JSONParsingException the json parsing exception
+     */
     private List<Survey> generateSurveyListFromJSONObject(JSONObject surveysJSONObject)
             throws JSONParsingException {
         List<Survey> surveyList = new ArrayList<>();
