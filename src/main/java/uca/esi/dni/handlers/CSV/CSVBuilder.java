@@ -1,14 +1,15 @@
 package uca.esi.dni.handlers.CSV;
 
-import processing.data.JSONArray;
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
 import uca.esi.dni.handlers.JSON.JSONHandler;
 import uca.esi.dni.types.Pair;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -218,8 +219,6 @@ public class CSVBuilder implements CSVBuilderI {
                     row.setDouble(k, floatToUse);
                 } else if (JSONObject.NULL.equals(v)) {
                     row.setString(k, "null");
-                } else if (v instanceof JSONArray) {
-
                 } else {
                     String stringToUse = jsonObject.getString(k);
                     row.setString(k, stringToUse);
