@@ -1,4 +1,4 @@
-package uca.esi.dni.handlers.DB;
+package uca.esi.dni.handlers.db;
 
 
 import com.google.auth.oauth2.AccessToken;

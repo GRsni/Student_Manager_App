@@ -20,6 +20,10 @@ import java.util.regex.Pattern;
  * The type Util.
  */
 public class Util {
+
+    private Util() {
+    }
+
     /**
      * The constant idPattern.
      */

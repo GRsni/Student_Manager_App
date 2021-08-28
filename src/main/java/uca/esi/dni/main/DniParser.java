@@ -8,7 +8,7 @@ import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 import uca.esi.dni.controllers.Controller;
 import uca.esi.dni.controllers.MainController;
-import uca.esi.dni.handlers.JSON.JSONHandler;
+import uca.esi.dni.handlers.json.JSONHandler;
 import uca.esi.dni.handlers.Util;
 import uca.esi.dni.logger.AppLogger;
 import uca.esi.dni.models.AppModel;

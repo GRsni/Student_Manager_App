@@ -1,4 +1,4 @@
-package uca.esi.dni.handlers.CSV;
+package uca.esi.dni.handlers.csv;
 
 import processing.data.JSONObject;
 import processing.data.Table;

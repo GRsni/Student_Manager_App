@@ -1,4 +1,4 @@
-package uca.esi.dni.handlers.JSON;
+package uca.esi.dni.handlers.json;
 
 import org.jetbrains.annotations.NotNull;
 import processing.data.JSONObject;

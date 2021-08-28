@@ -1,9 +1,9 @@
-package uca.esi.dni.handlers.CSV;
+package uca.esi.dni.handlers.csv;
 
 import processing.data.JSONObject;
 import processing.data.Table;
 import processing.data.TableRow;
-import uca.esi.dni.handlers.JSON.JSONHandler;
+import uca.esi.dni.handlers.json.JSONHandler;
 import uca.esi.dni.types.Pair;
 
 import java.util.ArrayList;
